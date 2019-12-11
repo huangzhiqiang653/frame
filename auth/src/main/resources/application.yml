@@ -1,0 +1,31 @@
+spring:
+  profiles:
+    #根据环境进行切换，local本机，company公司环境 ...待扩展
+    active: local
+#####mybatis###配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.zx.*.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: true
+#mybatis热加载
+mybatis-refresh:
+  enable: true
+  delaySeconds: 5
+  sleepSeconds: 3
+  mappingPath: ibeas
+#逻辑删除配置
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  type-enums-package: com.zx.*.enums
+#引入日志配置文件
+#=====================================  log  =============================
+logging:
+  level:
+    com.baomidou.mybatisplus.samples.pagination: debug
+debug: true
+

@@ -1,0 +1,62 @@
+## 项目配置
+server:
+  port: 9072
+  servlet:
+    context-path: /ibeas
+################################数据库配置-start###############################
+spring:
+  datasource:
+    name: lzda_db
+    url: jdbc:p6spy:mysql://192.168.1.224:3306/fwfx_db?useUnicode=true&useSSL=false&characterEncoding=utf8
+    username: root
+    password: 123456
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+  ###邮件发送
+  mail:
+    default-encoding: UTF-8
+    # 邮箱地址
+    host: smtp.163.com
+    # 邮箱用户名
+    username: 15855172401@163.com
+    # 授权码
+    password: hzq15855172401
+    # 协议
+    protocol: smtp
+    # 端口号 不通使用465
+    port: 25
+    title: 来自法务风险管理系统--待办提醒
+################################数据库配置-end#################################
+
+################################FastDFS参数-start###############################
+fastdfs:
+  connect_timeout_in_seconds: 20
+  network_timeout_in_seconds: 30
+  charset: UTF-8
+  http_tracker_http_port: 8888
+  tracker_servers: 192.168.1.225:22122
+  http_anti_steal_token: no
+  http_secret_key: FastDFS1234567890
+  previewFileTempPath: /iflytek/fwfx/
+################################FastDFS-end#################################
+
+################################外部对接接口地址-start#################################
+interfaceUrl:
+  uap: http://172.31.199.65:10003/exchange-uap-service/uap
+  ps: http://172.31.199.65:10003/exchange-uap-service/uap
+################################外部对接接口地址-end###################################
+################################文件导出配置-start###################################
+file:
+  direction: /templates/
+  template:
+    nonLitigationCases: 流程编号,申请日期,申请人,纠纷发生法人主体,业务所在部门,对方名称,金额,纠纷类型,服务类型,服务人员,协作人员,是否外聘律师,律所名称,律师姓名,是否产生费用,费用总额,保全费,代理费,其他费用,案件简介,诉求,风险等级,案件分析,初步处理/答复意见,案件进展,回款/减损金额,案件小结,案件复盘,案件状态
+    litigationCases:
+    ibeas:
+################################文件导出配置-end#####################################
+
+################################线程池配置-start#####################################
+pool:
+  # 定时任务线程次
+  schedule: 10
+
+################################线程池配置-end#######################################
+
