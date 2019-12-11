@@ -1,11 +1,15 @@
-package com.zx.auth.sec;
+package com.zx.auth.generator;
 
+import com.zx.common.common.ExcelUtil;
+import com.zx.common.common.FreemarkerUtils;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +33,20 @@ public class GenerateVue {
         List<String> infoHandle = (List<String>) configMap.get("infoHandle");
         // 获取展示字段数据
         List<Map> fields = (List<Map>) configMap.get("showFields");
-        // TODO 相应的vue文件生成
-        log.trace("forTable");
+
+        Map<String, Object> map = new HashMap<>();
+        // map.put("article",article);
+        // map.put("comment",comment);
+        // map.put("replyLabel","回复");
+        String cmtTpl = FreemarkerUtils.getTemplate("table.ftl", map);
+        try {
+            ExcelUtil.setResponseHeader(response, tableName + "Table" + ".vue");
+            OutputStream os = response.getOutputStream();
+            os.write(cmtTpl.getBytes());
+            os.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void forForm(Map configMap, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -43,8 +59,21 @@ public class GenerateVue {
         List<String> handleList = (List<String>) configMap.get("handleList");
         // 获取表单字段数据
         List<Map> fields = (List<Map>) configMap.get("mainSelectFields");
-        // TODO 相应的vue文件生成
-        log.trace("forForm");
+        Map<String, Object> map = new HashMap<>();
+        // map.put("article",article);
+        // map.put("comment",comment);
+        // map.put("replyLabel","回复");
+        String cmtTpl = FreemarkerUtils.getTemplate("suvdasPage.ftl", map);
+        // String cmtTpl = FreemarkerUtils.getTemplate("suvdasDialog.ftl", map);
+        try {
+            ExcelUtil.setResponseHeader(response, tableName + "OperatePage" + ".vue");
+            // ExcelUtil.setResponseHeader(response, tableName + "OperateDialog" + ".vue");
+            OutputStream os = response.getOutputStream();
+            os.write(cmtTpl.getBytes());
+            os.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

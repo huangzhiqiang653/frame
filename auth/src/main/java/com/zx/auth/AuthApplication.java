@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @ComponentScan({
         "com.zx.*.sec",
+        "com.zx.*.generator",
         "com.zx.*.common",
         "com.zx.*.schedule",
         "com.zx.*.controller",
