@@ -7,76 +7,76 @@
         </el-breadcrumb>
         <!--查询区域-->
         <el-row class="margin-top-10">
-            <#list fields! as field>
-                <#switch field.fieldType>
-                    <#case "normal">
-                        <el-col :span="3" class="margin-top-10">
-                            <label class="search-label">
-                                ${field.filedNameCode?split("#")[0]!}:
-                            </label>
-                        </el-col>
-                        <el-col :span="4" class="margin-top-10">
-                            <el-input v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
-                                      :size="GLOBAL.config.systemSize"
-                                      placeholder="${field.filedNameCode?split("#")[0]!}"
-                                      maxlength="32"></el-input>
-                        </el-col>
-                        <#break>
-                    <#case "dictionary">
-                        <el-col :span="3" class="margin-top-10">
-                            <label class="search-label">
-                                ${field.filedNameCode?split("#")[0]!}:
-                            </label>
-                        </el-col>
-                        <el-col :span="3" class="margin-top-10">
-                            <el-select v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
-                                       :size="GLOBAL.config.systemSize"
-                                       placeholder="${field.filedNameCode?split("#")[0]!}"
-                                       style="width: 100%;"
-                            >
-                                <el-option label="--请选择--" value=""></el-option>
-                                <el-option :label="item.name" :value="item.code"
-                                           v-for="item in dictionary.${(field.remark?length gt 0)?string(field.remark, field.filedNameCode?split("#")[1])}"
-                                           :key="item.id"></el-option>
-                            </el-select>
-                        </el-col>
-                        <#break>
-                    <#case "dateTime">
-                        <el-col :span="3" class="margin-top-10">
-                            <label class="search-label">
-                                ${field.filedNameCode?split("#")[0]!}:
-                            </label>
-                        </el-col>
-                        <el-col :span="5" class="margin-top-10">
-                            <el-date-picker
-                                    v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
-                                    :size="GLOBAL.config.systemSize"
-                                    type="daterange"
-                                    align="right"
-                                    unlink-panels
-                                    format="${(field.remark?length gt 0)?string(field.remark,"yyyy-MM-dd")}"
-                                    value-format="${(field.remark?length gt 0)?string(field.remark,"yyyy-MM-dd")}"
-                                    range-separator="至"
-                                    start-placeholder="开始"
-                                    end-placeholder="结束"
-                                    style="width: 100%;">
-                            </el-date-picker>
-                        </el-col>
-                        <#break>
-                    <#default>
-                        <el-col :span="3" class="margin-top-10">
-                            <label class="search-label">
-                                ${field.filedNameCode?split("#")[0]!}:
-                            </label>
-                        </el-col>
-                        <el-col :span="4" class="margin-top-10">
-                            <el-input v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
-                                      :size="GLOBAL.config.systemSize"
-                                      placeholder="${field.filedNameCode?split("#")[0]!}"
-                                      maxlength="32"></el-input>
-                        </el-col>
-                </#switch>
-            </#list>
+    <#list fields! as field>
+    <#switch field.fieldType>
+        <#case "normal">
+            <el-col :span="3" class="margin-top-10">
+                <label class="search-label">
+                    ${field.filedNameCode?split("#")[0]!}:
+                </label>
+            </el-col>
+            <el-col :span="4" class="margin-top-10">
+                <el-input v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
+                          :size="GLOBAL.config.systemSize"
+                          placeholder="${field.filedNameCode?split("#")[0]!}"
+                          maxlength="32"></el-input>
+            </el-col>
+            <#break>
+        <#case "dictionary">
+            <el-col :span="3" class="margin-top-10">
+                <label class="search-label">
+                    ${field.filedNameCode?split("#")[0]!}:
+                </label>
+            </el-col>
+            <el-col :span="3" class="margin-top-10">
+                <el-select v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
+                           :size="GLOBAL.config.systemSize"
+                           placeholder="${field.filedNameCode?split("#")[0]!}"
+                           style="width: 100%;"
+                >
+                    <el-option label="--请选择--" value=""></el-option>
+                    <el-option :label="item.name" :value="item.code"
+                               v-for="item in dictionary.${(field.remark?length gt 0)?string(field.remark, field.filedNameCode?split("#")[1])}"
+                               :key="item.id"></el-option>
+                </el-select>
+            </el-col>
+            <#break>
+        <#case "dateTime">
+            <el-col :span="3" class="margin-top-10">
+                <label class="search-label">
+                    ${field.filedNameCode?split("#")[0]!}:
+                </label>
+            </el-col>
+            <el-col :span="5" class="margin-top-10">
+                <el-date-picker
+                        v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
+                        :size="GLOBAL.config.systemSize"
+                        type="daterange"
+                        align="right"
+                        unlink-panels
+                        format="${(field.remark?length gt 0)?string(field.remark,"yyyy-MM-dd")}"
+                        value-format="${(field.remark?length gt 0)?string(field.remark,"yyyy-MM-dd")}"
+                        range-separator="至"
+                        start-placeholder="开始"
+                        end-placeholder="结束"
+                        style="width: 100%;">
+                </el-date-picker>
+            </el-col>
+            <#break>
+        <#default>
+            <el-col :span="3" class="margin-top-10">
+                <label class="search-label">
+                    ${field.filedNameCode?split("#")[0]!}:
+                </label>
+            </el-col>
+            <el-col :span="4" class="margin-top-10">
+                <el-input v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
+                          :size="GLOBAL.config.systemSize"
+                          placeholder="${field.filedNameCode?split("#")[0]!}"
+                          maxlength="32"></el-input>
+            </el-col>
+    </#switch>
+    </#list>
             <#--导入导出查询按钮-->
             <el-col :span="2" class="margin-top-10">
                 <el-button type="primary" @click="doSearch" :size="GLOBAL.config.systemSize" icon="el-icon-search">查询
@@ -86,42 +86,42 @@
         <el-row class="margin-top-20">
             <#--列表操作按钮-->
             <el-col :span="24" style="float: left;">
-                <#list tableHandleList! as tableHandle>
-                    <#switch tableHandle>
-                        <#case "deleteBatch">
-                            <el-button v-if="source.deleteBatch"
-                                       type="danger"
-                                       icon="el-icon-delete"
-                                       :size="GLOBAL.config.systemSize"
-                                       @click="deleteBatch">批量删除
-                            </el-button>
-                            <#break>
-                        <#case "addInfo">
-                            <el-button v-if="source.add"
-                                       type="primary"
-                                       icon="el-icon-plus"
-                                       :size="GLOBAL.config.systemSize"
-                                       @click="addData">新增
-                            </el-button>
-                            <#break>
-                        <#case "export">
-                            <el-button v-if="source.export"
-                                       type="primary"
-                                       icon="el-icon-download"
-                                       :size="GLOBAL.config.systemSize"
-                                       @click="exportTableData">导出
-                            </el-button>
-                            <#break>
-                        <#case "import">
-                            <el-button v-if="source.import"
-                                       type="primary"
-                                       icon="el-icon-download"
-                                       :size="GLOBAL.config.systemSize"
-                                       @click="importTableData">导入
-                            </el-button>
-                            <#break>
-                    </#switch>
-                </#list>
+    <#list tableHandleList! as tableHandle>
+        <#switch tableHandle>
+            <#case "deleteBatch">
+                <el-button v-if="source.deleteBatch"
+                           type="danger"
+                           icon="el-icon-delete"
+                           :size="GLOBAL.config.systemSize"
+                           @click="deleteBatch">批量删除
+                </el-button>
+                <#break>
+            <#case "addInfo">
+                <el-button v-if="source.add"
+                           type="primary"
+                           icon="el-icon-plus"
+                           :size="GLOBAL.config.systemSize"
+                           @click="operationMethod('add')">新增
+                </el-button>
+                <#break>
+            <#case "export">
+                <el-button v-if="source.export"
+                           type="primary"
+                           icon="el-icon-download"
+                           :size="GLOBAL.config.systemSize"
+                           @click="exportTableData">导出
+                </el-button>
+                <#break>
+            <#case "import">
+                <el-button v-if="source.import"
+                           type="primary"
+                           icon="el-icon-download"
+                           :size="GLOBAL.config.systemSize"
+                           @click="importTableData">导入
+                </el-button>
+                <#break>
+        </#switch>
+    </#list>
             </el-col>
         </el-row>
         <el-table style="width: 100%"
@@ -206,8 +206,7 @@
                 :fullscreen="true"
                 :show-close="false"
                 :visible.sync="operationVisibleFlag"
-                :destroy-on-close="true"
-        >
+                :destroy-on-close="true">
             <operationTemplate
                     ref="operationTemplate"
                     :refresh="init"
@@ -217,16 +216,17 @@
     </div>
 </template>
 <script>
-    import operationTemplate from './operationTemplate'
+    // 替换成相应的模板
+    import operationTemplate from './${tableName!}Table'
 
     export default {
-        name: 'Case',
+        name: '${tableName!}',
         data() {
             return {
                 // 查询表单
                 searchForm: {
                     <#list fields! as field>
-                    ${field.filedNameCode?split("#")[1] + ","}
+                    ${field.filedNameCode?split("#")[1] + ": '',"}
                     </#list>
                 },
                 // 字典数据
@@ -240,7 +240,7 @@
                 </#switch>
                 </#list>
                 },
-            //资源权限控制，有的系统不需这么细，则全部为true
+                // 资源权限控制，有的系统不需这么细，则全部为true
                 source: {
                     deleteBatch: true,
                     add: true,
@@ -256,17 +256,23 @@
                     currentPage: 1
                 },
                 operationVisibleFlag: false,
-                deletebatchList:{
+                <#list tableHandleList! as tableHandle>
+                <#switch tableHandle>
+                <#case "deleteBatch">
+                deleteBatchList: {
                     ids: [],
                     deleteFlag: false
                 },
+                <#break>
+                </#switch>
+                </#list>
                 loading: false
             }
         },
         components: {
             operationTemplate
         },
-        mounted() {
+        mounted () {
             this.init()
         },
         methods: {
@@ -277,38 +283,43 @@
             doSearch: function () {
                 this.getTableData('init')
             },
-            addData: function () {
+            operationMethod: function (operateType, info) {
                 this.operationVisibleFlag = true
             },
+            <#list tableHandleList! as tableHandle>
+            <#switch tableHandle>
+            <#case "deleteBatch">
             deleteBatch: function () {
                 let _this = this
                 _this.$confirm('确认删除当前选择' +
-                    '的' + _this.deletebatchList.ids.length + '条数据？？', '提示', {
+                    '的' + _this.deleteBatchList.ids.length + '条数据？？', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                }).then(() = > {
+                }).then(() => {
                     _this.loading = true
                     _this.FUNCTIONS.systemFunction.interactiveData(
                         _this,
-                        _this.GLOBAL.config.businessFlag.case,
+                        _this.GLOBAL.config.businessFlag.${tableName!},
                         _this.GLOBAL.config.handleType.deleteLogicalBatch,
-                        _this.deletebatchList.ids,
+                        _this.deleteBatchList.ids,
                         'list',
-                        resultData = > {
-                        _this.loading = false
-                        if(resultData) {
-                            _this.$message.success('删除成功～')
-                            _this.getTableData('init')
-                        } else {
-                            _this.$message.warning('删除失败～')
+                        resultData => {
+                            _this.loading = false
+                            if (resultData) {
+                                _this.$message.success('删除成功～')
+                                _this.getTableData('init')
+                            } else {
+                                _this.$message.warning('删除失败～')
+                            }
                         }
-                    }
-            )
-            })
+                    )
+                })
             },
+            <#break>
+            </#switch>
+            </#list>
             getSource: function (rowData) {
-                // TODO 根据uap返回数据，及rowData来进行分配
                 return [
                     {icon: 'el-icon-edit', title: '编辑', method: 'handleEdit'},
                     {icon: 'el-icon-view', title: '查看', method: 'handleView'},
@@ -319,10 +330,10 @@
             handleCommon: function (type, rowData) {
                 switch (type) {
                     case 'handleEdit':
-                        this.handleEdit(rowData)
+                        this.operationMethod('edit', rowData)
                         break
                     case 'handleView':
-                        this.handleView(rowData)
+                        this.operationMethod('view', rowData)
                         break
                     case 'handleDelete':
                         this.handleDelete(rowData)
@@ -335,25 +346,25 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
-                }).then(() = > {
+                }).then(() => {
                     _this.loading = true
                     _this.FUNCTIONS.systemFunction.interactiveData(
                         _this,
-                        _this.GLOBAL.config.businessFlag.case,
+                        _this.GLOBAL.config.businessFlag.${tableName!},
                         _this.GLOBAL.config.handleType.deleteLogical,
                         rowData.id,
                         null,
-                        resultData = > {
-                        _this.loading = false
-                        if(resultData) {
-                            _this.$message.success('删除成功～')
-                            _this.getTableData('init')
-                        } else {
-                            _this.$message.warning('删除失败～')
+                        resultData => {
+                            _this.loading = false
+                            if (resultData) {
+                                _this.$message.success('删除成功～')
+                                _this.getTableData('init')
+                            } else {
+                                _this.$message.warning('删除失败～')
+                            }
                         }
-                    }
-            )
-            })
+                    )
+                })
             },
             // 获取列表
             getTableData: function (initPageFlag) {
@@ -364,16 +375,16 @@
                     initPageFlag ? 1 : _this.pagination.currentPage,
                     initPageFlag ? 10 : _this.pagination.pageSize,
                     searchParams)
-                //3、 调接口获取数据
+                // 3、 调接口获取数据
                 _this.FUNCTIONS.systemFunction.interactiveData(
                     _this,
-                    _this.GLOBAL.config.businessFlag.case,
+                    _this.GLOBAL.config.businessFlag.${tableName!},
                     _this.GLOBAL.config.handleType.getPage,
                     paginationData,
                     null,
-                    resultData = > {
+                    resultData => {
                     _this.loading = false
-                    if(resultData) {
+                    if (resultData) {
                         // 结果参数赋值
                         _this.pagination.pageSize = resultData.size
                         _this.pagination.total = resultData.total
@@ -384,8 +395,6 @@
                     }
                 }
             )
-
-                // table及分页数据赋值
             },
             // 分页方法
             tableSizeChange: function (pageSize) {
@@ -396,35 +405,50 @@
                 this.pagination.currentPage = current
                 this.getTableData()
             },
+            <#list tableHandleList! as tableHandle>
+            <#switch tableHandle>
+            <#case "deleteBatch">
             // 复选框选择事件
             tableSelectionChange: function (targetList) {
                 let ids = []
-                targetList.forEach(item = > {
+                targetList.forEach(item => {
                     ids.push(item.id)
-                }
-            )
-                this.deletebatchList.ids = ids
-                if (this.deletebatchList.ids &&
-                    this.deletebatchList.ids.length > 0) {
-                    this.deletebatchList.deleteFlag = true
+                })
+                this.deleteBatchList.ids = ids
+                if (this.deleteBatchList.ids &&
+                    this.deleteBatchList.ids.length > 0) {
+                    this.deleteBatchList.deleteFlag = true
                 } else {
-                    this.deletebatchList.deleteFlag = false
+                    this.deleteBatchList.deleteFlag = false
                 }
-
             },
+            <#break>
+            </#switch>
+            </#list>
+            <#list tableHandleList! as tableHandle>
+            <#switch tableHandle>
+            <#case "export">
             // 列表数据导出
             exportTableData: function () {
-                // 1、获取查询条件内容
                 let _this = this, searchParams = this.searchForm
                 _this.FUNCTIONS.systemFunction.removeNullFields(searchParams)
-                //2、 获取当前展示tab,并赋值
-                let selectTab = _this.tabSelect
-                searchParams.caseStatus = selectTab
                 this.FUNCTIONS.systemFunction.postDownFile(this, {
                     type: 'litigationCasesServiceImpl.downFile',
                     info: searchParams
                 })
+            },
+            <#break>
+            </#switch>
+            </#list>
+            <#list tableHandleList! as tableHandle>
+            <#switch tableHandle>
+            <#case "import">
+            importTableData: function () {
+                // TODO
             }
+            <#break>
+            </#switch>
+            </#list>
         }
     }
 </script>
