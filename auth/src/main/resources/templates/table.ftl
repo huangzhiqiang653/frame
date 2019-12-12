@@ -1,4 +1,5 @@
 <!--${fileDesc!}-->
+<!--参数添加，1、模块参数：${tableName!}-->
 <template>
     <div class="main-area">
         <el-breadcrumb separator=":">
@@ -10,7 +11,7 @@
     <#list fields! as field>
     <#switch field.fieldType>
         <#case "normal">
-            <el-col :span="3" class="margin-top-10">
+            <el-col :span="2" class="margin-top-10">
                 <label class="search-label">
                     ${field.filedNameCode?split("#")[0]!}:
                 </label>
@@ -23,12 +24,12 @@
             </el-col>
             <#break>
         <#case "dictionary">
-            <el-col :span="3" class="margin-top-10">
+            <el-col :span="2" class="margin-top-10">
                 <label class="search-label">
                     ${field.filedNameCode?split("#")[0]!}:
                 </label>
             </el-col>
-            <el-col :span="3" class="margin-top-10">
+            <el-col :span="4" class="margin-top-10">
                 <el-select v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
                            :size="GLOBAL.config.systemSize"
                            placeholder="${field.filedNameCode?split("#")[0]!}"
@@ -42,12 +43,12 @@
             </el-col>
             <#break>
         <#case "dateTime">
-            <el-col :span="3" class="margin-top-10">
+            <el-col :span="2" class="margin-top-10">
                 <label class="search-label">
                     ${field.filedNameCode?split("#")[0]!}:
                 </label>
             </el-col>
-            <el-col :span="5" class="margin-top-10">
+            <el-col :span="6" class="margin-top-10">
                 <el-date-picker
                         v-model="searchForm.${field.filedNameCode?split("#")[1]!}"
                         :size="GLOBAL.config.systemSize"
@@ -64,7 +65,7 @@
             </el-col>
             <#break>
         <#default>
-            <el-col :span="3" class="margin-top-10">
+            <el-col :span="2" class="margin-top-10">
                 <label class="search-label">
                     ${field.filedNameCode?split("#")[0]!}:
                 </label>
@@ -85,7 +86,7 @@
         </el-row>
         <el-row class="margin-top-20">
             <#--列表操作按钮-->
-            <el-col :span="24" style="float: left;">
+            <el-col :span="24">
     <#list tableHandleList! as tableHandle>
         <#switch tableHandle>
             <#case "deleteBatch">
@@ -93,6 +94,7 @@
                            type="danger"
                            icon="el-icon-delete"
                            :size="GLOBAL.config.systemSize"
+                           style="float: left;"
                            @click="deleteBatch">批量删除
                 </el-button>
                 <#break>
@@ -101,6 +103,7 @@
                            type="primary"
                            icon="el-icon-plus"
                            :size="GLOBAL.config.systemSize"
+                           style="float: left;"
                            @click="operationMethod('add')">新增
                 </el-button>
                 <#break>
@@ -109,6 +112,7 @@
                            type="primary"
                            icon="el-icon-download"
                            :size="GLOBAL.config.systemSize"
+                           style="float: left;"
                            @click="exportTableData">导出
                 </el-button>
                 <#break>
@@ -117,6 +121,7 @@
                            type="primary"
                            icon="el-icon-download"
                            :size="GLOBAL.config.systemSize"
+                           style="float: left;"
                            @click="importTableData">导入
                 </el-button>
                 <#break>
@@ -125,7 +130,7 @@
             </el-col>
         </el-row>
         <el-table style="width: 100%"
-                  :data="tableData.working"
+                  :data="tableData"
                   @selection-change="tableSelectionChange"
                   element-loading-text="数据处理中...请稍等..."
                   v-loading="loading">
@@ -221,7 +226,7 @@
 
     export default {
         name: '${tableName!}',
-        data() {
+        data () {
             return {
                 // 查询表单
                 searchForm: {
@@ -229,6 +234,7 @@
                     ${field.filedNameCode?split("#")[1] + ": '',"}
                     </#list>
                 },
+                tableData: [],
                 // 字典数据
                 dictionary: {
                 <#list fields! as field>
