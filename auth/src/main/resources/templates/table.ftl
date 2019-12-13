@@ -468,17 +468,20 @@
                     paginationData,
                     null,
                     resultData => {
-                    _this.loading = false
-                    if (resultData) {
-                        // 结果参数赋值
-                        _this.pagination.pageSize = resultData.size
-                        _this.pagination.total = resultData.total
-                        _this.pagination.currentPage = resultData.current
-                        _this.tableData = resultData.records
-                    } else {
-                        _this.$message.warning('获取列表数据失败～')
+                        _this.loading = false
+                        if (resultData) {
+                            // 结果参数赋值
+                            _this.pagination.pageSize = resultData.size
+                            _this.pagination.total = resultData.total
+                            _this.pagination.currentPage = resultData.current
+                            _this.tableData = resultData.records
+                        } else {
+                            _this.$message.warning('获取列表数据失败～')
+                        }
+                    },
+                    () => {
+                        _this.loading = false
                     }
-                }
             )
             },
             // 分页方法
