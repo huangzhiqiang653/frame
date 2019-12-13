@@ -35,9 +35,16 @@ public class GenerateVue {
         List<Map> fields = (List<Map>) configMap.get("showFields");
 
         Map<String, Object> map = new HashMap<>();
-        // map.put("article",article);
-        // map.put("comment",comment);
-        // map.put("replyLabel","回复");
+        // 基本信息赋值
+        map.put("tableName", tableName);
+        map.put("tableComment", tableComment.substring(0, tableComment.length() - 1) + "列表");
+        map.put("fileDesc", tableDb + "." + tableFullName + "（" + tableComment + "）-table");
+        // 字段信息赋值
+        map.put("fields", fields);
+        // 操作信息赋值
+        map.put("tableHandleList", tableHandle);
+        // 单条数据操作
+        map.put("infoHandleList", infoHandle);
         String cmtTpl = FreemarkerUtils.getTemplate("table.ftl", map);
         try {
             ExcelUtil.setResponseHeader(response, tableName + "Table" + ".vue");

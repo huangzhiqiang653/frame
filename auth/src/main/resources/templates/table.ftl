@@ -1,5 +1,6 @@
 <!--${fileDesc!}-->
-<!--参数添加，1、模块参数：${tableName!}-->
+<!--参数添加，1、config.js business中添加：${tableName!}: '后台地址'-->
+<!--参数添加，2、global.js businessFlag中添加：${tableName!}: '${tableName!}'-->
 <template>
     <div class="main-area">
         <el-breadcrumb separator=":">
@@ -179,6 +180,7 @@
             <el-table-column prop="${field.filedNameCode?split("#")[1]!}" label="${field.filedNameCode?split("#")[0]!}" align="center"/>
                 </#switch>
             </#list>
+            <#if (infoHandleList?size > 0)>
             <el-table-column prop="scope" label="操作" align="center">
                 <template slot-scope="scope">
                     <el-dropdown>
@@ -195,6 +197,7 @@
                     </el-dropdown>
                 </template>
             </el-table-column>
+            </#if>
         </el-table>
         <el-pagination
                 class="margin-top-10 margin-bottom-20"
@@ -251,7 +254,12 @@
                     deleteBatch: true,
                     add: true,
                     import: true,
-                    export: true
+                    export: true,
+                    infoEdit: true,
+                    infoView: true,
+                    infoDelete: true,
+                    infoApproval: true,
+                    infoSubmit: true
                 },
                 // 分页参数
                 pagination: {
@@ -325,27 +333,82 @@
             <#break>
             </#switch>
             </#list>
+            <#if (infoHandleList?size > 0)>
             getSource: function (rowData) {
+                let tempList = []
                 return [
-                    {icon: 'el-icon-edit', title: '编辑', method: 'handleEdit'},
-                    {icon: 'el-icon-view', title: '查看', method: 'handleView'},
-                    {icon: 'el-icon-delete', title: '删除', method: 'handleDelete'},
-                    {icon: 'el-icon-bell', title: '提醒', method: 'handleRemind'}
+                    <#list infoHandleList! as infoHandle>
+                    <#switch infoHandle>
+                    <#case "edit">
+                    this.source.infoEdit && tempList.push({icon: 'el-icon-edit', title: '编辑', method: 'handleEdit'}),
+                    <#break>
+                    <#case "view">
+                    this.source.infoView && tempList.push({icon: 'el-icon-view', title: '查看', method: 'handleView'}),
+                    <#break>
+                    <#case "deleteInfo">
+                    this.source.infoDelete && tempList.push({icon: 'el-icon-delete', title: '删除', method: 'handleDelete'}),
+                    <#break>
+                    <#case "approval">
+                    this.source.infoApproval && tempList.push({icon: 'el-icon-bell', title: '审批', method: 'handleApproval'}),
+                    <#break>
+                    <#case "submit">
+                    this.source.infoSubmit && tempList.push({icon: 'el-icon-bell', title: '提交', method: 'handleSubmit'}),
+                    <#break>
+                    </#switch>
+                    </#list>
                 ]
             },
             handleCommon: function (type, rowData) {
                 switch (type) {
+                    <#list infoHandleList! as infoHandle>
+                    <#switch infoHandle>
+                    <#case "edit">
                     case 'handleEdit':
-                        this.operationMethod('edit', rowData)
+                        this.handleEdit(rowData)
                         break
+                    <#break>
+                    <#case "view">
                     case 'handleView':
-                        this.operationMethod('view', rowData)
+                        this.handleView(rowData)
                         break
+                    <#break>
+                    <#case "deleteInfo">
                     case 'handleDelete':
                         this.handleDelete(rowData)
                         break
+                    <#break>
+                    <#case "approval">
+                    case 'handleApproval':
+                        this.handleApproval(rowData)
+                        break
+                    <#break>
+                    <#case "submit">
+                    case 'handleSubmit':
+                        this.handleSubmit(rowData)
+                        break
+                    <#break>
+                    </#switch>
+                    </#list>
                 }
             },
+            <#list infoHandleList! as infoHandle>
+            <#switch infoHandle>
+            <#case "edit">
+            // 编辑
+            handleEdit: function (rowData) {
+                this.operationMethod('edit', rowData)
+                // TODO
+            },
+            <#break>
+            <#case "view">
+            // 查看
+            handleView: function (rowData) {
+                this.operationMethod('view', rowData)
+                // TODO
+            },
+            <#break>
+            <#case "deleteInfo">
+            // 单条数据删除
             handleDelete: function (rowData) {
                 let _this = this
                 _this.$confirm('确认删除当前数据？？', '提示', {
@@ -372,6 +435,22 @@
                     )
                 })
             },
+            <#break>
+            <#case "approval">
+            // 审批
+            handleApproval: function (rowData) {
+                // TODO
+            },
+            <#break>
+            <#case "submit">
+            // 提交
+            handleSubmit: function (rowData) {
+                // TODO
+            },
+            <#break>
+            </#switch>
+            </#list>
+            </#if>
             // 获取列表
             getTableData: function (initPageFlag) {
                 this.loading = true
