@@ -6,8 +6,8 @@ server:
 ################################数据库配置-start###############################
 spring:
   datasource:
-    name: lzda_db
-    url: jdbc:p6spy:mysql://localhost:3306/fwfx_db?useUnicode=true&useSSL=false&characterEncoding=utf8
+    name: fwfx_db
+    url: jdbc:p6spy:mysql://localhost:3306/zx_frame_db?useUnicode=true&useSSL=false&characterEncoding=utf8
     username: root
     password: root
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver

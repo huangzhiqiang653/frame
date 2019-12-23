@@ -6,7 +6,7 @@ server:
 ################################数据库配置-start###############################
 spring:
   datasource:
-    name: lzda_db
+    name: fwfx_db
     url: jdbc:p6spy:mysql://192.168.1.224:3306/fwfx_db?useUnicode=true&useSSL=false&characterEncoding=utf8
     username: root
     password: 123456

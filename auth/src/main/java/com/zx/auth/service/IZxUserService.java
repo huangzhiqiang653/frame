@@ -1,7 +1,9 @@
 package com.zx.auth.service;
 
-import com.zx.auth.entity.ZxUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zx.auth.entity.ZxUser;
+import com.zx.common.common.RequestBean;
+import com.zx.common.common.ResponseBean;
 
 /**
  * <p>
@@ -12,5 +14,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2019-12-04
  */
 public interface IZxUserService extends IService<ZxUser> {
+    /**
+     * 公共基础方法
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean base(RequestBean requestBean);
 
 }
