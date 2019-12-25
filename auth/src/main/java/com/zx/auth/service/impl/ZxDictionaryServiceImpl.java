@@ -1,6 +1,5 @@
 package com.zx.auth.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -143,9 +144,12 @@ public class ZxDictionaryServiceImpl extends ServiceImpl<ZxDictionaryMapper, ZxD
      * @return
      */
     public ResponseBean getListByCondition(RequestBean requestBean) {
-        Wrapper queryWrapper = new QueryWrapper();
-        // TODO 添加查询条件
-
+        QueryWrapper<ZxDictionary> queryWrapper = new QueryWrapper<ZxDictionary>();
+        queryWrapper.orderByAsc("sort");
+        ZxDictionary zxDictionary = BaseHzq.convertValue(requestBean.getInfo(), ZxDictionary.class);
+        if (!StringUtils.isEmpty(zxDictionary.getParentCode())) {
+            queryWrapper.eq("parent_code", zxDictionary.getParentCode());
+        }
         return new ResponseBean(this.list(queryWrapper));
     }
 
@@ -170,9 +174,18 @@ public class ZxDictionaryServiceImpl extends ServiceImpl<ZxDictionaryMapper, ZxD
         if (StringUtils.isEmpty(page)) {
             page = new Page();
         }
-        Wrapper queryWrapper = new QueryWrapper();
-        // TODO 添加查询条件
-
+        QueryWrapper<ZxDictionary> queryWrapper = new QueryWrapper<ZxDictionary>();
+        queryWrapper.orderByAsc("sort");
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        ZxDictionary zxDictionary = BaseHzq.convertValue(queryMap, ZxDictionary.class);
+        queryWrapper.isNull("parent_id");
+        queryWrapper.isNull("parent_code");
+        if (!StringUtils.isEmpty(zxDictionary.getName())) {
+            queryWrapper.like("name", zxDictionary.getName());
+        }
+        if (!StringUtils.isEmpty(zxDictionary.getCode())) {
+            queryWrapper.like("code", zxDictionary.getCode());
+        }
         return new ResponseBean(this.page(page, queryWrapper));
     }
 }

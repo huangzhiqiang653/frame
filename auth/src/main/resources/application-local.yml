@@ -6,7 +6,7 @@ server:
 ################################数据库配置-start###############################
 spring:
   datasource:
-    name: fwfx_db
+    name: zx_frame_db
     url: jdbc:p6spy:mysql://localhost:3306/zx_frame_db?useUnicode=true&useSSL=false&characterEncoding=utf8
     username: root
     password: root
