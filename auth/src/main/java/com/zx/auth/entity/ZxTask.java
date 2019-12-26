@@ -2,12 +2,13 @@ package com.zx.auth.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zx.common.common.BaseEntityBean;
-import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("auth_zx_task")
-@ApiModel(value="ZxTask对象", description="定时任务")
+@ApiModel(value = "ZxTask对象", description = "定时任务")
 public class ZxTask extends BaseEntityBean {
 
     private static final long serialVersionUID = 1L;
@@ -36,7 +37,7 @@ public class ZxTask extends BaseEntityBean {
     private String targetMethod;
 
     @ApiModelProperty(value = "执行时间")
-    private LocalDateTime executeTime;
+    private Date executeTime;
 
     @ApiModelProperty(value = "时间正则")
     private String timeRegular;

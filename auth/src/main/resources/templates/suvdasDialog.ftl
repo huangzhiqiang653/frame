@@ -1,6 +1,6 @@
 <!--${fileDesc!}-->
 <template>
-    <div class="main-area">
+    <el-dialog :title="showTitle" :visible.sync="showFlag">
         <el-form
                 :inline="true"
                 :model="formData"
@@ -187,23 +187,21 @@
                 </el-col>
                 </#if>
             </el-row>
-            <el-row class="margin-top-20">
-                <el-button @click="closeDialog" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">关闭</el-button>
-                <#if saveFlag??>
-                <el-button type="primary" @click="saveForm" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">保存</el-button>
-                </#if>
-                <#if updateFlag??>
-                <el-button type="primary" @click="updateForm" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">保存修改</el-button>
-                </#if>
-                <#if submitFlag??>
-                <el-button type="primary" @click="submitForm" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">提交</el-button>
-                </#if>
-                <#if approvalFlag??>
-                <el-button type="primary" @click="approvalForm" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">审批</el-button>
-                </#if>
-            </el-row>
         </el-form>
-    </div>
+        <el-row class="margin-top-20">
+            <el-button @click="closeDialog" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">关闭</el-button>
+            <#if saveFlag?? || updateFlag??>
+                <el-button v-if="editableFlag" type="primary" @click="saveOrUpdateForm" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">保存
+                </el-button>
+            </#if>
+            <#if submitFlag??>
+                <el-button type="primary" @click="submitForm" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">提交</el-button>
+            </#if>
+            <#if approvalFlag??>
+                <el-button type="primary" @click="approvalForm" style="margin: 0 20px;" :size="GLOBAL.config.systemSize">审批</el-button>
+            </#if>
+        </el-row>
+    </el-dialog>
 </template>
 <script>export default {
         name: '${tableName!}',
@@ -253,20 +251,34 @@
                 <#if viewFlag??>
                 editableFlag: true,
                 </#if>
-                loading: false
+                loading: false,
+                showTitle: '新增',
+                showFlag: false
             }
         },
-        mounted () {
-            this.init()
-        },
         methods: {
-            init: function () {
-                <#if updateFlag??||viewFlag??>
-                this.getInfo()
-                </#if>
+            init: function (type, id) {
+                let _title = ''
+                if (type === 'add') {
+                    _title = '新增'
+                } else if (type === 'edit') {
+                    _title = '编辑'
+                } else if (type === 'view') {
+                    _title = '查看'
+                    this.editableFlag = false
+                }
+                this.showTitle = this.showTitle || _title
+                this.showFlag = true
+                if (id) {
+                    this.formData.id = id
+                    this.getInfo()
+                }
             },
             closeDialog: function () {
-                this.$props.closeSelf && this.$props.closeSelf()
+                this.showFlag = false
+            },
+            saveOrUpdateForm: function () {
+                this.formData.id ? this.updateForm() : this.saveForm()
             },
             <#if saveFlag??>
             saveForm: function () {
@@ -288,6 +300,8 @@
                                 _this.loading = false
                                 if (resultData) {
                                     _this.$message.success('保存成功～')
+                                    _this.showFlag = false
+                                    _this.$props.refresh && this.$props.refresh('init')
                                 } else {
                                     _this.$message.warning('保存失败～')
                                 }
@@ -322,6 +336,8 @@
                                 _this.loading = false
                                 if (resultData) {
                                     _this.$message.success('修改成功～')
+                                    _this.showFlag = false
+                                    _this.$props.refresh && this.$props.refresh('init')
                                 } else {
                                     _this.$message.warning('修改失败～')
                                 }

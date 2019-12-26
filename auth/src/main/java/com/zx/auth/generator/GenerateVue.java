@@ -27,6 +27,7 @@ public class GenerateVue {
         // 获取表信息
         String[] tableDetail = ((String) configMap.get("tableDetail")).split(",");
         String tableName = tableDetail[0], tableFullName = tableDetail[1], tableComment = tableDetail[2], tableDb = tableDetail[3];
+        String fileName = tableName.substring(0, 1).toUpperCase() + tableName.substring(1);
         // 获取列表操作信息
         List<String> tableHandle = (List<String>) configMap.get("tableHandle");
         // 获取单条数据操作信息
@@ -45,9 +46,11 @@ public class GenerateVue {
         map.put("tableHandleList", tableHandle);
         // 单条数据操作
         map.put("infoHandleList", infoHandle);
+        // 文件名
+        map.put("fileName", fileName + "Table");
         String cmtTpl = FreemarkerUtils.getTemplate("table.ftl", map);
         try {
-            ExcelUtil.setResponseHeader(response, tableName + "Table" + ".vue");
+            ExcelUtil.setResponseHeader(response, fileName + "Table" + ".vue");
             OutputStream os = response.getOutputStream();
             os.write(cmtTpl.getBytes());
             os.flush();
@@ -60,6 +63,7 @@ public class GenerateVue {
         // 获取表信息
         String[] tableDetail = ((String) configMap.get("tableDetail")).split(",");
         String tableName = tableDetail[0], tableFullName = tableDetail[1], tableComment = tableDetail[2], tableDb = tableDetail[3];
+        String fileName = tableName.substring(0, 1).toUpperCase() + tableName.substring(1);
         // 展现形式
         String formShowType = (String) configMap.get("formShowType");
         // 获取操作数据
@@ -119,7 +123,9 @@ public class GenerateVue {
             } else if (formShowType.equals("page")) {
                 fileTypeName = "OperatePage";
             }
-            ExcelUtil.setResponseHeader(response, tableName + fileTypeName + ".vue");
+            // 文件名
+            map.put("fileName", fileName + fileTypeName);
+            ExcelUtil.setResponseHeader(response, fileName + fileTypeName + ".vue");
             OutputStream os = response.getOutputStream();
             os.write(cmtTpl.getBytes());
             os.flush();

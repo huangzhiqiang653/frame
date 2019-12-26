@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -31,7 +31,7 @@ public class ZxTaskLog extends BaseSimpleEntityBean {
     private String taskId;
 
     @ApiModelProperty(value = "执行时间")
-    private LocalDateTime executeTime;
+    private Date executeTime;
 
     @ApiModelProperty(value = "执行结果 0成功(默认)，1失败，2未知")
     private Integer executeResult;

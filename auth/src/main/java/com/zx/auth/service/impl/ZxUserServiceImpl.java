@@ -1,10 +1,10 @@
 package com.zx.auth.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.auth.entity.ZxUser;
+import com.zx.auth.mapper.SystemMapper;
 import com.zx.auth.mapper.ZxUserMapper;
 import com.zx.auth.service.IZxUserService;
 import com.zx.common.common.BaseHzq;
@@ -15,7 +15,11 @@ import com.zx.common.enums.SystemMessageEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -27,6 +31,8 @@ import java.util.Collection;
  */
 @Service
 public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> implements IZxUserService {
+    @Resource
+    SystemMapper systemMapper;
 
     /**
      * 公共基础方法
@@ -93,7 +99,9 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
      * @return
      */
     public ResponseBean updateAllField(RequestBean requestBean) {
-        return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), ZxUser.class)));
+        ZxUser zxUser = BaseHzq.convertValue(requestBean.getInfo(), ZxUser.class);
+        zxUser.setUpdateTime(systemMapper.getNow());
+        return new ResponseBean(this.updateById(zxUser));
     }
 
     /**
@@ -143,7 +151,27 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
      * @return
      */
     public ResponseBean getListByCondition(RequestBean requestBean) {
-        Wrapper queryWrapper = new QueryWrapper();
+        QueryWrapper<ZxUser> queryWrapper = new QueryWrapper<ZxUser>();
+        queryWrapper.orderByDesc("update_time");
+        queryWrapper.eq("status", 0);
+        Map queryMap = (Map) requestBean.getInfo();
+        ZxUser zxUser = BaseHzq.convertValue(queryMap, ZxUser.class);
+        // 查询条件
+        if (!StringUtils.isEmpty(zxUser.getUserName())) {
+            queryWrapper.like("user_name", zxUser.getUserName().trim());
+        }
+        if (!StringUtils.isEmpty(zxUser.getEmail())) {
+            queryWrapper.like("email", zxUser.getEmail().trim());
+        }
+        if (!StringUtils.isEmpty(zxUser.getPhoneNumber())) {
+            queryWrapper.like("phone_number", zxUser.getPhoneNumber().trim());
+        }
+        if (!StringUtils.isEmpty(zxUser.getSex())) {
+            queryWrapper.eq("sex", zxUser.getSex());
+        }
+        if (!StringUtils.isEmpty(zxUser.getStatus())) {
+            queryWrapper.eq("status", zxUser.getStatus());
+        }
         // TODO 添加查询条件
 
         return new ResponseBean(this.list(queryWrapper));
@@ -170,9 +198,33 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
         if (StringUtils.isEmpty(page)) {
             page = new Page();
         }
-        Wrapper queryWrapper = new QueryWrapper();
-        // TODO 添加查询条件
+        QueryWrapper<ZxUser> queryWrapper = new QueryWrapper<ZxUser>();
+        queryWrapper.orderByAsc("status");
+        queryWrapper.orderByDesc("update_time");
 
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        List<String> updateTimes = (List<String>) queryMap.get("updateTime");
+        queryMap.remove("updateTime");
+        ZxUser zxUser = BaseHzq.convertValue(queryMap, ZxUser.class);
+        // 查询条件
+        if (!StringUtils.isEmpty(zxUser.getUserName())) {
+            queryWrapper.like("user_name", zxUser.getUserName().trim());
+        }
+        if (!StringUtils.isEmpty(zxUser.getEmail())) {
+            queryWrapper.like("email", zxUser.getEmail().trim());
+        }
+        if (!StringUtils.isEmpty(zxUser.getPhoneNumber())) {
+            queryWrapper.like("phone_number", zxUser.getPhoneNumber().trim());
+        }
+        if (!StringUtils.isEmpty(zxUser.getSex())) {
+            queryWrapper.eq("sex", zxUser.getSex());
+        }
+        if (!StringUtils.isEmpty(zxUser.getStatus())) {
+            queryWrapper.eq("status", zxUser.getStatus());
+        }
+        if (updateTimes != null && updateTimes.size() == 2) {
+            queryWrapper.between("update_time", updateTimes.get(0), updateTimes.get(1));
+        }
         return new ResponseBean(this.page(page, queryWrapper));
     }
 }

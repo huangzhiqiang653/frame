@@ -96,6 +96,7 @@
                            icon="el-icon-delete"
                            :size="GLOBAL.config.systemSize"
                            style="float: left;"
+                           :disabled="deleteBatchList.ids.length === 0"
                            @click="deleteBatch">批量删除
                 </el-button>
                 <#break>
@@ -159,7 +160,7 @@
                     FUNCTIONS.systemFunction.getConfigValue(
                     scope.row.${field.filedNameCode?split("#")[1]!},
                     GLOBAL.config.dictionaryPre +
-                    GLOBAL.config.dictionary.${field.filedNameCode?split("#")[0]!})
+                    GLOBAL.config.dictionary.${field.filedNameCode?split("#")[1]!})
                     }}
                 </template>
             </el-table-column>
@@ -210,25 +211,15 @@
                 :total="pagination.total">
         </el-pagination>
         <!--操作-->
-        <el-dialog
-                :fullscreen="true"
-                :show-close="false"
-                :visible.sync="operationVisibleFlag"
-                :destroy-on-close="true">
-            <operationTemplate
-                    ref="operationTemplate"
-                    :refresh="init"
-                    :close-self="()=> operationVisibleFlag = false"
-            />
-        </el-dialog>
+        <operationTemplate ref="operationTemplate" :refresh="getTableData"/>
     </div>
 </template>
 <script>
     // 替换成相应的模板
-    import operationTemplate from './${tableName!}Table'
+    import operationTemplate from './${fileName!}OperateDialog'
 
     export default {
-        name: '${tableName!}',
+        name: '${fileName!}',
         data () {
             return {
                 // 查询表单
@@ -243,23 +234,48 @@
                 <#list fields! as field>
                 <#switch field.fieldType>
                 <#case "dictionary">
-                ${(field.remark?length gt 0)?string(field.remark, field.filedNameCode?split("#")[1])}:
-                    JSON.parse(unescape(localStorage.getItem(this.GLOBAL.config.dictionaryPre + this.GLOBAL.config.dictionary.${(field.remark?length gt 0)?string(field.remark, field.filedNameCode?split("#")[1])}))),
+                ${(field.remark?length gt 0)?string(field.remark, field.filedNameCode?split("#")[1])}: JSON.parse(unescape(localStorage.getItem(this.GLOBAL.config.dictionaryPre + this.GLOBAL.config.dictionary.${(field.remark?length gt 0)?string(field.remark, field.filedNameCode?split("#")[1])}))),
                 <#break>
                 </#switch>
                 </#list>
                 },
                 // 资源权限控制，有的系统不需这么细，则全部为true
                 source: {
+                    <#list tableHandleList! as tableHandle>
+                    <#switch tableHandle>
+                    <#case "deleteBatch">
                     deleteBatch: true,
+                    <#break>
+                    <#case "addInfo">
                     add: true,
+                    <#break>
+                    <#case "import">
                     import: true,
+                    <#break>
+                    <#case "export">
                     export: true,
+                    <#break>
+                    </#switch>
+                    </#list>
+                    <#list infoHandleList! as infoHandle>
+                    <#switch infoHandle>
+                    <#case "edit">
                     infoEdit: true,
+                    <#break>
+                    <#case "view">
                     infoView: true,
+                    <#break>
+                    <#case "deleteInfo">
                     infoDelete: true,
+                    <#break>
+                    <#case "approval">
                     infoApproval: true,
-                    infoSubmit: true
+                    <#break>
+                    <#case "submit">
+                    infoSubmit: true,
+                    <#break>
+                    </#switch>
+                    </#list>
                 },
                 // 分页参数
                 pagination: {
@@ -298,7 +314,7 @@
                 this.getTableData('init')
             },
             operationMethod: function (operateType, info) {
-                this.operationVisibleFlag = true
+                this.$refs.operationTemplate.init(operateType, info ? info.id : null)
             },
             <#list tableHandleList! as tableHandle>
             <#switch tableHandle>
@@ -336,27 +352,26 @@
             <#if (infoHandleList?size > 0)>
             getSource: function (rowData) {
                 let tempList = []
-                return [
-                    <#list infoHandleList! as infoHandle>
-                    <#switch infoHandle>
-                    <#case "edit">
-                    this.source.infoEdit && tempList.push({icon: 'el-icon-edit', title: '编辑', method: 'handleEdit'}),
-                    <#break>
-                    <#case "view">
-                    this.source.infoView && tempList.push({icon: 'el-icon-view', title: '查看', method: 'handleView'}),
-                    <#break>
-                    <#case "deleteInfo">
-                    this.source.infoDelete && tempList.push({icon: 'el-icon-delete', title: '删除', method: 'handleDelete'}),
-                    <#break>
-                    <#case "approval">
-                    this.source.infoApproval && tempList.push({icon: 'el-icon-bell', title: '审批', method: 'handleApproval'}),
-                    <#break>
-                    <#case "submit">
-                    this.source.infoSubmit && tempList.push({icon: 'el-icon-bell', title: '提交', method: 'handleSubmit'}),
-                    <#break>
-                    </#switch>
-                    </#list>
-                ]
+                <#list infoHandleList! as infoHandle>
+                <#switch infoHandle>
+                <#case "edit">
+                this.source.infoEdit && tempList.push({icon: 'el-icon-edit', title: '编辑', method: 'handleEdit'})
+                <#break>
+                <#case "view">
+                this.source.infoView && tempList.push({icon: 'el-icon-view', title: '查看', method: 'handleView'})
+                <#break>
+                <#case "deleteInfo">
+                this.source.infoDelete && tempList.push({icon: 'el-icon-delete', title: '删除', method: 'handleDelete'})
+                <#break>
+                <#case "approval">
+                this.source.infoApproval && tempList.push({icon: 'el-icon-bell', title: '审批', method: 'handleApproval'})
+                <#break>
+                <#case "submit">
+                this.source.infoSubmit && tempList.push({icon: 'el-icon-bell', title: '提交', method: 'handleSubmit'})
+                <#break>
+                </#switch>
+                </#list>
+                return tempList
             },
             handleCommon: function (type, rowData) {
                 switch (type) {

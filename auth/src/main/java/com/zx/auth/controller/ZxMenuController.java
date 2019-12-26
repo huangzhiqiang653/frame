@@ -1,11 +1,14 @@
 package com.zx.auth.controller;
 
 
+import com.zx.auth.service.IZxMenuService;
 import com.zx.common.common.BaseController;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -19,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth/zx-menu")
 public class ZxMenuController extends BaseController {
 
+    @Resource
+    IZxMenuService zxMenuService;
+
     /**
      * 公共基础方法
      *
@@ -27,6 +33,6 @@ public class ZxMenuController extends BaseController {
      */
     @Override
     public ResponseBean base(RequestBean requestBean) {
-        return null;
+        return zxMenuService.base(requestBean);
     }
 }

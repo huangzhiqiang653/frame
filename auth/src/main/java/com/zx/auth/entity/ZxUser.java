@@ -3,6 +3,8 @@ package com.zx.auth.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zx.common.common.BaseEntityBean;
 import java.time.LocalDateTime;
+import java.util.Date;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,7 +35,7 @@ public class ZxUser extends BaseEntityBean {
     private Integer sex;
 
     @ApiModelProperty(value = "出生年月日")
-    private LocalDateTime birthDay;
+    private Date birthDay;
 
     @ApiModelProperty(value = "头像地址")
     private String headUrl;

@@ -1,12 +1,14 @@
 package com.zx.auth.controller;
 
 
+import com.zx.auth.service.IZxAccountService;
+import com.zx.common.common.BaseController;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
-import com.zx.common.common.BaseController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -20,6 +22,9 @@ import com.zx.common.common.BaseController;
 @RequestMapping("/auth/zx-account")
 public class ZxAccountController extends BaseController {
 
+    @Resource
+    IZxAccountService zxAccountService;
+
     /**
      * 公共基础方法
      *
@@ -28,6 +33,6 @@ public class ZxAccountController extends BaseController {
      */
     @Override
     public ResponseBean base(RequestBean requestBean) {
-        return null;
+        return zxAccountService.base(requestBean);
     }
 }

@@ -20,10 +20,13 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("auth_zx_account")
-@ApiModel(value="ZxAccount对象", description="账户表")
+@ApiModel(value = "ZxAccount对象", description = "账户表")
 public class ZxAccount extends BaseEntityBean {
 
     private static final long serialVersionUID = 1L;
+
+    @ApiModelProperty(value = "用户主键")
+    private String userId;
 
     @ApiModelProperty(value = "账户名称")
     private String accountName;
