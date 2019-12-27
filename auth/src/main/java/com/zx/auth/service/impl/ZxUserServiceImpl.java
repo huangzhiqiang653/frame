@@ -3,13 +3,16 @@ package com.zx.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zx.auth.entity.ZxAccount;
 import com.zx.auth.entity.ZxUser;
 import com.zx.auth.mapper.SystemMapper;
 import com.zx.auth.mapper.ZxUserMapper;
+import com.zx.auth.service.IZxAccountService;
 import com.zx.auth.service.IZxUserService;
 import com.zx.common.common.BaseHzq;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
+import com.zx.common.enums.BusinessEnum;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,8 @@ import java.util.Map;
 public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> implements IZxUserService {
     @Resource
     SystemMapper systemMapper;
+    @Resource
+    IZxAccountService zxAccountService;
 
     /**
      * 公共基础方法
@@ -101,6 +106,20 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
     public ResponseBean updateAllField(RequestBean requestBean) {
         ZxUser zxUser = BaseHzq.convertValue(requestBean.getInfo(), ZxUser.class);
         zxUser.setUpdateTime(systemMapper.getNow());
+        // 如果用户禁用，则该用户下的账号全部禁用
+        if (StringUtils.isEmpty(zxUser.getStatus()) && zxUser.getStatus().equals(Integer.parseInt(BusinessEnum.USER_NORMAL.getValue()))) {
+            QueryWrapper<ZxAccount> queryWrapper = new QueryWrapper<ZxAccount>();
+            queryWrapper.eq("user_id", zxUser.getId());
+            queryWrapper.eq("status", Integer.parseInt(BusinessEnum.ACCOUNT_NORMAL.getValue()));
+            List<ZxAccount> accountList = zxAccountService.list(queryWrapper);
+            if (accountList != null && accountList.size() > 0) {
+                for (ZxAccount zxAccount : accountList) {
+                    zxAccount.setStatus(Integer.parseInt(BusinessEnum.ACCOUNT_PROHIBIT.getValue()));
+                    zxAccount.setUpdateTime(systemMapper.getNow());
+                }
+                zxAccountService.updateBatchById(accountList);
+            }
+        }
         return new ResponseBean(this.updateById(zxUser));
     }
 

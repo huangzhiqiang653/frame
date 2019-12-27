@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * 操作枚举
+ *
  * @author huangzhiqiang
  */
 @Getter
@@ -28,7 +29,8 @@ public enum HandleEnum {
     EMPTY("", "空"),
     // 根据业务需要，增加积累
     DELETE_AND_ADD("deleteAndAdd", "删除之前的数据，并新增"),
-    UPDATE_SELF_INFO("updateSelfInfo", "更新主表自己");
+    UPDATE_SELF_INFO("updateSelfInfo", "更新主表自己"),
+    GET_TREE("getTree", "获取树数据");
 
     HandleEnum(String value, String desc) {
         this.value = value;

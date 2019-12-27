@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.auth.entity.ZxOrganization;
+import com.zx.auth.mapper.SystemMapper;
 import com.zx.auth.mapper.ZxOrganizationMapper;
 import com.zx.auth.service.IZxOrganizationService;
 import com.zx.common.common.BaseHzq;
@@ -14,7 +15,11 @@ import com.zx.common.enums.SystemMessageEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -26,6 +31,9 @@ import java.util.Collection;
  */
 @Service
 public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper, ZxOrganization> implements IZxOrganizationService {
+
+    @Resource
+    SystemMapper systemMapper;
 
     /**
      * 公共基础方法
@@ -56,6 +64,8 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case GET_TREE:
+                return getOrgTree(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -92,7 +102,9 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
      * @return
      */
     public ResponseBean updateAllField(RequestBean requestBean) {
-        return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), ZxOrganization.class)));
+        ZxOrganization zxOrganization = BaseHzq.convertValue(requestBean.getInfo(), ZxOrganization.class);
+        zxOrganization.setUpdateTime(systemMapper.getNow());
+        return new ResponseBean(this.updateById(zxOrganization));
     }
 
     /**
@@ -175,4 +187,46 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
         return new ResponseBean(this.page(page, queryWrapper));
     }
 
+    /**
+     * 获取组织树数据
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getOrgTree(RequestBean requestBean) {
+        QueryWrapper<ZxOrganization> queryWrapper = new QueryWrapper<ZxOrganization>();
+        queryWrapper.isNull("parent_id");
+        List<ZxOrganization> organizationList = this.list(queryWrapper);
+        if (organizationList != null && organizationList.size() == 1) {
+            ZxOrganization root = organizationList.get(0);
+            Map resultMap = BaseHzq.beanToMap(root);
+            this.recursionGetOrg(resultMap);
+            return new ResponseBean(resultMap);
+        } else {
+            return new ResponseBean(
+                    CommonConstants.FAIL.getCode(),
+                    "获取树根节点数据失败"
+            );
+        }
+    }
+
+    /**
+     * 递归获取组织数据
+     *
+     * @return
+     */
+    public void recursionGetOrg(Map map) {
+        QueryWrapper<ZxOrganization> queryWrapper = new QueryWrapper<ZxOrganization>();
+        queryWrapper.orderByAsc("sort").eq("parent_id", map.get("id"));
+        List<ZxOrganization> zxOrganizations = this.list(queryWrapper);
+        if (zxOrganizations != null && zxOrganizations.size() > 0) {
+            List<Map> children = new ArrayList<Map>();
+            for (ZxOrganization zxOrganization : zxOrganizations) {
+                Map child = BaseHzq.beanToMap(zxOrganization);
+                this.recursionGetOrg(child);
+                children.add(child);
+            }
+            map.put("children", children);
+        }
+    }
 }
