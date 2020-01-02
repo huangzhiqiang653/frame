@@ -223,7 +223,11 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
 
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         List<String> updateTimes = (List<String>) queryMap.get("updateTime");
+        String keyWords = (String) queryMap.get("keyWords");
+        boolean includeChildrenFlag = StringUtils.isEmpty(queryMap.get("childrenInclude")) ? false : (boolean) queryMap.get("childrenInclude");
         queryMap.remove("updateTime");
+        queryMap.remove("keyWords");
+        queryMap.remove("childrenInclude");
         ZxUser zxUser = BaseHzq.convertValue(queryMap, ZxUser.class);
         // 查询条件
         if (!StringUtils.isEmpty(zxUser.getUserName())) {
@@ -243,6 +247,21 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
         }
         if (updateTimes != null && updateTimes.size() == 2) {
             queryWrapper.between("update_time", updateTimes.get(0), updateTimes.get(1));
+        }
+        if (!StringUtils.isEmpty(zxUser.getOrganizationId())) {
+            if (includeChildrenFlag) {
+                String[] orgs = zxUser.getOrganizationId().split(",");
+                String selectId = orgs[orgs.length - 2];
+                queryWrapper.like("organization_id", selectId);
+            } else {
+                queryWrapper.eq("organization_id", zxUser.getOrganizationId());
+            }
+        }
+        if (!StringUtils.isEmpty(keyWords)) {
+            queryWrapper
+                    .like("user_name", keyWords.trim())
+                    .like("email", keyWords.trim())
+                    .like("phone_number", keyWords.trim());
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }

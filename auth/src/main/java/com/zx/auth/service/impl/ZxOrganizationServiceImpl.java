@@ -82,7 +82,9 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
-        return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), ZxOrganization.class)));
+        ZxOrganization zxOrganization = BaseHzq.convertValue(requestBean.getInfo(), ZxOrganization.class);
+        boolean saveFlag = this.save(zxOrganization);
+        return saveFlag ? new ResponseBean(zxOrganization) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
     }
 
     /**
@@ -193,6 +195,7 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
      * @param requestBean
      * @return
      */
+    @Override
     public ResponseBean getOrgTree(RequestBean requestBean) {
         QueryWrapper<ZxOrganization> queryWrapper = new QueryWrapper<ZxOrganization>();
         queryWrapper.isNull("parent_id");
@@ -201,7 +204,9 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
             ZxOrganization root = organizationList.get(0);
             Map resultMap = BaseHzq.beanToMap(root);
             this.recursionGetOrg(resultMap);
-            return new ResponseBean(resultMap);
+            List<Map> treeList = new ArrayList<Map>();
+            treeList.add(resultMap);
+            return new ResponseBean(treeList);
         } else {
             return new ResponseBean(
                     CommonConstants.FAIL.getCode(),

@@ -22,4 +22,12 @@ public interface IZxOrganizationService extends IService<ZxOrganization> {
      * @return
      */
     public ResponseBean base(RequestBean requestBean);
+
+    /**
+     * 获取组织树数据
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getOrgTree(RequestBean requestBean);
 }
