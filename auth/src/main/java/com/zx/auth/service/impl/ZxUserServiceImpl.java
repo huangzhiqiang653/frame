@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -258,10 +259,14 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
             }
         }
         if (!StringUtils.isEmpty(keyWords)) {
-            queryWrapper
-                    .like("user_name", keyWords.trim())
-                    .like("email", keyWords.trim())
-                    .like("phone_number", keyWords.trim());
+            queryWrapper.and(new Consumer<QueryWrapper<ZxUser>>() {
+                @Override
+                public void accept(QueryWrapper<ZxUser> zxUserQueryWrapper) {
+                    zxUserQueryWrapper.like("user_name", keyWords.trim()).or()
+                            .like("email", keyWords.trim()).or()
+                            .like("phone_number", keyWords.trim());
+                }
+            });
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }

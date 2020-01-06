@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.auth.entity.ZxOrganization;
+import com.zx.auth.entity.ZxUser;
 import com.zx.auth.mapper.SystemMapper;
 import com.zx.auth.mapper.ZxOrganizationMapper;
 import com.zx.auth.service.IZxOrganizationService;
+import com.zx.auth.service.IZxUserService;
 import com.zx.common.common.BaseHzq;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
@@ -34,6 +36,8 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
 
     @Resource
     SystemMapper systemMapper;
+    @Resource
+    IZxUserService zxUserService;
 
     /**
      * 公共基础方法
@@ -126,7 +130,17 @@ public class ZxOrganizationServiceImpl extends ServiceImpl<ZxOrganizationMapper,
      * @return
      */
     public ResponseBean deleteLogicalSingle(RequestBean requestBean) {
-        return new ResponseBean(this.removeById((String) requestBean.getInfo()));
+        String orgId = (String) requestBean.getInfo();
+        // 校验该组织下可有人员数据，无可以删
+        QueryWrapper<ZxUser> queryWrapper = new QueryWrapper<ZxUser>();
+        queryWrapper.eq("organization_id", orgId);
+        List<ZxUser> list = zxUserService.list(queryWrapper);
+        if (list != null && list.size() > 0) {
+            return new ResponseBean(
+                    CommonConstants.FAIL.getCode(),
+                    "请先删除该部门下的人员数据");
+        }
+        return new ResponseBean(this.removeById(orgId));
     }
 
     /**

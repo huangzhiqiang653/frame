@@ -22,6 +22,8 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
   type-enums-package: com.zx.*.enums
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #引入日志配置文件
 #=====================================  log  =============================
 logging:
