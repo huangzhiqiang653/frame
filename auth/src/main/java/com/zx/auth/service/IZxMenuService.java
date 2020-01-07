@@ -22,4 +22,12 @@ public interface IZxMenuService extends IService<ZxMenu> {
      * @return
      */
     public ResponseBean base(RequestBean requestBean);
+
+    /**
+     * 获取菜单树数据
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getMenuTree(RequestBean requestBean);
 }

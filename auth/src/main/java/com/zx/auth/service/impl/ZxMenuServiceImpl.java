@@ -12,9 +12,13 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -56,6 +60,8 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case GET_TREE:
+                return getMenuTree(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -173,5 +179,53 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
         // TODO 添加查询条件
 
         return new ResponseBean(this.page(page, queryWrapper));
+    }
+
+    /**
+     * 获取菜单树
+     *
+     * @param requestBean
+     * @return
+     */
+    @Override
+    public ResponseBean getMenuTree(RequestBean requestBean) {
+        QueryWrapper<ZxMenu> queryWrapper = new QueryWrapper<>();
+        queryWrapper.isNull("parent_id");
+        queryWrapper.last("limit 1");
+        ZxMenu root = this.getOne(queryWrapper);
+        if(root == null){
+            return new ResponseBean(
+                    CommonConstants.FAIL.getCode(),
+                    "获取树根节点数据失败"
+            );
+        }
+
+        Map resultMap = BaseHzq.beanToMap(root);
+        this.recursionGetMenu(resultMap);
+        List<Map> treeList = new ArrayList<>();
+        treeList.add(resultMap);
+        return new ResponseBean(treeList);
+    }
+
+    /**
+     * 递归获取菜单数据
+     *
+     * @return
+     */
+    public void recursionGetMenu(Map map) {
+        QueryWrapper<ZxMenu> queryWrapper = new QueryWrapper<ZxMenu>();
+        queryWrapper.orderByAsc("sort").eq("parent_id", map.get("id"));
+        List<ZxMenu> zxMenuList = this.list(queryWrapper);
+        if (CollectionUtils.isEmpty(zxMenuList)) {
+            return;
+        }
+        List<Map> children = new ArrayList<>();
+        for (ZxMenu zxMenu : zxMenuList) {
+            Map child = BaseHzq.beanToMap(zxMenu);
+            this.recursionGetMenu(child);
+            children.add(child);
+        }
+
+        map.put("children", children);
     }
 }
