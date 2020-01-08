@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -170,7 +172,30 @@ public class ZxResourceServiceImpl extends ServiceImpl<ZxResourceMapper, ZxResou
             page = new Page();
         }
         QueryWrapper<ZxResource> queryWrapper = new QueryWrapper<>();
-        // TODO 添加查询条件
+        queryWrapper.orderByAsc("sort");
+        queryWrapper.orderByDesc("update_time");
+
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        String keyWords = (String) queryMap.get("keyWords");
+        queryMap.remove("keyWords");
+        ZxResource zxResource = BaseHzq.convertValue(queryMap, ZxResource.class);
+        // 查询条件
+        if (!StringUtils.isEmpty(zxResource.getResourceName())) {
+            queryWrapper.like("resource_name", zxResource.getResourceName().trim());
+        }
+
+        if (!StringUtils.isEmpty(zxResource.getResourceCode())) {
+            queryWrapper.eq("resource_code", zxResource.getResourceCode().trim());
+        }
+
+        if (!StringUtils.isEmpty(zxResource.getRelationId())) {
+            queryWrapper.eq("relation_id", zxResource.getRelationId().trim());
+        }
+
+        if (!StringUtils.isEmpty(keyWords)) {
+            queryWrapper.and(zxUserQueryWrapper -> zxUserQueryWrapper.like("resource_name", keyWords.trim()).or()
+                    .like("resource_code", keyWords.trim()));
+        }
 
         return new ResponseBean(this.page(page, queryWrapper));
     }

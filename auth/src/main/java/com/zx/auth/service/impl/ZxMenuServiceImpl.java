@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.auth.entity.ZxMenu;
+import com.zx.auth.entity.ZxResource;
+import com.zx.auth.mapper.SystemMapper;
 import com.zx.auth.mapper.ZxMenuMapper;
 import com.zx.auth.service.IZxMenuService;
+import com.zx.auth.service.IZxResourceService;
 import com.zx.common.common.BaseHzq;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
@@ -15,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +33,11 @@ import java.util.Map;
  */
 @Service
 public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> implements IZxMenuService {
+    @Resource
+    SystemMapper systemMapper;
+
+    @Resource
+    IZxResourceService resourceService;
 
     /**
      * 公共基础方法
@@ -78,7 +86,9 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
-        return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), ZxMenu.class)));
+        ZxMenu zxMenu = BaseHzq.convertValue(requestBean.getInfo(), ZxMenu.class);
+        boolean saveFlag = this.save(zxMenu);
+        return saveFlag ? new ResponseBean(zxMenu) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
     }
 
     /**
@@ -98,7 +108,9 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
      * @return
      */
     public ResponseBean updateAllField(RequestBean requestBean) {
-        return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), ZxMenu.class)));
+        ZxMenu zxMenu = BaseHzq.convertValue(requestBean.getInfo(), ZxMenu.class);
+        zxMenu.setUpdateTime(systemMapper.getNow());
+        return new ResponseBean(this.updateById(zxMenu));
     }
 
     /**
@@ -118,7 +130,12 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
      * @return
      */
     public ResponseBean deleteLogicalSingle(RequestBean requestBean) {
-        return new ResponseBean(this.removeById((String) requestBean.getInfo()));
+        String menuId = (String) requestBean.getInfo();
+        //删除菜单资源信息
+        QueryWrapper<ZxResource> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("relation_id", menuId);
+        resourceService.remove(queryWrapper);
+        return new ResponseBean(this.removeById(menuId));
     }
 
     /**
@@ -128,7 +145,12 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
      * @return
      */
     public ResponseBean deleteLogicalBatch(RequestBean requestBean) {
-        return new ResponseBean(this.removeByIds((Collection<String>) requestBean.getInfos()));
+        List<String> menuIds = (List<String>) requestBean.getInfo();
+        //删除菜单资源信息
+        QueryWrapper<ZxResource> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("relation_id", menuIds);
+        resourceService.remove(queryWrapper);
+        return new ResponseBean(this.removeByIds(menuIds));
     }
 
     /**
@@ -193,7 +215,7 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
         queryWrapper.isNull("parent_id");
         queryWrapper.last("limit 1");
         ZxMenu root = this.getOne(queryWrapper);
-        if(root == null){
+        if (root == null) {
             return new ResponseBean(
                     CommonConstants.FAIL.getCode(),
                     "获取树根节点数据失败"
