@@ -144,8 +144,21 @@ public class ZxResourceServiceImpl extends ServiceImpl<ZxResourceMapper, ZxResou
      * @return
      */
     public ResponseBean getListByCondition(RequestBean requestBean) {
+        ZxResource zxResource = BaseHzq.convertValue(requestBean.getInfo(), ZxResource.class);
         QueryWrapper<ZxResource> queryWrapper = new QueryWrapper<ZxResource>();
         // TODO 添加查询条件
+        // 查询条件
+        if (!StringUtils.isEmpty(zxResource.getResourceName())) {
+            queryWrapper.like("resource_name", zxResource.getResourceName().trim());
+        }
+
+        if (!StringUtils.isEmpty(zxResource.getResourceCode())) {
+            queryWrapper.eq("resource_code", zxResource.getResourceCode().trim());
+        }
+
+        if (!StringUtils.isEmpty(zxResource.getRelationId())) {
+            queryWrapper.eq("relation_id", zxResource.getRelationId().trim());
+        }
 
         return new ResponseBean(this.list(queryWrapper));
     }

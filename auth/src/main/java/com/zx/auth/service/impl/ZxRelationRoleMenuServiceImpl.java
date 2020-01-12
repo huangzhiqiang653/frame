@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.auth.entity.ZxRelationRoleMenu;
+import com.zx.auth.entity.ZxRelationRoleResource;
 import com.zx.auth.mapper.ZxRelationRoleMenuMapper;
 import com.zx.auth.service.IZxRelationRoleMenuService;
+import com.zx.auth.service.IZxRelationRoleResourceService;
 import com.zx.common.common.BaseHzq;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +33,8 @@ import java.util.Map;
  */
 @Service
 public class ZxRelationRoleMenuServiceImpl extends ServiceImpl<ZxRelationRoleMenuMapper, ZxRelationRoleMenu> implements IZxRelationRoleMenuService {
+    @Resource
+    IZxRelationRoleResourceService zxRelationRoleResourceService;
 
     @Override
     public ResponseBean base(RequestBean requestBean) {
@@ -73,6 +78,7 @@ public class ZxRelationRoleMenuServiceImpl extends ServiceImpl<ZxRelationRoleMen
         // 获取其他数据
         Map object = (LinkedHashMap) requestBean.getInfo();
         List<String> menuIds = (ArrayList) object.get("menuIds");
+        Map<String, List<String>> menuResourceIds = (Map) object.get("menuResourceIds");
         String roleId = (String) object.get("roleId");
         //构建角色菜单关系对象
         if (CollectionUtils.isEmpty(menuIds)) {
@@ -84,14 +90,36 @@ public class ZxRelationRoleMenuServiceImpl extends ServiceImpl<ZxRelationRoleMen
         for (String menuId : menuIds) {
             ZxRelationRoleMenu zxRelationRoleMenu = new ZxRelationRoleMenu();
             zxRelationRoleMenu.setRoleId(roleId);
-            roleMenuList.add(zxRelationRoleMenu);
             zxRelationRoleMenu.setMenuId(menuId);
+            roleMenuList.add(zxRelationRoleMenu);
         }
 
         //删除旧关系
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("role_id", roleId);
         this.remove(queryWrapper);
+        if (!CollectionUtils.isEmpty(menuResourceIds)) {
+            List<ZxRelationRoleResource> roleResourceArrayList = new ArrayList<>();
+            for (String menuId : menuResourceIds.keySet()) {
+                List<String> resourceList = menuResourceIds.get(menuId);
+                if (CollectionUtils.isEmpty(resourceList)) {
+                    continue;
+                }
+
+                for (String resourceId : resourceList) {
+                    ZxRelationRoleResource zxRelationRoleResource = new ZxRelationRoleResource();
+                    zxRelationRoleResource.setRoleId(roleId);
+                    zxRelationRoleResource.setMenuId(menuId);
+                    zxRelationRoleResource.setResourceId(resourceId);
+                    roleResourceArrayList.add(zxRelationRoleResource);
+                }
+
+                //删除已存在的关系
+                zxRelationRoleResourceService.remove(queryWrapper);
+                //保存
+                zxRelationRoleResourceService.saveBatch(roleResourceArrayList);
+            }
+        }
         //保存
         boolean saveFlag = this.saveBatch(roleMenuList);
         return saveFlag ? new ResponseBean(CommonConstants.SUCCESS.getCode()) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");

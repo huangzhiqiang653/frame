@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +70,8 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
             case GET_PAGE:
                 return getPage(requestBean);
             case GET_TREE:
+                return getMenuTree(requestBean);
+            case GET_MENU_BY_ROLE:
                 return getMenuTree(requestBean);
             default:
                 return new ResponseBean(
@@ -211,6 +214,12 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
      */
     @Override
     public ResponseBean getMenuTree(RequestBean requestBean) {
+        Map object = (LinkedHashMap) requestBean.getInfo();
+        boolean showResource = false;
+        if (!StringUtils.isEmpty(object.get("showResource"))) {
+            showResource = (Boolean) object.get("showResource");
+        }
+
         QueryWrapper<ZxMenu> queryWrapper = new QueryWrapper<>();
         queryWrapper.isNull("parent_id");
         queryWrapper.last("limit 1");
@@ -223,7 +232,7 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
         }
 
         Map resultMap = BaseHzq.beanToMap(root);
-        this.recursionGetMenu(resultMap);
+        this.recursionGetMenu(resultMap, showResource);
         List<Map> treeList = new ArrayList<>();
         treeList.add(resultMap);
         return new ResponseBean(treeList);
@@ -234,20 +243,35 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
      *
      * @return
      */
-    public void recursionGetMenu(Map map) {
+    public void recursionGetMenu(Map map, boolean isShowResource) {
         QueryWrapper<ZxMenu> queryWrapper = new QueryWrapper<ZxMenu>();
         queryWrapper.orderByAsc("sort").eq("parent_id", map.get("id"));
         List<ZxMenu> zxMenuList = this.list(queryWrapper);
+        List<Map> children = new ArrayList<>();
         if (CollectionUtils.isEmpty(zxMenuList)) {
+            if (isShowResource) {
+                QueryWrapper<ZxResource> subQueryWrapper = new QueryWrapper<>();
+                subQueryWrapper.in("relation_id", map.get("id"));
+                List<ZxResource> resourceList = resourceService.list(subQueryWrapper);
+                if (!CollectionUtils.isEmpty(resourceList)) {
+                    for (ZxResource resource : resourceList) {
+                        Map child = BaseHzq.beanToMap(resource);
+                        child.put("name",resource.getResourceName());
+                        child.put("isResource",true);
+                        children.add(child);
+                    }
+
+                    map.put("children", children);
+                }
+            }
             return;
         }
-        List<Map> children = new ArrayList<>();
+
         for (ZxMenu zxMenu : zxMenuList) {
             Map child = BaseHzq.beanToMap(zxMenu);
-            this.recursionGetMenu(child);
+            this.recursionGetMenu(child, isShowResource);
             children.add(child);
         }
-
         map.put("children", children);
     }
 }

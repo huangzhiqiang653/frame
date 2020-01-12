@@ -1,11 +1,14 @@
 package com.zx.auth.controller;
 
 
+import com.zx.auth.service.IZxRelationRoleResourceService;
 import com.zx.common.common.BaseController;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -18,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth/zx-relation-role-resource")
 public class ZxRelationRoleResourceController extends BaseController {
+    @Resource
+    IZxRelationRoleResourceService relationRoleResourceService;
+
     /**
      * 公共基础方法
      *
@@ -26,6 +32,6 @@ public class ZxRelationRoleResourceController extends BaseController {
      */
     @Override
     public ResponseBean base(RequestBean requestBean) {
-        return null;
+        return relationRoleResourceService.base(requestBean);
     }
 }

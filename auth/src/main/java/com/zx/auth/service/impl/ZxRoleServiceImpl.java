@@ -3,8 +3,12 @@ package com.zx.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zx.auth.entity.ZxRelationRoleMenu;
+import com.zx.auth.entity.ZxRelationRoleResource;
 import com.zx.auth.entity.ZxRole;
 import com.zx.auth.mapper.ZxRoleMapper;
+import com.zx.auth.service.IZxRelationRoleMenuService;
+import com.zx.auth.service.IZxRelationRoleResourceService;
 import com.zx.auth.service.IZxRoleService;
 import com.zx.common.common.BaseHzq;
 import com.zx.common.common.RequestBean;
@@ -12,9 +16,11 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Collection;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * <p>
@@ -26,6 +32,10 @@ import java.util.Collection;
  */
 @Service
 public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> implements IZxRoleService {
+    @Resource
+    IZxRelationRoleMenuService relationRoleMenuService;
+    @Resource
+    IZxRelationRoleResourceService relationRoleResourceService;
 
     /**
      * 公共基础方法
@@ -56,6 +66,8 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case GET_MENU_BY_ROLE:
+                return getMenuByRole(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -174,4 +186,48 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
 
         return new ResponseBean(this.page(page, queryWrapper));
     }
+
+    /**
+     * 根据角色获取菜单信息（包含资源信息）
+     *
+     * @param requestBean
+     * @return
+     */
+    @Override
+    public ResponseBean getMenuByRole(RequestBean requestBean) {
+        ZxRole role = BaseHzq.convertValue(requestBean.getInfo(), ZxRole.class);
+        String roleId = role.getId();
+        Map<String, Object> map = new HashMap<>();
+        QueryWrapper<ZxRelationRoleMenu> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("role_id", roleId);
+        List<ZxRelationRoleMenu> menuList = relationRoleMenuService.list(queryWrapper);
+        if (!CollectionUtils.isEmpty(menuList)) {
+            List<String> menuIds = new ArrayList<>();
+            map.put("menuIds",menuIds);
+            for (ZxRelationRoleMenu menu : menuList) {
+                String menuId = menu.getMenuId();
+                menuIds.add(menuId);
+                QueryWrapper<ZxRelationRoleResource> queryWrapper2 = new QueryWrapper<>();
+                queryWrapper2.eq("role_id", roleId);
+                queryWrapper2.eq("menu_id", menuId);
+                List<ZxRelationRoleResource> resourceList = relationRoleResourceService.list(queryWrapper2);
+                if (CollectionUtils.isEmpty(resourceList)) {
+                    continue;
+                }
+
+                Map<String, List<String>> subMap = new HashMap<>();
+                map.put("menuResourceIds",subMap);
+                List<String> resourceIds = new ArrayList<>();
+                subMap.put(menuId, resourceIds);
+
+                for (ZxRelationRoleResource resource : resourceList) {
+                    resourceIds.add(resource.getResourceId());
+                }
+            }
+        }
+
+        return new ResponseBean(map);
+    }
+
+
 }

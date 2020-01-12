@@ -1,14 +1,27 @@
 package com.zx.auth.controller;
 
 
+import com.zx.auth.entity.ZxMenu;
+import com.zx.auth.entity.ZxResource;
+import com.zx.auth.entity.ZxRole;
+import com.zx.auth.mapper.ZxMenuMapper;
+import com.zx.auth.mapper.ZxResourceMapper;
 import com.zx.auth.service.IZxRoleService;
 import com.zx.common.common.BaseController;
+import com.zx.common.common.BaseHzq;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -24,7 +37,6 @@ public class ZxRoleController extends BaseController {
 
     @Resource
     IZxRoleService zxRoleService;
-
     /**
      * 公共基础方法
      *
