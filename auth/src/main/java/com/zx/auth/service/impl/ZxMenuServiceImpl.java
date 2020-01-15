@@ -216,7 +216,7 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
     public ResponseBean getMenuTree(RequestBean requestBean) {
         Map object = (LinkedHashMap) requestBean.getInfo();
         boolean showResource = false;
-        if (!StringUtils.isEmpty(object.get("showResource"))) {
+        if (object != null && !StringUtils.isEmpty(object.get("showResource"))) {
             showResource = (Boolean) object.get("showResource");
         }
 

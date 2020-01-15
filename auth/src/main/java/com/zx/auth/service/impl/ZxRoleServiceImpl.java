@@ -207,20 +207,23 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
             for (ZxRelationRoleMenu menu : menuList) {
                 String menuId = menu.getMenuId();
                 menuIds.add(menuId);
-                QueryWrapper<ZxRelationRoleResource> queryWrapper2 = new QueryWrapper<>();
-                queryWrapper2.eq("role_id", roleId);
-                queryWrapper2.eq("menu_id", menuId);
-                List<ZxRelationRoleResource> resourceList = relationRoleResourceService.list(queryWrapper2);
-                if (CollectionUtils.isEmpty(resourceList)) {
-                    continue;
-                }
+            }
 
+            QueryWrapper<ZxRelationRoleResource> queryWrapper2 = new QueryWrapper<>();
+            queryWrapper2.eq("role_id", roleId);
+            queryWrapper2.in("menu_id", menuIds);
+            List<ZxRelationRoleResource> resourceList = relationRoleResourceService.list(queryWrapper2);
+            if (!CollectionUtils.isEmpty(resourceList)) {
                 Map<String, List<String>> subMap = new HashMap<>();
-                map.put("menuResourceIds",subMap);
-                List<String> resourceIds = new ArrayList<>();
-                subMap.put(menuId, resourceIds);
-
+                map.put("menuResourceIds", subMap);
                 for (ZxRelationRoleResource resource : resourceList) {
+                    String menuId = resource.getMenuId();
+                    List<String> resourceIds = subMap.get(menuId);
+                    if(CollectionUtils.isEmpty(resourceIds)){
+                        resourceIds = new ArrayList<>();
+                        subMap.put(menuId, resourceIds);
+                    }
+
                     resourceIds.add(resource.getResourceId());
                 }
             }
