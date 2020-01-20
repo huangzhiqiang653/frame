@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.auth.entity.ZxRelationRoleMenu;
 import com.zx.auth.entity.ZxRelationRoleResource;
 import com.zx.auth.entity.ZxRole;
+import com.zx.auth.mapper.ZxAccountMapper;
 import com.zx.auth.mapper.ZxRoleMapper;
 import com.zx.auth.service.IZxRelationRoleMenuService;
 import com.zx.auth.service.IZxRelationRoleResourceService;

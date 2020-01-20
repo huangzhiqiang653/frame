@@ -13,6 +13,7 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -64,6 +65,8 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case LIST_ACCOUNT_BY_ROLE:
+                return listAccountByRole(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -71,6 +74,18 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
                 );
 
         }
+    }
+
+    @Override
+    public ResponseBean listAccountByRole(RequestBean requestBean) {
+        String roleId = (String) requestBean.getInfo();
+        if (StringUtils.isEmpty(roleId)) {
+            return new ResponseBean();
+        }
+
+        ZxAccountMapper accountMapper = this.getBaseMapper();
+        List<ZxAccount> zxAccounts = accountMapper.listAccountByRoleId(roleId);
+        return new ResponseBean(zxAccounts);
     }
 
     /**
@@ -184,8 +199,12 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
         queryWrapper.orderByDesc("update_time");
 
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
-        List<String> updateTimes = (List<String>) queryMap.get("updateTime");
-        queryMap.remove("updateTime");
+        List<String> updateTimes = null;
+        if (!CollectionUtils.isEmpty(queryMap) && queryMap.get("updateTime") != null) {
+            updateTimes = (List<String>) queryMap.get("updateTime");
+            queryMap.remove("updateTime");
+        }
+
         ZxAccount zxAccount = BaseHzq.convertValue(queryMap, ZxAccount.class);
         // 查询条件
         if (!StringUtils.isEmpty(zxAccount.getAccountName())) {

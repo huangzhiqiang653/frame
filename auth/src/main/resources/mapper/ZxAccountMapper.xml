@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zx.auth.mapper.ZxAccountMapper">
+    <resultMap id="zxAccountMap" type="com.zx.auth.entity.ZxAccount">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="delete_flag" jdbcType="TINYINT" property="deleteFlag"/>
 
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="account_name" jdbcType="VARCHAR" property="accountName"/>
+        <result column="account_password" jdbcType="VARCHAR" property="accountPassword"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+    </resultMap>
+    <select id="listAccountByRoleId" parameterType="string" resultMap="zxAccountMap">
+       SELECT a.* FROM auth_zx_account a LEFT JOIN auth_zx_relaiton_account_role r on a.id=r.account_id
+       where r.role_id = #{roleId}
+    </select>
 </mapper>

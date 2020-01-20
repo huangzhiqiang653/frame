@@ -22,6 +22,7 @@ public interface IZxRoleService extends IService<ZxRole> {
      * @return
      */
     public ResponseBean base(RequestBean requestBean);
+
     /*
      * 根据角色获取菜单（包含菜单下资源）信息
      * @param requestBean

@@ -31,7 +31,8 @@ public enum HandleEnum {
     DELETE_AND_ADD("deleteAndAdd", "删除之前的数据，并新增"),
     UPDATE_SELF_INFO("updateSelfInfo", "更新主表自己"),
     GET_TREE("getTree", "获取树数据"),
-    GET_MENU_BY_ROLE("getAuthMenu", "获取有权限的菜单");
+    GET_MENU_BY_ROLE("getAuthMenu", "获取有权限的菜单"),
+    LIST_ACCOUNT_BY_ROLE("listAccountByRole", "获取有权限的菜单");
 
     HandleEnum(String value, String desc) {
         this.value = value;

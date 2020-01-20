@@ -22,4 +22,12 @@ public interface IZxAccountService extends IService<ZxAccount> {
      * @return
      */
     public ResponseBean base(RequestBean requestBean);
+
+    /**
+     * 根据角色获取账号信息
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean listAccountByRole(RequestBean requestBean);
 }
