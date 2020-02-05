@@ -17,10 +17,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -83,9 +80,17 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
             return new ResponseBean();
         }
 
-        ZxAccountMapper accountMapper = this.getBaseMapper();
-        List<ZxAccount> zxAccounts = accountMapper.listAccountByRoleId(roleId);
+        List<ZxAccount> zxAccounts = getZxRoleAccounts(roleId);
         return new ResponseBean(zxAccounts);
+    }
+
+    private List<ZxAccount> getZxRoleAccounts(String roleId) {
+        if (StringUtils.isEmpty(roleId)) {
+            return new ArrayList<>(0);
+        }
+
+        ZxAccountMapper accountMapper = this.getBaseMapper();
+        return accountMapper.listAccountByRoleId(roleId);
     }
 
     /**
@@ -200,9 +205,31 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
 
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         List<String> updateTimes = null;
-        if (!CollectionUtils.isEmpty(queryMap) && queryMap.get("updateTime") != null) {
-            updateTimes = (List<String>) queryMap.get("updateTime");
-            queryMap.remove("updateTime");
+        if (!CollectionUtils.isEmpty(queryMap)) {
+            if (queryMap.get("updateTime") != null) {
+                updateTimes = (List<String>) queryMap.get("updateTime");
+                queryMap.remove("updateTime");
+            }
+            //授权标志：false 只查询未授权，true 只查询已授权，未空则查询全部
+            if (queryMap.get("authFlag") != null) {
+                String roleId = (String) queryMap.get("roleId");
+                boolean authFlag = Boolean.getBoolean((String)queryMap.get("authFlag"));
+                queryMap.remove("roleId");
+                queryMap.remove("authFlag");
+                List<ZxAccount> zxAccounts = getZxRoleAccounts(roleId);
+                if (CollectionUtils.isEmpty(zxAccounts)) {
+                    Set<String> authAccountIds = new HashSet<>();
+                    for (ZxAccount account : zxAccounts) {
+                        authAccountIds.add(account.getId());
+                    }
+
+                    if (authFlag) {
+                        queryWrapper.in("id", authAccountIds);
+                    } else {
+                        queryWrapper.notIn("id", authAccountIds);
+                    }
+                }
+            }
         }
 
         ZxAccount zxAccount = BaseHzq.convertValue(queryMap, ZxAccount.class);

@@ -80,10 +80,15 @@ public class ZxRelationRoleMenuServiceImpl extends ServiceImpl<ZxRelationRoleMen
         List<String> menuIds = (ArrayList) object.get("menuIds");
         Map<String, List<String>> menuResourceIds = (Map) object.get("menuResourceIds");
         String roleId = (String) object.get("roleId");
+        //删除旧关系
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("role_id", roleId);
         //构建角色菜单关系对象
         if (CollectionUtils.isEmpty(menuIds)) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(),
-                    "菜单信息为空");
+            this.remove(queryWrapper);
+            //删除已存在的关系
+            zxRelationRoleResourceService.remove(queryWrapper);
+            return new ResponseBean(CommonConstants.SUCCESS.getCode());
         }
 
         List<ZxRelationRoleMenu> roleMenuList = new ArrayList<>();
@@ -94,10 +99,9 @@ public class ZxRelationRoleMenuServiceImpl extends ServiceImpl<ZxRelationRoleMen
             roleMenuList.add(zxRelationRoleMenu);
         }
 
-        //删除旧关系
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("role_id", roleId);
         this.remove(queryWrapper);
+        //保存
+        boolean saveFlag = this.saveBatch(roleMenuList);
         if (!CollectionUtils.isEmpty(menuResourceIds)) {
             List<ZxRelationRoleResource> roleResourceArrayList = new ArrayList<>();
             for (String menuId : menuResourceIds.keySet()) {
@@ -120,8 +124,7 @@ public class ZxRelationRoleMenuServiceImpl extends ServiceImpl<ZxRelationRoleMen
                 zxRelationRoleResourceService.saveBatch(roleResourceArrayList);
             }
         }
-        //保存
-        boolean saveFlag = this.saveBatch(roleMenuList);
+
         return saveFlag ? new ResponseBean(CommonConstants.SUCCESS.getCode()) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
     }
 

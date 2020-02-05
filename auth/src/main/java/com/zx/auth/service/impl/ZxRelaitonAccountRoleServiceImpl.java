@@ -78,25 +78,25 @@ public class ZxRelaitonAccountRoleServiceImpl extends ServiceImpl<ZxRelaitonAcco
         String roleId = (String) object.get("roleId");
         List<String> accountIds = (List<String>) object.get("accountIds");
         //构建角色菜单关系对象
-        if (CollectionUtils.isEmpty(accountIds)) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(),
-                    "授权账号信息为空");
+        List<ZxRelaitonAccountRole> accountRoleResourceList = null;
+        if(!CollectionUtils.isEmpty(accountIds)) {
+            accountRoleResourceList = new ArrayList<>();
+            for (String accountId : accountIds) {
+                ZxRelaitonAccountRole zxRelationRoleResource = new ZxRelaitonAccountRole();
+                zxRelationRoleResource.setRoleId(roleId);
+                zxRelationRoleResource.setAccountId(accountId);
+                accountRoleResourceList.add(zxRelationRoleResource);
+            }
         }
-
-        List<ZxRelaitonAccountRole> accountRoleResourceList = new ArrayList<>();
-        for (String accountId : accountIds) {
-            ZxRelaitonAccountRole zxRelationRoleResource = new ZxRelaitonAccountRole();
-            zxRelationRoleResource.setRoleId(roleId);
-            zxRelationRoleResource.setAccountId(accountId);
-            accountRoleResourceList.add(zxRelationRoleResource);
-
-        }
-
         //删除旧关系
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("role_id", roleId);
         this.remove(queryWrapper);
         //保存
+        if(CollectionUtils.isEmpty(accountRoleResourceList)){
+           return new ResponseBean(CommonConstants.SUCCESS.getCode());
+        }
+
         boolean saveFlag = this.saveBatch(accountRoleResourceList);
         return saveFlag ? new ResponseBean(CommonConstants.SUCCESS.getCode()) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
     }
