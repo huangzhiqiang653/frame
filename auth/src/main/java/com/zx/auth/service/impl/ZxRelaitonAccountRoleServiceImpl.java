@@ -3,6 +3,7 @@ package com.zx.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zx.auth.entity.ZxOrganization;
 import com.zx.auth.entity.ZxRelaitonAccountRole;
 import com.zx.auth.entity.ZxRelationRoleMenu;
 import com.zx.auth.entity.ZxRelaitonAccountRole;
@@ -38,6 +39,10 @@ public class ZxRelaitonAccountRoleServiceImpl extends ServiceImpl<ZxRelaitonAcco
         switch (requestBean.getHandle()) {
             case ADD:
                 return add(requestBean);
+            case ADD_ROLE_ACCOUNTS_RELATION:
+                return addRoleAccountsRelation(requestBean);
+            case ADD_ACCOUNT_ROLES_RELATION:
+                return addAccountRolesRelation(requestBean);
             case ADD_BATCH:
                 return addBatch(requestBean);
             case UPDATE_ALL:
@@ -64,8 +69,6 @@ public class ZxRelaitonAccountRoleServiceImpl extends ServiceImpl<ZxRelaitonAcco
 
         }
     }
-
-
     /**
      * 单个新增
      *
@@ -73,6 +76,18 @@ public class ZxRelaitonAccountRoleServiceImpl extends ServiceImpl<ZxRelaitonAcco
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
+        ZxRelaitonAccountRole zxRelaitonAccountRole = BaseHzq.convertValue(requestBean.getInfo(), ZxRelaitonAccountRole.class);
+        boolean saveFlag = this.save(zxRelaitonAccountRole);
+        return saveFlag ? new ResponseBean(zxRelaitonAccountRole) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
+    }
+
+    /**
+     * 指定角色添加账号信息
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean addRoleAccountsRelation(RequestBean requestBean) {
         // 获取其他数据
         Map object = (LinkedHashMap) requestBean.getInfo();
         String roleId = (String) object.get("roleId");
@@ -91,6 +106,41 @@ public class ZxRelaitonAccountRoleServiceImpl extends ServiceImpl<ZxRelaitonAcco
         //删除旧关系
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("role_id", roleId);
+        this.remove(queryWrapper);
+        //保存
+        if(CollectionUtils.isEmpty(accountRoleResourceList)){
+           return new ResponseBean(CommonConstants.SUCCESS.getCode());
+        }
+
+        boolean saveFlag = this.saveBatch(accountRoleResourceList);
+        return saveFlag ? new ResponseBean(CommonConstants.SUCCESS.getCode()) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
+    }
+
+    /**
+     * 指定账号添加角色信息
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean addAccountRolesRelation(RequestBean requestBean) {
+        // 获取其他数据
+        Map object = (LinkedHashMap) requestBean.getInfo();
+        String accountId = (String) object.get("accountId");
+        List<String> roleIds = (List<String>) object.get("roleIds");
+        //构建角色菜单关系对象
+        List<ZxRelaitonAccountRole> accountRoleResourceList = null;
+        if(!CollectionUtils.isEmpty(roleIds)) {
+            accountRoleResourceList = new ArrayList<>();
+            for (String roleId : roleIds) {
+                ZxRelaitonAccountRole zxRelationRoleResource = new ZxRelaitonAccountRole();
+                zxRelationRoleResource.setRoleId(roleId);
+                zxRelationRoleResource.setAccountId(accountId);
+                accountRoleResourceList.add(zxRelationRoleResource);
+            }
+        }
+        //删除旧关系
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("account_id", accountId);
         this.remove(queryWrapper);
         //保存
         if(CollectionUtils.isEmpty(accountRoleResourceList)){

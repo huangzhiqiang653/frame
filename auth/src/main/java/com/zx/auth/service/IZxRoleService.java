@@ -29,4 +29,12 @@ public interface IZxRoleService extends IService<ZxRole> {
      * @return
      */
     public ResponseBean getMenuByRole(RequestBean requestBean);
+
+    /**
+     * 根据账号id获取该账号设置的角色信息列表
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean listRoleByAccountId(RequestBean requestBean);
 }

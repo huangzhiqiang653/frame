@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.auth.entity.ZxRelationRoleMenu;
 import com.zx.auth.entity.ZxRelationRoleResource;
 import com.zx.auth.entity.ZxRole;
-import com.zx.auth.mapper.ZxAccountMapper;
 import com.zx.auth.mapper.ZxRoleMapper;
 import com.zx.auth.service.IZxRelationRoleMenuService;
 import com.zx.auth.service.IZxRelationRoleResourceService;
@@ -22,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -69,6 +69,8 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
                 return getPage(requestBean);
             case GET_MENU_BY_ROLE:
                 return getMenuByRole(requestBean);
+            case LIST_ROLE_BY_ACCOUNT:
+                return listRoleByAccountId(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -183,8 +185,58 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
             page = new Page();
         }
         QueryWrapper<ZxRole> queryWrapper = new QueryWrapper<ZxRole>();
-        // TODO 添加查询条件
+        queryWrapper.orderByAsc("sort");
+        queryWrapper.orderByDesc("update_time");
+        //查询条件
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        if (!CollectionUtils.isEmpty(queryMap)) {
+            //授权标志：false 只查询未授权，true 只查询已授权，未空则查询全部
+            if (queryMap.get("authFlag") != null) {
+                String accountId = (String) queryMap.get("accountId");
+                boolean authFlag = Boolean.getBoolean((String) queryMap.get("authFlag"));
+                queryMap.remove("accountId");
+                queryMap.remove("authFlag");
+                ZxRoleMapper accountMapper = this.getBaseMapper();
+                accountMapper.listRoleByAccountId(accountId);
+                List<ZxRole> zxRoles = accountMapper.listRoleByAccountId(accountId);
+                if (!CollectionUtils.isEmpty(zxRoles)) {
+                    Set<String> authRoleIds = new HashSet<>();
+                    for (ZxRole r : zxRoles) {
+                        authRoleIds.add(r.getId());
+                    }
 
+                    if (authFlag) {
+                        queryWrapper.in("id", authRoleIds);
+                    } else {
+                        queryWrapper.notIn("id", authRoleIds);
+                    }
+                }
+            }
+
+            String keyWords = (String) queryMap.get("keyWords");
+            queryMap.remove("keyWords");
+            if (!StringUtils.isEmpty(keyWords)) {
+                queryWrapper.and(new Consumer<QueryWrapper<ZxRole>>() {
+                    @Override
+                    public void accept(QueryWrapper<ZxRole> zxUserQueryWrapper) {
+                        zxUserQueryWrapper.like("name", keyWords.trim()).or()
+                                .like("code", keyWords.trim());
+                    }
+                });
+            }
+
+            ZxRole zxRole = BaseHzq.convertValue(queryMap, ZxRole.class);
+            // 查询条件
+            if (!StringUtils.isEmpty(zxRole.getName())) {
+                queryWrapper.like("name", zxRole.getName().trim());
+            }
+            if (!StringUtils.isEmpty(zxRole.getCode())) {
+                queryWrapper.eq("code", zxRole.getCode());
+            }
+            if (!StringUtils.isEmpty(zxRole.getRemark())) {
+                queryWrapper.like("remark", zxRole.getRemark());
+            }
+        }
         return new ResponseBean(this.page(page, queryWrapper));
     }
 
@@ -204,7 +256,7 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
         List<ZxRelationRoleMenu> menuList = relationRoleMenuService.list(queryWrapper);
         if (!CollectionUtils.isEmpty(menuList)) {
             List<String> menuIds = new ArrayList<>();
-            map.put("menuIds",menuIds);
+            map.put("menuIds", menuIds);
             for (ZxRelationRoleMenu menu : menuList) {
                 String menuId = menu.getMenuId();
                 menuIds.add(menuId);
@@ -220,7 +272,7 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
                 for (ZxRelationRoleResource resource : resourceList) {
                     String menuId = resource.getMenuId();
                     List<String> resourceIds = subMap.get(menuId);
-                    if(CollectionUtils.isEmpty(resourceIds)){
+                    if (CollectionUtils.isEmpty(resourceIds)) {
                         resourceIds = new ArrayList<>();
                         subMap.put(menuId, resourceIds);
                     }
@@ -231,6 +283,27 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
         }
 
         return new ResponseBean(map);
+    }
+
+    /**
+     * 根据账号id获取该账号设置的角色信息列表
+     *
+     * @param requestBean
+     * @return
+     */
+    @Override
+    public ResponseBean listRoleByAccountId(RequestBean requestBean) {
+        String accountId = (String) requestBean.getInfo();
+        if (StringUtils.isEmpty(accountId)) {
+            return new ResponseBean();
+        }
+
+        if (StringUtils.isEmpty(accountId)) {
+            return new ResponseBean();
+        }
+
+        ZxRoleMapper accountMapper = this.getBaseMapper();
+        return new ResponseBean(accountMapper.listRoleByAccountId(accountId));
     }
 
 

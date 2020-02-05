@@ -73,6 +73,12 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
         }
     }
 
+    /**
+     * 根据角色获取账号信息
+     *
+     * @param requestBean
+     * @return
+     */
     @Override
     public ResponseBean listAccountByRole(RequestBean requestBean) {
         String roleId = (String) requestBean.getInfo();
@@ -217,7 +223,7 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
                 queryMap.remove("roleId");
                 queryMap.remove("authFlag");
                 List<ZxAccount> zxAccounts = getZxRoleAccounts(roleId);
-                if (CollectionUtils.isEmpty(zxAccounts)) {
+                if (!CollectionUtils.isEmpty(zxAccounts)) {
                     Set<String> authAccountIds = new HashSet<>();
                     for (ZxAccount account : zxAccounts) {
                         authAccountIds.add(account.getId());
