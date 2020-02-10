@@ -3,8 +3,12 @@ server:
   port: 9073
   servlet:
     context-path: /zxauth
+    session:
+      timeout: 7200 #session失效时间 单位秒
 ################################数据库配置-start###############################
 spring:
+  session:
+    store-type: redis
   datasource:
     name: zx_frame_db
     url: jdbc:p6spy:mysql://localhost:3306/zx_frame_db?useUnicode=true&useSSL=false&characterEncoding=utf8
@@ -25,16 +29,17 @@ spring:
     # 端口号 不通使用465
     port: 25
     title: 来自法务风险管理系统--待办提醒
-    ###redis配置-start#######################################
-    redis:
-      #Redis数据库索引（默认为0）
-      database: 0
-      # Redis服务器地址
-      host: 127.0.0.1
-      # Redis服务器连接端口
-      port: 6379
-      # Redis服务器连接密码（默认为空）
-      password:
+  ###redis配置-start#######################################
+  redis:
+    #Redis数据库索引（默认为0）
+    database: 0
+    # Redis服务器地址
+    host: 127.0.0.1
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password:
+    jedis:
       pool:
         # 连接池最大连接数（使用负值表示没有限制）
         max-active: 200
@@ -44,9 +49,9 @@ spring:
         max-idle: 10
         # 连接池中的最小空闲连接
         min-idle: 0
-        # 连接超时时间（毫秒）
-        timeout: 1000
-    ###redis配置-end#######################################
+    # 连接超时时间（毫秒）
+    timeout: 3000
+  ###redis配置-end#######################################
 ################################数据库配置-end#################################
 
 ################################FastDFS参数-start###############################
@@ -81,3 +86,11 @@ pool:
   schedule: 10
 
 ################################线程池配置-end#######################################
+login:
+  excludeUrl: /auth/index/login,/auth/index/logout
+  redis:
+    #登录session的失效时长 单位秒
+    timeout: 7200
+
+account:
+  initialpwd: '000000'

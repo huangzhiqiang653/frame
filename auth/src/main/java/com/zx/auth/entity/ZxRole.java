@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * <p>
  * 角色表
@@ -20,7 +22,7 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @TableName("auth_zx_role")
-@ApiModel(value="ZxRole对象", description="角色表")
+@ApiModel(value = "ZxRole对象", description = "角色表")
 public class ZxRole extends BaseEntityBean {
 
     private static final long serialVersionUID = 1L;
@@ -37,5 +39,5 @@ public class ZxRole extends BaseEntityBean {
     @ApiModelProperty(value = "排序")
     private Integer sort;
 
-
+    private List<ZxMenu> authMenuList;
 }

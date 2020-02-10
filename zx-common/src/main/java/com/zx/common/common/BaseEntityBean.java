@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Date;
  * @author: 黄智强
  * @create: 2019-11-12 12:10
  **/
-public class BaseEntityBean {
+public class BaseEntityBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -3,7 +3,6 @@
 <mapper namespace="com.zx.auth.mapper.ZxAccountMapper">
     <resultMap id="zxAccountMap" type="com.zx.auth.entity.ZxAccount">
         <id column="id" jdbcType="VARCHAR" property="id"/>
-        <result column="create_time" jdbcType="VARCHAR" property="createTime"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="creator" jdbcType="VARCHAR" property="creator"/>

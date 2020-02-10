@@ -71,8 +71,6 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
                 return getPage(requestBean);
             case GET_TREE:
                 return getMenuTree(requestBean);
-            case GET_MENU_BY_ROLE:
-                return getMenuTree(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -256,8 +254,8 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
                 if (!CollectionUtils.isEmpty(resourceList)) {
                     for (ZxResource resource : resourceList) {
                         Map child = BaseHzq.beanToMap(resource);
-                        child.put("name",resource.getResourceName());
-                        child.put("isResource",true);
+                        child.put("name", resource.getResourceName());
+                        child.put("isResource", true);
                         children.add(child);
                     }
 
@@ -273,5 +271,36 @@ public class ZxMenuServiceImpl extends ServiceImpl<ZxMenuMapper, ZxMenu> impleme
             children.add(child);
         }
         map.put("children", children);
+    }
+
+
+    /**
+     * 根据角色Id获取角色下的菜单及资源权限
+     *
+     * @param roleId 角色id
+     * @return
+     */
+    @Override
+    public List<ZxMenu> listMenuByRoleId(String roleId) {
+        ZxMenuMapper zxMenuMapper = this.getBaseMapper();
+        List<ZxMenu> menuList = zxMenuMapper.listMenuByRoleId(roleId);
+        if (CollectionUtils.isEmpty(menuList)) return new ArrayList<>(0);
+        List<ZxResource> resourceList = zxMenuMapper.listResourceByRoleId(roleId);
+        if (CollectionUtils.isEmpty(resourceList)) return menuList;
+        for (ZxMenu menu : menuList) {
+            for (ZxResource resource : resourceList) {
+                if (menu.getId().equals(resource.getRelationId())) {
+                    List<ZxResource> list = menu.getZxResourceList();
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        menu.setZxResourceList(list);
+                    }
+
+                    list.add(resource);
+                }
+            }
+        }
+
+        return menuList;
     }
 }

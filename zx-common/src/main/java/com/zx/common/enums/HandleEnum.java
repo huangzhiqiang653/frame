@@ -34,8 +34,10 @@ public enum HandleEnum {
     GET_MENU_BY_ROLE("getAuthMenu", "获取有权限的菜单"),
     LIST_ACCOUNT_BY_ROLE("listAccountByRole", "根据指定角色下的账号"),
     LIST_ROLE_BY_ACCOUNT("listRoleByAccountId", "获取指定账号设定的角色信息"),
-    ADD_ROLE_ACCOUNTS_RELATION("addRoleAccountsRelation","指定角色添加账号信息"),
-    ADD_ACCOUNT_ROLES_RELATION("addAccountRolesRelation","指定账号添加角色信息");
+    ADD_ROLE_ACCOUNTS_RELATION("addRoleAccountsRelation", "指定角色添加账号信息"),
+    ADD_ACCOUNT_ROLES_RELATION("addAccountRolesRelation", "指定账号添加角色信息"),
+    INIT_ACCOUNT_PWD("initialAccountPwd", "初始化账户密码");
+
     HandleEnum(String value, String desc) {
         this.value = value;
         this.desc = desc;

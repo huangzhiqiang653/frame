@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zx.auth.mapper.ZxMenuMapper">
+    <resultMap id="zxMenuMap" type="com.zx.auth.entity.ZxMenu">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="delete_flag" jdbcType="TINYINT" property="deleteFlag"/>
 
+        <result column="parent_id" jdbcType="VARCHAR" property="parentId"/>
+        <result column="level" jdbcType="INTEGER" property="level"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="menu_type" jdbcType="VARCHAR" property="menuType"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="remark" jdbcType="CLOB" property="remark"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+    </resultMap>
+
+    <resultMap id="zxResourceMap" type="com.zx.auth.entity.ZxResource">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="creator" jdbcType="VARCHAR" property="creator"/>
+        <result column="delete_flag" jdbcType="TINYINT" property="deleteFlag"/>
+
+        <result column="relation_id" jdbcType="VARCHAR" property="relationId"/>
+        <result column="resource_name" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="resource_code" jdbcType="VARCHAR" property="resourceCode"/>
+        <result column="remark" jdbcType="CLOB" property="remark"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+    </resultMap>
+    <select id="listMenuByRoleId" parameterType="string" resultMap="zxMenuMap">
+       SELECT a.* FROM auth_zx_menu a LEFT JOIN auth_zx_relation_role_menu r on a.id=r.menu_id
+       where r.role_id = #{roleId}
+    </select>
+
+    <select id="listResourceByRoleId" parameterType="string" resultMap="zxResourceMap">
+       SELECT a.* FROM auth_zx_resource a LEFT JOIN auth_zx_relation_role_resource r on a.id=r.resource_id
+       where r.role_id = #{roleId}
+    </select>
 </mapper>

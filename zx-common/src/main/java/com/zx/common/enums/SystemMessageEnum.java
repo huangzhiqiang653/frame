@@ -5,6 +5,7 @@ import lombok.Getter;
 
 /**
  * 系统提示枚举
+ *
  * @author huangzhiqiang
  */
 @Getter
@@ -13,6 +14,9 @@ public enum SystemMessageEnum {
     HANDLE_NOT_IN("type类型匹配失败，可选项(add,addBatch,updateAll,updateAllBatch,updateSelect,updateSelectBatch,deletePhysical,deletePhysicalBatch,deleteLogical,deleteLogicalBatch,getInfoById,getListByCondition,getAll,getPage)"),
     // 参数为空提示
     ENTITY_IS_NULL("参数为空"),
+    //账号不存在
+    ACCOUNT_IS_NULL("账号不存在"),
+    ACCOUNT_PASSWORD_IS_ERROR("密码错误"),
     ;
 
     SystemMessageEnum(String value) {

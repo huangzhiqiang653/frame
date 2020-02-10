@@ -8,10 +8,12 @@ import com.zx.auth.mapper.SystemMapper;
 import com.zx.auth.mapper.ZxAccountMapper;
 import com.zx.auth.service.IZxAccountService;
 import com.zx.common.common.BaseHzq;
+import com.zx.common.common.MD5Utils;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -32,6 +34,9 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
 
     @Resource
     SystemMapper systemMapper;
+
+    @Value("${account.initialpwd}")
+    private String initialPwd;
 
     /**
      * 公共基础方法
@@ -64,6 +69,8 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
                 return getPage(requestBean);
             case LIST_ACCOUNT_BY_ROLE:
                 return listAccountByRole(requestBean);
+            case INIT_ACCOUNT_PWD:
+                return initAccountPwd(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -90,6 +97,30 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
         return new ResponseBean(zxAccounts);
     }
 
+    /**
+     * 根据参数获取有效的账号信息
+     *
+     * @param zxAccount 账号对象<%link com.zx.auth.entity.ZxAccount#accountName> 账号名不可为空 </%link>
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public List<ZxAccount> listByAccount(ZxAccount zxAccount) throws Exception {
+        if (zxAccount == null || StringUtils.isEmpty(zxAccount.getAccountName())) {
+            throw new Exception(SystemMessageEnum.ENTITY_IS_NULL.getValue());
+        }
+
+        QueryWrapper<ZxAccount> queryWrapper = new QueryWrapper<ZxAccount>();
+        queryWrapper.orderByAsc("status");
+        queryWrapper.orderByDesc("update_time");
+        queryWrapper.eq("status", 0);
+        if (!StringUtils.isEmpty(zxAccount.getAccountName())) {
+            queryWrapper.eq("account_name", zxAccount.getAccountName());
+        }
+
+        return this.list(queryWrapper);
+    }
+
     private List<ZxAccount> getZxRoleAccounts(String roleId) {
         if (StringUtils.isEmpty(roleId)) {
             return new ArrayList<>(0);
@@ -106,7 +137,12 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
-        return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), ZxAccount.class)));
+        ZxAccount zxAccount = BaseHzq.convertValue(requestBean.getInfo(), ZxAccount.class);
+        if (zxAccount != null && StringUtils.isEmpty(zxAccount.getAccountPassword())) {
+            zxAccount.setAccountPassword(MD5Utils.md5(initialPwd));
+        }
+
+        return new ResponseBean(this.save(zxAccount));
     }
 
     /**
@@ -219,7 +255,7 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
             //授权标志：false 只查询未授权，true 只查询已授权，未空则查询全部
             if (queryMap.get("authFlag") != null) {
                 String roleId = (String) queryMap.get("roleId");
-                boolean authFlag = Boolean.getBoolean((String)queryMap.get("authFlag"));
+                boolean authFlag = Boolean.getBoolean((String) queryMap.get("authFlag"));
                 queryMap.remove("roleId");
                 queryMap.remove("authFlag");
                 List<ZxAccount> zxAccounts = getZxRoleAccounts(roleId);
@@ -250,5 +286,19 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
             queryWrapper.between("update_time", updateTimes.get(0), updateTimes.get(1));
         }
         return new ResponseBean(this.page(page, queryWrapper));
+    }
+
+    /**
+     * 初始化账户密码
+     *
+     * @param requestBean
+     * @return
+     */
+    private ResponseBean initAccountPwd(RequestBean requestBean) {
+        String id = (String) requestBean.getInfo();
+        ZxAccount zxAccount = new ZxAccount();
+        zxAccount.setId(id);
+        zxAccount.setAccountPassword(MD5Utils.md5(initialPwd));
+        return new ResponseBean(this.updateById(zxAccount));
     }
 }

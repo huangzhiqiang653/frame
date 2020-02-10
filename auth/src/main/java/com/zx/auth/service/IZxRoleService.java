@@ -1,9 +1,12 @@
 package com.zx.auth.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zx.auth.entity.ZxMenu;
 import com.zx.auth.entity.ZxRole;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
+
+import java.util.List;
 
 /**
  * <p>
@@ -33,8 +36,8 @@ public interface IZxRoleService extends IService<ZxRole> {
     /**
      * 根据账号id获取该账号设置的角色信息列表
      *
-     * @param requestBean
+     * @param accountId
      * @return
      */
-    public ResponseBean listRoleByAccountId(RequestBean requestBean);
+    public List<ZxRole> listRoleByAccountId(String accountId);
 }

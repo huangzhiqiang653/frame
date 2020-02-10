@@ -3,9 +3,11 @@ package com.zx.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zx.auth.entity.ZxMenu;
 import com.zx.auth.entity.ZxRelationRoleMenu;
 import com.zx.auth.entity.ZxRelationRoleResource;
 import com.zx.auth.entity.ZxRole;
+import com.zx.auth.mapper.ZxMenuMapper;
 import com.zx.auth.mapper.ZxRoleMapper;
 import com.zx.auth.service.IZxRelationRoleMenuService;
 import com.zx.auth.service.IZxRelationRoleResourceService;
@@ -291,20 +293,24 @@ public class ZxRoleServiceImpl extends ServiceImpl<ZxRoleMapper, ZxRole> impleme
      * @param requestBean
      * @return
      */
-    @Override
-    public ResponseBean listRoleByAccountId(RequestBean requestBean) {
+    private ResponseBean listRoleByAccountId(RequestBean requestBean) {
         String accountId = (String) requestBean.getInfo();
         if (StringUtils.isEmpty(accountId)) {
             return new ResponseBean();
         }
 
-        if (StringUtils.isEmpty(accountId)) {
-            return new ResponseBean();
-        }
-
-        ZxRoleMapper accountMapper = this.getBaseMapper();
-        return new ResponseBean(accountMapper.listRoleByAccountId(accountId));
+        return new ResponseBean(listRoleByAccountId(accountId));
     }
 
-
+    /**
+     * 根据账号id获取该账号设置的角色信息列表
+     *
+     * @param accountId
+     * @return
+     */
+    @Override
+    public List<ZxRole> listRoleByAccountId(String accountId) {
+        ZxRoleMapper zxRoleMapper = this.getBaseMapper();
+        return zxRoleMapper.listRoleByAccountId(accountId);
+    }
 }
