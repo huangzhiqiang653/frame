@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Transient;
 
 import java.util.List;
 
@@ -39,5 +40,6 @@ public class ZxRole extends BaseEntityBean {
     @ApiModelProperty(value = "排序")
     private Integer sort;
 
-    private List<ZxMenu> authMenuList;
+    @Transient
+    private transient List<ZxMenu> authMenuList;
 }
