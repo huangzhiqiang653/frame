@@ -61,7 +61,7 @@ public class IndexController {
      */
     @GetMapping("/toLogin")
     public ResponseBean loginValidate(HttpServletRequest request) {
-        Map<String, Object> map ;
+        Map<String, Object> map;
         //判断请求是手机端还是pc端发出
         String userAgent = request.getHeader("USER-AGENT");
         boolean isPhone = CheckMobileUtil.check(userAgent);
@@ -81,11 +81,11 @@ public class IndexController {
         } else {
             HttpSession session = request.getSession();
             ZxUser user = (ZxUser) session.getAttribute("userInfo");
-            ZxOrganization orgInfo = (ZxOrganization) session.getAttribute("orgInfo");
+            Map<String, ZxOrganization> orgInfoMap = (Map<String, ZxOrganization>) session.getAttribute("orgInfoMap");
             List<ZxRole> authRoles = (List<ZxRole>) session.getAttribute("authRoles");
             map = new HashMap<>();
             map.put("userInfo", user);
-            map.put("orgInfo", orgInfo);
+            map.put("orgInfoMap", orgInfoMap);
             map.put("authRoles", authRoles);
         }
 
@@ -132,10 +132,20 @@ public class IndexController {
             }
 
             //(用户、角色、权限、组织等)
-            ZxUser user = zxUserService.getById(zxAccount.getUserId());
-            ZxOrganization org = null;
+            ZxUser user = null;
+            if (!StringUtils.isEmpty(zxAccount.getUserId())) {
+                user = zxUserService.getById(zxAccount.getUserId().split(",")[0]);
+            }
+
+            Map<String, ZxOrganization> orgMap = null;
             if (user != null && !StringUtils.isEmpty(user.getOrganizationId())) {
-                org = organizationService.getById(user.getOrganizationId());
+                orgMap = new HashMap<>();
+                String[] orgIds = user.getOrganizationId().split(",");
+                int len = orgIds.length;
+                for (int i = 0; i < (len > 1 ? len - 1 : len); i++) {
+                    ZxOrganization org = organizationService.getById(orgIds[i]);
+                    orgMap.put(orgIds[i], org);
+                }
             }
 
             List<ZxRole> roleList = zxRoleService.listRoleByAccountId(zxAccount.getId());
@@ -152,7 +162,7 @@ public class IndexController {
             if (isPhone) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("userInfo", user);
-                map.put("orgInfo", org);
+                map.put("orgInfoMap", orgMap);
                 map.put("authRoles", roleList);
                 String ticket = UUID.randomUUID().toString();
                 String key = ticket_ + ticket;
@@ -162,7 +172,7 @@ public class IndexController {
             } else {
                 HttpSession session = request.getSession();
                 session.setAttribute("userInfo", user);
-                session.setAttribute("orgInfo", org);
+                session.setAttribute("orgInfoMap", orgMap);
                 session.setAttribute("authRoles", roleList);
                 return new ResponseBean();
             }
