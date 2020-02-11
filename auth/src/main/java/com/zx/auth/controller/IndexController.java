@@ -170,6 +170,28 @@ public class IndexController {
             return new ResponseBean(CommonConstants.FAIL.getCode(), e.getMessage());
         }
     }
+    /**
+     * 注册新用户
+     *
+     *@param account
+     */
+    @PostMapping("/register")
+    public ResponseBean toRegister(@RequestBody ZxAccount account) {
+        //获取用户账号
+        String accountName = account.getAccountName();
+        //获取用户密码
+        String accountPassword = account.getAccountPassword();
+        //验证账号密码非空
+        if (StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountPassword)) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
+        }
+        //对密码进行md5加密
+        account.setAccountPassword(MD5Utils.md5(accountPassword));
+        //将注册的新用户信息进行保存
+        return new ResponseBean(zxAccountService.addRegisterAccount(account));
+
+    }
+
 
     /**
      * 退出校验

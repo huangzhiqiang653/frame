@@ -40,4 +40,16 @@ public interface IZxAccountService extends IService<ZxAccount> {
      * @return 账号信息
      */
     public List<ZxAccount> listByAccount(ZxAccount zxAccount) throws Exception;
+
+
+    /**
+     *2020-2-11
+     * @param zxAccount
+     * @return
+     */
+    public ResponseBean addRegisterAccount(ZxAccount zxAccount)  ;
+
+
+
+
 }
