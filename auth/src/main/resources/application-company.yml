@@ -88,8 +88,12 @@ pool:
 ################################线程池配置-end#######################################
 login:
   excludeUrl: /auth/index/login,/auth/index/logout
-  redis:
-    #登录session的失效时长 单位秒
+redis:
+  #登录session的失效时长 单位秒
+  session:
+    timeout: 7200
+  #dictionary的失效时长 单位秒
+  dictionary:
     timeout: 7200
 
 account:

@@ -1,13 +1,10 @@
 package com.zx.auth.controller;
 
-import com.alibaba.druid.support.json.JSONUtils;
 import com.zx.auth.entity.*;
 import com.zx.auth.service.*;
-import com.zx.common.common.CheckMobileUtil;
-import com.zx.common.common.MD5Utils;
-import com.zx.common.common.RedisUtil;
-import com.zx.common.common.ResponseBean;
+import com.zx.common.common.*;
 import com.zx.common.enums.CommonConstants;
+import com.zx.common.enums.HandleEnum;
 import com.zx.common.enums.SystemMessageEnum;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -19,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @program: law-risk->IndexController
@@ -47,8 +47,10 @@ public class IndexController {
     @Resource
     RedisUtil redisUtil;
 
-    @Value("${login.session.timeout}")
-    private String loginSessionTimeOut;
+    @Value("${redis.session.timeout}")
+    private String redisSessionTimeout;
+    @Value("${redis.dictionary.timeout}")
+    private String redisDictionaryTimeout;
 
     private final static String ticket_ = "ticket_";
 
@@ -59,10 +61,10 @@ public class IndexController {
      */
     @GetMapping("/toLogin")
     public ResponseBean loginValidate(HttpServletRequest request) {
+        Map<String, Object> map ;
         //判断请求是手机端还是pc端发出
         String userAgent = request.getHeader("USER-AGENT");
         boolean isPhone = CheckMobileUtil.check(userAgent);
-        Map<String, Object> map = null;
         if (isPhone) {
             String ticket = (String) request.getAttribute("ticket");
             if (StringUtils.isEmpty(ticket)) {
@@ -75,7 +77,7 @@ public class IndexController {
                 return new ResponseBean(CommonConstants.NOT_LOGIN.getCode(), CommonConstants.NOT_LOGIN.getMessage());
             }
 
-            map = (Map<String, Object>) JSONUtils.parse((String) values);
+            map = JSONUtil.json2Object((String) values, Map.class);
         } else {
             HttpSession session = request.getSession();
             ZxUser user = (ZxUser) session.getAttribute("userInfo");
@@ -87,6 +89,17 @@ public class IndexController {
             map.put("authRoles", authRoles);
         }
 
+        List<ZxDictionary> allDictionary;
+        String dictionary = (String) redisUtil.get("dictionaryList");
+        if (StringUtils.isEmpty(dictionary)) {
+            allDictionary = (List<ZxDictionary>) zxDictionaryService.base(new RequestBean("getAll", HandleEnum.GET_ALL, null, null, null)).getData();
+            redisUtil.set("dictionaryList", JSONUtil.object2Json(allDictionary));
+            redisUtil.expire("dictionaryList", Long.parseLong(redisDictionaryTimeout));
+        } else {
+            allDictionary = (List<ZxDictionary>) JSONUtil.json2Object((String) dictionary, List.class);
+        }
+
+        map.put("dictionaryList", allDictionary);
         return new ResponseBean(map);
     }
 
@@ -143,8 +156,8 @@ public class IndexController {
                 map.put("authRoles", roleList);
                 String ticket = UUID.randomUUID().toString();
                 String key = ticket_ + ticket;
-                redisUtil.set(key, JSONUtils.toJSONString(map));
-                redisUtil.expire(key, Long.parseLong(loginSessionTimeOut));
+                redisUtil.set(key, JSONUtil.object2Json(map));
+                redisUtil.expire(key, Long.parseLong(redisSessionTimeout));
                 return new ResponseBean(ticket);
             } else {
                 HttpSession session = request.getSession();
