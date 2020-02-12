@@ -87,7 +87,7 @@ pool:
 
 ################################线程池配置-end#######################################
 login:
-  excludeUrl: /auth/index/login,/auth/index/logout
+  excludeUrl: /auth/index/login,/auth/index/logout,/auth/index/register
 redis:
   #登录session的失效时长 单位秒
   session:
