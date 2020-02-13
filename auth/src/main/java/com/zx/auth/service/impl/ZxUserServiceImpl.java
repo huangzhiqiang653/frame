@@ -270,4 +270,21 @@ public class ZxUserServiceImpl extends ServiceImpl<ZxUserMapper, ZxUser> impleme
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }
+
+    /**
+     * 2020-2-12
+     * @param zxUser
+     * @return
+     */
+    @Override
+    public ResponseBean addAccountUser(ZxUser zxUser){
+        return new ResponseBean(this.save(zxUser));
+
+    }
+
+
+
+
+
+
 }

@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @program: law-risk->IndexController
@@ -187,6 +184,15 @@ public class IndexController {
      */
     @PostMapping("/register")
     public ResponseBean toRegister(@RequestBody ZxAccount account) {
+       //生成随机不重复的字符串
+        String result= UUID.randomUUID().toString().replace("-", "").toUpperCase();
+        //保存注册账号用户信息
+        ZxUser user1=new  ZxUser();
+        user1.setId(MD5Utils.md5(result));
+        //保存用户信息
+        zxUserService.addAccountUser(user1);
+        //账号表中的用户id主键
+        account.setUserId(user1.getId());
         //获取用户账号
         String accountName = account.getAccountName();
         //获取用户密码

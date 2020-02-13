@@ -46,4 +46,7 @@ public class BaseEntityBean implements Serializable {
     @Getter
     @TableLogic
     private Integer deleteFlag;
+
+
+
 }
