@@ -183,16 +183,19 @@ public class IndexController {
      *@param account
      */
     @PostMapping("/register")
-    public ResponseBean toRegister(@RequestBody ZxAccount account) {
+    public ResponseBean toRegister(@RequestBody ZxAccount account ) {
        //生成随机不重复的字符串
         String result= UUID.randomUUID().toString().replace("-", "").toUpperCase();
         //保存注册账号用户信息
         ZxUser user1=new  ZxUser();
         user1.setId(MD5Utils.md5(result));
+        user1.setUserName(account.getUserAccountNameZhu());
+        user1.setBirthDay(account.getUserAccountBirthdayZhu());
+        user1.setSex(account.getUserAccountSexZhu());
+        user1.setCreateTime(new  Date());
+        user1.setPhoneNumber(account.getUserAccountPhone());
         //保存用户信息
         zxUserService.addAccountUser(user1);
-        //账号表中的用户id主键
-        account.setUserId(user1.getId());
         //获取用户账号
         String accountName = account.getAccountName();
         //获取用户密码
@@ -201,10 +204,13 @@ public class IndexController {
         if (StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountPassword)) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
         }
-        //对密码进行md5加密
-        account.setAccountPassword(MD5Utils.md5(accountPassword));
+        //2015-2-13重新new个对象
+        ZxAccount accountNew =new  ZxAccount();
+        accountNew.setUserId(user1.getId());
+        accountNew.setAccountName(accountName);
+        accountNew.setAccountPassword(MD5Utils.md5(accountPassword));
         //将注册的新用户信息进行保存
-        return new ResponseBean(zxAccountService.addRegisterAccount(account));
+        return new ResponseBean(zxAccountService.addRegisterAccount(accountNew));
 
     }
 
