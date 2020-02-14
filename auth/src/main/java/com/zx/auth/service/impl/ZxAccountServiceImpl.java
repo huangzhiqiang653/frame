@@ -302,17 +302,5 @@ public class ZxAccountServiceImpl extends ServiceImpl<ZxAccountMapper, ZxAccount
         return new ResponseBean(this.updateById(zxAccount));
     }
 
-    /**
-     * 2020-2-11
-     * @param zxAccount
-     * @return
-     */
-    @Override
-    public ResponseBean addRegisterAccount(ZxAccount zxAccount){
-        return new ResponseBean(this.save(zxAccount));
-
-    }
-
-
 
 }

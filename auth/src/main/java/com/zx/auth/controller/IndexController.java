@@ -180,47 +180,41 @@ public class IndexController {
     /**
      * 注册新用户
      *
-     *@param account
+     *@param requestBean
      */
     @PostMapping("/register")
-    public ResponseBean toRegister(@RequestBody ZxAccount account ) {
+    public ResponseBean toRegister(@RequestBody RequestBean   requestBean) {
+        Map   object= (LinkedHashMap) requestBean.getInfo() ;
+        if (CollectionUtils.isEmpty(object)) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
+        }
+        ZxAccount  account=BaseHzq.convertValue(object.get("account"),ZxAccount.class);
+        ZxUser  user=BaseHzq.convertValue(object.get("user"),ZxUser.class);
+        //验证账号唯一性
+        ZxAccount zxAccount2 = new ZxAccount();
+        zxAccount2.setAccountName(account.getAccountName());
+        try {
+            List<ZxAccount> list = zxAccountService.listByAccount(zxAccount2);
+            if (!CollectionUtils.isEmpty(list)) {
+                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ACCOUNT_IS_LIVE.getValue());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //注册用户名非空验证
-        if (StringUtils.isEmpty(account.getUserAccountNameZhu())|| StringUtils.isEmpty(account.getUserAccountPhone())) {
+        if (StringUtils.isEmpty(user.getUserName())||StringUtils.isEmpty(user.getPhoneNumber())){
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
         }
-       //生成随机不重复的字符串
-        String result= UUID.randomUUID().toString().replace("-", "").toUpperCase();
-        //接收注册用户信息
-        ZxUser user1=new  ZxUser();
-        //用户id主键
-        user1.setId(MD5Utils.md5(result));
-        //用户名
-        user1.setUserName(account.getUserAccountNameZhu());
-        //出生日期
-        user1.setBirthDay(account.getUserAccountBirthdayZhu());
-        //性别
-        user1.setSex(account.getUserAccountSexZhu());
-        //创建时间
-        user1.setCreateTime(new  Date());
-        //电话
-        user1.setPhoneNumber(account.getUserAccountPhone());
         //保存用户信息
-        zxUserService.addAccountUser(user1);
-        //获取用户账号
-        String accountName = account.getAccountName();
-        //获取用户密码
-        String accountPassword = account.getAccountPassword();
+         zxUserService.save(user);
         //验证账号密码非空
-        if (StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountPassword)) {
+        if (StringUtils.isEmpty(account.getAccountName()) || StringUtils.isEmpty(account.getAccountPassword())) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
         }
-        //2015-2-13重新new个对象接收账号信息
-        ZxAccount accountNew =new  ZxAccount();
-        accountNew.setUserId(user1.getId());
-        accountNew.setAccountName(accountName);
-        accountNew.setAccountPassword(MD5Utils.md5(accountPassword));
+        account.setUserId(user.getId());
+        account.setAccountPassword(MD5Utils.md5(account.getAccountPassword()));
         //将注册的新用户信息进行保存
-        return new ResponseBean(zxAccountService.addRegisterAccount(accountNew));
+        return new ResponseBean(zxAccountService.save(account));
 
     }
 

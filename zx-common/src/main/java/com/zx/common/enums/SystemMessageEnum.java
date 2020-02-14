@@ -16,6 +16,7 @@ public enum SystemMessageEnum {
     ENTITY_IS_NULL("参数为空"),
     //账号不存在
     ACCOUNT_IS_NULL("账号不存在"),
+    ACCOUNT_IS_LIVE("账号已存在"),
     ACCOUNT_PASSWORD_IS_ERROR("密码错误"),
     ;
 

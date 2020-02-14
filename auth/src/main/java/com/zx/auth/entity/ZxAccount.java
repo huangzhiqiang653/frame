@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 /**
  * <p>
  * 账户表
@@ -41,6 +43,7 @@ public class ZxAccount extends BaseEntityBean {
 
     @ApiModelProperty(value = "排序")
     private Integer sort;
+
 
 
 

@@ -48,18 +48,6 @@ public class BaseEntityBean implements Serializable {
     private Integer deleteFlag;
 
 
-    @Setter
-    @Getter
-    private  String  userAccountNameZhu;
-    @Setter
-    @Getter
-    private  Integer  userAccountSexZhu;
-    @Setter
-    @Getter
-    private  Date  userAccountBirthdayZhu;
-    @Setter
-    @Getter
-    private  String  userAccountPhone;
 
 
 

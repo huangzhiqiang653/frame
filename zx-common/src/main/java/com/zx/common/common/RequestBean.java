@@ -77,6 +77,10 @@ public class RequestBean<T> implements Serializable {
         }
     }
 
+    public   RequestBean(){
+
+    }
+
     public RequestBean(String type, HandleEnum handle, String message, T info, List<T> infos) {
         this.type = type;
         this.handle = handle;
@@ -84,4 +88,7 @@ public class RequestBean<T> implements Serializable {
         this.info = info;
         this.infos = infos;
     }
+
+
+
 }

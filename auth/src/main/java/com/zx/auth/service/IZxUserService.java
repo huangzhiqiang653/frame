@@ -25,13 +25,4 @@ public interface IZxUserService extends IService<ZxUser> {
 
 
 
-
-    /**
-     *2020-2-12
-     * @param zxUser
-     * @return
-     */
-    public ResponseBean addAccountUser(ZxUser zxUser)  ;
-
-
 }
