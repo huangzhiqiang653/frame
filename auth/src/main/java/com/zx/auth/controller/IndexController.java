@@ -184,15 +184,25 @@ public class IndexController {
      */
     @PostMapping("/register")
     public ResponseBean toRegister(@RequestBody ZxAccount account ) {
+        //注册用户名非空验证
+        if (StringUtils.isEmpty(account.getUserAccountNameZhu())|| StringUtils.isEmpty(account.getUserAccountPhone())) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
+        }
        //生成随机不重复的字符串
         String result= UUID.randomUUID().toString().replace("-", "").toUpperCase();
-        //保存注册账号用户信息
+        //接收注册用户信息
         ZxUser user1=new  ZxUser();
+        //用户id主键
         user1.setId(MD5Utils.md5(result));
+        //用户名
         user1.setUserName(account.getUserAccountNameZhu());
+        //出生日期
         user1.setBirthDay(account.getUserAccountBirthdayZhu());
+        //性别
         user1.setSex(account.getUserAccountSexZhu());
+        //创建时间
         user1.setCreateTime(new  Date());
+        //电话
         user1.setPhoneNumber(account.getUserAccountPhone());
         //保存用户信息
         zxUserService.addAccountUser(user1);
@@ -204,7 +214,7 @@ public class IndexController {
         if (StringUtils.isEmpty(accountName) || StringUtils.isEmpty(accountPassword)) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
         }
-        //2015-2-13重新new个对象
+        //2015-2-13重新new个对象接收账号信息
         ZxAccount accountNew =new  ZxAccount();
         accountNew.setUserId(user1.getId());
         accountNew.setAccountName(accountName);
