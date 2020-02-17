@@ -76,5 +76,8 @@ public class RtUser extends BaseEntityBean {
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    @ApiModelProperty(value = "车牌号")
+    private String carNo;
+
 
 }

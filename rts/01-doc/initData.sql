@@ -20,6 +20,7 @@
         town_code         VARCHAR(32) COMMENT '所属乡镇编码',
         address           TEXT COMMENT '详细地址',
         remark            TEXT COMMENT '备注',
+        car_no            VARCHAR(64) COMMENT '车牌号',
         create_time       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
         creator           VARCHAR(64) COMMENT '创建人',
         update_time       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
