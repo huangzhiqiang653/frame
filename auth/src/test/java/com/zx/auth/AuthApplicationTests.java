@@ -6,7 +6,5 @@ import org.springframework.boot.test.context.SpringBootTest;
 class AuthApplicationTests {
 
 
-    public static void main(String[] args) {
 
-    }
 }
