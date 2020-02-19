@@ -13,7 +13,7 @@ CREATE TABLE t_rt_user
     wechat_city       VARCHAR(64) COMMENT '微信参数城市',
     wechat_province   VARCHAR(64) COMMENT '微信参数省份',
     wechat_country    VARCHAR(64) COMMENT '微信参数国家',
-    user_type         VARCHAR(1024)        DEFAULT 'villager' COMMENT '用户类型 villager村名(默认)，villageManage村管，systemMnage系统管理员，repairPersonnel维修人员，dirver司机',
+    user_type         VARCHAR(1024)        DEFAULT 'villager' COMMENT '用户类型 villager村名(默认)，villageManage村管，systemManage系统管理员，repairPersonnel维修人员，driver司机',
     approval_status   INT                  DEFAULT 0 COMMENT '审批状态 0待审批，1审批通过，2审批未过',
     work_status       INT                  DEFAULT 0 COMMENT '工作状态 0在职，1离职',
     village_code      VARCHAR(32) COMMENT '所属村居编码',
