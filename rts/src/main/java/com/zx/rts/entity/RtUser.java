@@ -55,8 +55,8 @@ public class RtUser extends BaseEntityBean {
     @ApiModelProperty(value = "微信参数国家")
     private String wechatCountry;
 
-    @ApiModelProperty(value = "用户类型 0村名，1村管，2系统管理员，3维修人员，4司机")
-    private Integer userType;
+    @ApiModelProperty(value = "用户类型 villager村名(默认)，villageManage村管，systemMnage系统管理员，repairPersonnel维修人员，dirver司机")
+    private String userType;
 
     @ApiModelProperty(value = "审批状态 0待审批，1审批通过，2审批未过")
     private Integer approvalStatus;
