@@ -8,10 +8,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
-import com.zx.rts.entity.RtRecordPump;
-import com.zx.rts.entity.RtRecordRepair;
-import com.zx.rts.entity.RtCars;
-import com.zx.rts.entity.RtUser;
+import com.zx.rts.entity.*;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.IRtOrganizationService;
 import com.zx.rts.service.IRtRecordPumpService;
@@ -202,6 +199,13 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         // TODO 添加查询条件
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        //获取区域主键id,由id获取code
+        String   quId=(String)queryMap.get("quId");
+        RtOrganization rtOrganization1= rtOrganizationService.getById(quId);
+        if(!StringUtils.isEmpty(rtOrganization1)){
+            queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
+        }
+
         //条件构造
         if (!CollectionUtils.isEmpty(queryMap)) {
             //车牌号等值查询
