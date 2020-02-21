@@ -1,6 +1,8 @@
 package com.zx.rts.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -8,10 +10,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
-import com.zx.rts.entity.RtRecordPump;
-import com.zx.rts.entity.RtRecordRepair;
-import com.zx.rts.entity.RtCars;
-import com.zx.rts.entity.RtUser;
+import com.zx.rts.entity.*;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.IRtOrganizationService;
 import com.zx.rts.service.IRtRecordPumpService;
