@@ -14,6 +14,7 @@ import com.zx.rts.mapper.RtCarsMapper;
 import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtOrganizationService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -177,9 +178,11 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         if (StringUtils.isEmpty(page)) {
             page = new Page();
         }
-        QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
-        // TODO 添加查询条件
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
+
+        // TODO 添加查询条件   王志成
+    /*    Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         //获取区域主键id,由id获取code  car_no
         String   quId=(String)queryMap.get("quId");
         RtOrganization  rtOrganization1= rtOrganizationService.getById(quId);
@@ -190,6 +193,36 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         if (!StringUtils.isEmpty(rtCars.getCarNo())) {
             queryWrapper.like("car_no", rtCars.getCarNo());
         }
-        return new ResponseBean(this.page(page, queryWrapper));
+        return new ResponseBean(this.page(page, queryWrapper));*/
+        //条件构造
+        if (!CollectionUtils.isEmpty(queryMap)) {
+            //车牌号等值查询
+            if (!StringUtils.isEmpty(queryMap.get("carNo"))) {
+                queryWrapper.eq("car_no", queryMap.get("carNo"));
+            }
+
+            //所属村居编码
+            if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
+                queryWrapper.eq("village_code", queryMap.get("villageCode"));
+            }
+            //所属乡镇编码
+            if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
+                queryWrapper.eq("town_code", queryMap.get("townCode"));
+            }
+
+            //姓名
+            if (!StringUtils.isEmpty(queryMap.get("name"))) {
+                queryWrapper.like("name", queryMap.get("name"));
+            }
+            //手机号
+            if (!StringUtils.isEmpty(queryMap.get("phoneNumber"))) {
+                queryWrapper.eq("phone_number", queryMap.get("phoneNumber"));
+            }
+
+
+        }
+        // TODO 添加查询条件
+        //return new ResponseBean(this.page(page, queryWrapper));
+        return new ResponseBean( baseMapper.selectPageRtCars(page,queryWrapper));
     }
 }

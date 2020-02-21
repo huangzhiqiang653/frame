@@ -1,7 +1,12 @@
 package com.zx.rts.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zx.rts.entity.RtCars;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +18,5 @@ import com.zx.rts.entity.RtCars;
  */
 public interface RtCarsMapper extends BaseMapper<RtCars> {
 
+    public IPage<RtCars> selectPageRtCars(IPage<RtCars> page, @Param(Constants.WRAPPER) Wrapper<RtCars> queryWrapper);
 }
