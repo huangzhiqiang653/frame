@@ -102,7 +102,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         //第二步：校验车牌是否存在
         LambdaQueryWrapper<RtCars> lambda = Wrappers.<RtCars>lambdaQuery();
         lambda.eq(RtCars::getCarNo, rtCars.getCarNo());
-        lambda.eq(RtCars::getDeleteFlag, 0);
+        lambda.eq(RtCars::getDeleteFlag,  CommonConstants.DELETE_NO.getCode());
         Integer integer = baseMapper.selectCount(lambda);
         if (integer > 0) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), "车牌号已存在，添加失败");

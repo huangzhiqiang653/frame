@@ -1,6 +1,8 @@
 package com.zx.rts.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -10,7 +12,6 @@ import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.entity.RtRecordPump;
 import com.zx.rts.entity.RtRecordRepair;
-import com.zx.rts.entity.RtCars;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.IRtOrganizationService;
@@ -22,9 +23,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,6 +49,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     @Resource
     IRtRecordRepairService rtRecordRepairService;
+
     /**
      * 公共基础方法
      *
@@ -95,7 +97,34 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
-        return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), RtUser.class)));
+        try {
+            RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+            if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
+                return new ResponseBean(CommonConstants.FAIL.getCode(), "手机号不能为空");
+            }
+            //第一步，检查数据来源
+            if ("1".equals(rtUser.getLy())) {
+                // 数据来源手机用户
+
+            } else {
+                // 数据来源平台，平台新增，无需审核
+                rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
+            }
+            //第二步：校验用户是否存在
+            LambdaQueryWrapper<RtUser> lambda = Wrappers.<RtUser>lambdaQuery();
+            lambda.eq(RtUser::getDeleteFlag, CommonConstants.DELETE_NO.getCode());
+            lambda.eq(RtUser::getPhoneNumber, rtUser.getPhoneNumber());
+            Integer integer = baseMapper.selectCount(lambda);
+            if (integer > 0) {
+                //用户存在，不允许注册
+                return new ResponseBean(CommonConstants.FAIL.getCode(), "新增失败，用户已存在");
+            }
+
+            return new ResponseBean(this.save(rtUser));
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return new ResponseBean(CommonConstants.FAIL.getCode(), e.getMessage());
+        }
     }
 
     /**
@@ -189,6 +218,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 获取分页数据
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -232,7 +262,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * @return
      */
     @Override
-    public ResponseBean getPumpRepairInfo(RequestBean requestBean){
+    public ResponseBean getPumpRepairInfo(RequestBean requestBean) {
         RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         QueryWrapper<RtRecordPump> queryWrapper1 = new QueryWrapper<>();
@@ -251,20 +281,18 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         if (!StringUtils.isEmpty(rtUser.getId())) {
             queryWrapper2.eq("submit_user_id", rtUser.getId());
         }
-          if (!StringUtils.isEmpty(rtUser.getId())) {
+        if (!StringUtils.isEmpty(rtUser.getId())) {
             queryWrapper1.eq("submit_user_id", rtUser.getId());
         }
         List<RtRecordPump> listPump = rtRecordPumpService.list(queryWrapper1);
 
         List<RtRecordRepair> listRepair = rtRecordRepairService.list(queryWrapper2);
 
-        map.put("pump",listPump);
+        map.put("pump", listPump);
 
-        map.put("repair",listRepair);
-        return    new   ResponseBean(map);
+        map.put("repair", listRepair);
+        return new ResponseBean(map);
     }
-
-
 
 
 }
