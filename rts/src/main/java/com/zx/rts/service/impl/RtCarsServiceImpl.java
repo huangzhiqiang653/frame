@@ -12,9 +12,12 @@ import com.zx.rts.entity.RtCars;
 import com.zx.rts.mapper.RtCarsMapper;
 import com.zx.rts.service.IRtCarsService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -169,9 +172,37 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         if (StringUtils.isEmpty(page)) {
             page = new Page();
         }
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
-        // TODO 添加查询条件
+        //条件构造
+        if (!CollectionUtils.isEmpty(queryMap)) {
+            //车牌号等值查询
+            if (!StringUtils.isEmpty(queryMap.get("carNo"))) {
+                queryWrapper.eq("car_no", queryMap.get("carNo"));
+            }
 
-        return new ResponseBean(this.page(page, queryWrapper));
+            //所属村居编码
+            if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
+                queryWrapper.eq("village_code", queryMap.get("villageCode"));
+            }
+            //所属乡镇编码
+            if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
+                queryWrapper.eq("town_code", queryMap.get("townCode"));
+            }
+
+            //姓名
+            if (!StringUtils.isEmpty(queryMap.get("name"))) {
+                queryWrapper.like("name", queryMap.get("name"));
+            }
+            //手机号
+            if (!StringUtils.isEmpty(queryMap.get("phoneNumber"))) {
+                queryWrapper.eq("phone_number", queryMap.get("phoneNumber"));
+            }
+
+
+        }
+        // TODO 添加查询条件
+        //return new ResponseBean(this.page(page, queryWrapper));
+        return new ResponseBean( baseMapper.selectPageRtCars(page,queryWrapper));
     }
 }
