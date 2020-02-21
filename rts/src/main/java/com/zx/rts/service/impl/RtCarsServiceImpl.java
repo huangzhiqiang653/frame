@@ -1,9 +1,12 @@
 package com.zx.rts.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
+import com.zx.common.common.CommonUtil;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
@@ -75,7 +78,30 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
-        return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), RtCars.class)));
+
+        RtCars rtCars = BaseHzq.convertValue(requestBean.getInfo(), RtCars.class);
+        //车辆新增，需要验证车牌号是否存在，及车牌号是否正确
+        //第一步:校验车牌号
+        if (StringUtils.isEmpty(rtCars.getCarNo())) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), "车牌号不为空");
+        } else {
+            //忽略车牌大小写
+            rtCars.setCarNo(rtCars.getCarNo().toUpperCase().trim());
+        }
+        ;
+        if (!CommonUtil.checkPlateNumberFormat(rtCars.getCarNo())) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), "车牌号格式不正确");
+        }
+
+        //第二步：校验车牌是否存在
+        LambdaQueryWrapper<RtCars> lambda = Wrappers.<RtCars>lambdaQuery();
+        lambda.eq(RtCars::getCarNo, rtCars.getCarNo());
+        lambda.eq(RtCars::getDeleteFlag, 0);
+        Integer integer = baseMapper.selectCount(lambda);
+        if (integer > 0) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), "车牌号已存在，添加失败");
+        }
+        return new ResponseBean(this.save(rtCars));
     }
 
     /**
@@ -178,7 +204,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         if (!CollectionUtils.isEmpty(queryMap)) {
             //车牌号等值查询
             if (!StringUtils.isEmpty(queryMap.get("carNo"))) {
-                queryWrapper.eq("car_no", queryMap.get("carNo"));
+                queryWrapper.eq("car_no", queryMap.get("carNo").toString().toUpperCase().trim());
             }
 
             //所属村居编码
@@ -203,6 +229,6 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         }
         // TODO 添加查询条件
         //return new ResponseBean(this.page(page, queryWrapper));
-        return new ResponseBean( baseMapper.selectPageRtCars(page,queryWrapper));
+        return new ResponseBean(baseMapper.selectPageRtCars(page, queryWrapper));
     }
 }
