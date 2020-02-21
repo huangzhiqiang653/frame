@@ -198,22 +198,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         if (StringUtils.isEmpty(page)) {
             page = new Page();
         }
-/*        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
-        // TODO 添加查询条件  name  王志成
-        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
-        //获取区域主键id,由id获取code  phone_number
-        String   quId=(String)queryMap.get("quId");
-        RtOrganization rtOrganization1= rtOrganizationService.getById(quId);
-        if(!StringUtils.isEmpty(rtOrganization1)){
-            queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
-        }
-        RtUser rtUser = BaseHzq.convertValue(queryMap, RtUser.class);
-        if (!StringUtils.isEmpty(rtUser.getName())) {
-            queryWrapper.like("name", rtUser.getName());
-        }
-        if (!StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-            queryWrapper.like("phone_number", rtUser.getPhoneNumber());
-        }*/
 
         // TODO 添加查询条件
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
