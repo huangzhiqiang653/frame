@@ -1,8 +1,6 @@
 package com.zx.rts.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -12,6 +10,7 @@ import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.entity.RtRecordPump;
 import com.zx.rts.entity.RtRecordRepair;
+import com.zx.rts.entity.RtCars;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.IRtOrganizationService;
@@ -23,9 +22,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.*;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -218,7 +217,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 获取分页数据
      * 2020-2-21
-     *
      * @param requestBean
      * @return
      */
@@ -232,6 +230,13 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         // TODO 添加查询条件
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        //获取区域主键id,由id获取code
+        String   quId=(String)queryMap.get("quId");
+        RtOrganization rtOrganization1= rtOrganizationService.getById(quId);
+        if(!StringUtils.isEmpty(rtOrganization1)){
+            queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
+        }
+
         //条件构造
         if (!CollectionUtils.isEmpty(queryMap)) {
             //车牌号等值查询
