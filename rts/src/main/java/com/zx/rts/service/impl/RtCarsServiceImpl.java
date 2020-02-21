@@ -206,20 +206,6 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         }
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
-
-        // TODO 添加查询条件   王志成
-    /*    Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
-        //获取区域主键id,由id获取code  car_no
-        String   quId=(String)queryMap.get("quId");
-        RtOrganization  rtOrganization1= rtOrganizationService.getById(quId);
-        if(!StringUtils.isEmpty(rtOrganization1)){
-            queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
-        }
-        RtCars rtCars = BaseHzq.convertValue(queryMap, RtCars.class);
-        if (!StringUtils.isEmpty(rtCars.getCarNo())) {
-            queryWrapper.like("car_no", rtCars.getCarNo());
-        }
-        return new ResponseBean(this.page(page, queryWrapper));*/
         //条件构造
         if (!CollectionUtils.isEmpty(queryMap)) {
             //车牌号等值查询
