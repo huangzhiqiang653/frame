@@ -9,12 +9,15 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.entity.RtOrganization;
+import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtOrganizationMapper;
 import com.zx.rts.service.IRtOrganizationService;
+import com.zx.rts.service.IRtUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collection;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * <p>
@@ -26,6 +29,12 @@ import java.util.Collection;
  */
 @Service
 public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper, RtOrganization> implements IRtOrganizationService {
+
+    @Resource
+    IRtUserService rtUserService;
+
+    @Resource
+    IRtOrganizationService rtOrganizationService;
 
     /**
      * 公共基础方法
@@ -56,6 +65,8 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case GET_TREE:
+                return getOrgTree(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -67,12 +78,23 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
 
     /**
      * 单个新增
-     *
+     * 2020/2/20
      * @param requestBean
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
-        return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), RtOrganization.class)));
+        RtOrganization rtOrganization = BaseHzq.convertValue(requestBean.getInfo(), RtOrganization.class);
+        //检测code是否唯一
+        QueryWrapper<RtOrganization> queryWrapper = new QueryWrapper<RtOrganization>();
+        queryWrapper.eq("code", rtOrganization.getCode());
+        List<RtOrganization> list = rtOrganizationService.list(queryWrapper);
+        if (list != null && list.size() > 0) {
+            return new ResponseBean(
+                    CommonConstants.FAIL.getCode(),
+                    "code已有请修改");
+        }
+        boolean saveFlag = this.save(rtOrganization);
+        return saveFlag ? new ResponseBean(rtOrganization) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
     }
 
     /**
@@ -87,12 +109,16 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
 
     /**
      * 更新单条数据所有字段
-     *
+     * 2020/2/20
      * @param requestBean
      * @return
      */
     public ResponseBean updateAllField(RequestBean requestBean) {
-        return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), RtOrganization.class)));
+
+        RtOrganization rtOrganization = BaseHzq.convertValue(requestBean.getInfo(), RtOrganization.class);
+        rtOrganization.setUpdateTime(new Date());
+        return new ResponseBean(this.updateById(rtOrganization));
+
     }
 
     /**
@@ -107,12 +133,25 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
 
     /**
      * 单条逻辑删除
-     *
+     * 2020/2/20
      * @param requestBean
      * @return
      */
     public ResponseBean deleteLogicalSingle(RequestBean requestBean) {
-        return new ResponseBean(this.removeById((String) requestBean.getInfo()));
+        String orgId = (String) requestBean.getInfo();
+        //由主键id获取区域对象
+        RtOrganization rtOrganization1=this.getById((String) requestBean.getInfo());
+        // 校验该区域下可有人员数据，无可以删
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<RtUser>();
+        // 2020-2-20待修改
+        queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
+        List<RtUser> list = rtUserService.list(queryWrapper);
+        if (list != null && list.size() > 0) {
+            return new ResponseBean(
+                    CommonConstants.FAIL.getCode(),
+                    "请先删除该区域下的人员数据");
+        }
+        return new ResponseBean(this.removeById(orgId));
     }
 
     /**
@@ -127,7 +166,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
 
     /**
      * 根据主键获取单条数据
-     *
+     * 2020/2/20
      * @param requestBean
      * @return
      */
@@ -174,4 +213,52 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
 
         return new ResponseBean(this.page(page, queryWrapper));
     }
+
+
+
+    /**
+     * 获取区域树数据
+     * 2020-2-19
+     * @param requestBean
+     * @return
+     */
+    @Override
+    public ResponseBean getOrgTree(RequestBean requestBean) {
+        QueryWrapper<RtOrganization> queryWrapper = new QueryWrapper<RtOrganization>();
+        queryWrapper.isNull("parent_id");
+        List<RtOrganization> organizationList = this.list(queryWrapper);
+        if (organizationList != null && organizationList.size() == 1) {
+            RtOrganization root = organizationList.get(0);
+            Map resultMap = BaseHzq.beanToMap(root);
+            this.dGGetOrg(resultMap);
+            List<Map> treeList = new ArrayList<Map>();
+            treeList.add(resultMap);
+            return new ResponseBean(treeList);
+        } else {
+            return new ResponseBean(
+                    CommonConstants.FAIL.getCode(),
+                    "获取树根节点数据失败"
+            );
+        }
+    }
+    /**
+     * 递归获取区域数据
+     * 2020-2-19
+     * @return
+     */
+    public void dGGetOrg(Map map) {
+        QueryWrapper<RtOrganization> queryWrapper = new QueryWrapper<RtOrganization>();
+        queryWrapper.orderByAsc("sort").eq("parent_id", map.get("id"));
+        List<RtOrganization> rtOrganizations = this.list(queryWrapper);
+        if (rtOrganizations != null && rtOrganizations.size() > 0) {
+            List<Map> children = new ArrayList<Map>();
+            for (RtOrganization rtOrganization : rtOrganizations) {
+                Map child = BaseHzq.beanToMap(rtOrganization);
+                this.dGGetOrg(child);
+                children.add(child);
+            }
+            map.put("children", children);
+        }
+    }
+
 }

@@ -8,13 +8,20 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.entity.RtOrganization;
+import com.zx.rts.entity.RtRecordPump;
+import com.zx.rts.entity.RtRecordRepair;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
+import com.zx.rts.service.IRtOrganizationService;
+import com.zx.rts.service.IRtRecordPumpService;
+import com.zx.rts.service.IRtRecordRepairService;
 import com.zx.rts.service.IRtUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collection;
+import javax.annotation.Resource;
+import java.util.*;
 
 /**
  * <p>
@@ -27,6 +34,16 @@ import java.util.Collection;
 @Service
 public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> implements IRtUserService {
 
+    @Resource
+    IRtOrganizationService rtOrganizationService;
+
+
+    @Resource
+    IRtRecordPumpService rtRecordPumpService;
+
+
+    @Resource
+    IRtRecordRepairService rtRecordRepairService;
     /**
      * 公共基础方法
      *
@@ -160,7 +177,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     /**
      * 获取分页数据
-     *
+     * 2020-2-21
      * @param requestBean
      * @return
      */
@@ -170,9 +187,65 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             page = new Page();
         }
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
-        // TODO 添加查询条件
+        // TODO 添加查询条件  name
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        //获取区域主键id,由id获取code  phone_number
+        String   quId=(String)queryMap.get("quId");
+        RtOrganization rtOrganization1= rtOrganizationService.getById(quId);
+        if(!StringUtils.isEmpty(rtOrganization1)){
+            queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
+        }
+        RtUser rtUser = BaseHzq.convertValue(queryMap, RtUser.class);
+        if (!StringUtils.isEmpty(rtUser.getName())) {
+            queryWrapper.like("name", rtUser.getName());
+        }
+        if (!StringUtils.isEmpty(rtUser.getPhoneNumber())) {
+            queryWrapper.like("phone_number", rtUser.getPhoneNumber());
+        }
 
         return new ResponseBean(this.page(page, queryWrapper));
     }
+
+    /**
+     * 由保修人的主键id获取报修和报抽信息
+     *
+     * @param requestBean
+     * @return
+     */
+    @Override
+    public ResponseBean getPumpRepairInfo(RequestBean requestBean){
+        RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<RtRecordPump> queryWrapper1 = new QueryWrapper<>();
+        QueryWrapper<RtRecordRepair> queryWrapper2 = new QueryWrapper<>();
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        if (!StringUtils.isEmpty(rtUser.getPhoneNumber())) {
+            queryWrapper.like("phone_number", rtUser.getPhoneNumber());
+        }
+        if (!StringUtils.isEmpty(rtUser.getAddress())) {
+            queryWrapper.like("address", rtUser.getAddress());
+        }
+        if (!StringUtils.isEmpty(rtUser.getId())) {
+            queryWrapper1.eq("submit_user_id", rtUser.getId());
+        }
+        if (!StringUtils.isEmpty(rtUser.getId())) {
+            queryWrapper2.eq("submit_user_id", rtUser.getId());
+        }
+          if (!StringUtils.isEmpty(rtUser.getId())) {
+            queryWrapper1.eq("submit_user_id", rtUser.getId());
+        }
+        List<RtRecordPump> listPump = rtRecordPumpService.list(queryWrapper1);
+
+        List<RtRecordRepair> listRepair = rtRecordRepairService.list(queryWrapper2);
+
+        map.put("pump",listPump);
+
+        map.put("repair",listRepair);
+        return    new   ResponseBean(map);
+    }
+
+
+
 
 }
