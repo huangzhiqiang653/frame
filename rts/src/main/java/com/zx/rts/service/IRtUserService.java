@@ -22,4 +22,13 @@ public interface IRtUserService extends IService<RtUser> {
      * @return
      */
     public ResponseBean base(RequestBean requestBean);
+
+    /**
+     * 由用户id获取保修和报抽信息
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getPumpRepairInfo(RequestBean requestBean);
+
 }

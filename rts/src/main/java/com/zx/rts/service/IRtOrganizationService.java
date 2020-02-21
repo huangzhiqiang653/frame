@@ -22,4 +22,14 @@ public interface IRtOrganizationService extends IService<RtOrganization> {
      * @return
      */
     public ResponseBean base(RequestBean requestBean);
+
+
+
+    /**
+     * 获取区域树数据
+     * 2020-2-19
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getOrgTree(RequestBean requestBean);
 }

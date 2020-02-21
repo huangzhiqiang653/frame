@@ -12,12 +12,15 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.entity.RtCars;
+import com.zx.rts.entity.RtOrganization;
 import com.zx.rts.mapper.RtCarsMapper;
 import com.zx.rts.service.IRtCarsService;
+import com.zx.rts.service.IRtOrganizationService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +35,9 @@ import java.util.Map;
  */
 @Service
 public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> implements IRtCarsService {
+    @Resource
+    IRtOrganizationService rtOrganizationService;
+
 
     /**
      * 公共基础方法
@@ -200,6 +206,20 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         }
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
+
+        // TODO 添加查询条件   王志成
+    /*    Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        //获取区域主键id,由id获取code  car_no
+        String   quId=(String)queryMap.get("quId");
+        RtOrganization  rtOrganization1= rtOrganizationService.getById(quId);
+        if(!StringUtils.isEmpty(rtOrganization1)){
+            queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
+        }
+        RtCars rtCars = BaseHzq.convertValue(queryMap, RtCars.class);
+        if (!StringUtils.isEmpty(rtCars.getCarNo())) {
+            queryWrapper.like("car_no", rtCars.getCarNo());
+        }
+        return new ResponseBean(this.page(page, queryWrapper));*/
         //条件构造
         if (!CollectionUtils.isEmpty(queryMap)) {
             //车牌号等值查询

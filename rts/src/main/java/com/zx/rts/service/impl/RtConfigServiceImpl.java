@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -67,7 +70,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
 
     /**
      * 单个新增
-     *
+     * 2020-2-21
      * @param requestBean
      * @return
      */
@@ -87,7 +90,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
 
     /**
      * 更新单条数据所有字段
-     *
+     * 2020-2-21
      * @param requestBean
      * @return
      */
@@ -107,7 +110,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
 
     /**
      * 单条逻辑删除
-     *
+     * 2020-2-21
      * @param requestBean
      * @return
      */
@@ -127,7 +130,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
 
     /**
      * 根据主键获取单条数据
-     *
+     * 2020-2-21
      * @param requestBean
      * @return
      */
@@ -159,8 +162,8 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
 
 
     /**
-     * 获取分页数据
-     *
+     * 获取分页数据和条件查询
+     * 2020-2-21
      * @param requestBean
      * @return
      */
@@ -171,7 +174,22 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
         }
         QueryWrapper<RtConfig> queryWrapper = new QueryWrapper<>();
         // TODO 添加查询条件
-
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        //更新时间查询
+        List<String> updateTimes = (List<String>) queryMap.get("updateTime");
+        RtConfig rtConfig = BaseHzq.convertValue(queryMap, RtConfig.class);
+        if (!StringUtils.isEmpty(rtConfig.getConfigName())) {
+            queryWrapper.like("config_name", rtConfig.getConfigName());
+        }
+        if (!StringUtils.isEmpty(rtConfig.getConfigCode())) {
+            queryWrapper.like("config_code", rtConfig.getConfigCode());
+        }
+        if (!StringUtils.isEmpty(rtConfig.getConfigParam())) {
+            queryWrapper.like("config_param", rtConfig.getConfigParam());
+        }
+        if (updateTimes != null && updateTimes.size() == 2) {
+            queryWrapper.between("update_time", updateTimes.get(0), updateTimes.get(1));
+        }
         return new ResponseBean(this.page(page, queryWrapper));
     }
 }
