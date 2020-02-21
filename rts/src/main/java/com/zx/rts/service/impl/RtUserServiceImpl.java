@@ -8,13 +8,17 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.entity.RtCars;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.IRtUserService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -142,9 +146,14 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * @return
      */
     public ResponseBean getListByCondition(RequestBean requestBean) {
+
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         // TODO 添加查询条件
-
+        RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+        //根据车牌号查询
+        if (!StringUtils.isEmpty(rtUser.getCarNo())) {
+            queryWrapper.eq("car_no", rtUser.getCarNo());
+        }
         return new ResponseBean(this.list(queryWrapper));
     }
 
@@ -165,13 +174,22 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * @return
      */
     public ResponseBean getPage(RequestBean requestBean) {
+
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
         if (StringUtils.isEmpty(page)) {
             page = new Page();
         }
-        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         // TODO 添加查询条件
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        //条件构造
+        if (!CollectionUtils.isEmpty(queryMap)) {
+            //车牌号等值查询
+            if (!StringUtils.isEmpty(queryMap.get("carNo"))) {
+                queryWrapper.eq("car_no", queryMap.get("carNo"));
+            }
 
+        }
         return new ResponseBean(this.page(page, queryWrapper));
     }
 
