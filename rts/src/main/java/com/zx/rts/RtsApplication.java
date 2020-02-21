@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         "com.zx.*.generator",
         "com.zx.*.common",
         "com.zx.*.controller",
-        "com.zx.*.service"
+        "com.zx.*.service",
+        "com.zx.*.scheduler",
+        "com.zx.*.config",
 })
 @MapperScan("com.zx.*.mapper")
 public class RtsApplication {
