@@ -77,6 +77,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case GET_PUMP:
+                return getPumpRepairInfo(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
