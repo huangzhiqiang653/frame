@@ -8,17 +8,16 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.config.ExportExcel;
 import com.zx.rts.entity.*;
 import com.zx.rts.mapper.RtUserMapper;
-import com.zx.rts.service.IRtOrganizationService;
-import com.zx.rts.service.IRtRecordPumpService;
-import com.zx.rts.service.IRtRecordRepairService;
-import com.zx.rts.service.IRtUserService;
+import com.zx.rts.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +44,18 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     @Resource
     IRtRecordRepairService rtRecordRepairService;
+
+    @Resource
+    ExportExcelService exportExcelService;
+    /**
+     * 导出excel需使用的表头标记
+     */
+    static final String INFO_EXPORT_TITLE = "村民信息";
+
+    /**
+     * 导出excel需使用的表头标记
+     */
+    static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号","所属区划", "手机号码"};
     /**
      * 公共基础方法
      *
@@ -268,7 +279,36 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         return    new   ResponseBean(map);
     }
 
+    /**
+     * 导出人员信息
+     * wangzhicheng
+     * @param response
+     * @return
+     */
+    @Override
+    public  void ExportRtUser(HttpServletResponse response){
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.ne("delete_flag",1);
+        List<RtUser> list = this.list(queryWrapper);
+        ExportExcel ee = new ExportExcel();
+        ee.setTitle(INFO_EXPORT_TITLE);
+        ee.setRowName(INFO_EXPORT_ROWNAME);
+        List<Map<String, Object>> expList = new ArrayList<Map<String, Object>>();
+        int  i=1;
+        for(RtUser rtUser:list){
+            Map<String, Object> map = new HashMap<String, Object>();
+            //序号
+            map.put(INFO_EXPORT_ROWNAME[0],i++);
+            //所属区划 //待修改
+            map.put(INFO_EXPORT_ROWNAME[1],rtUser.getTownCode());
+            //手机号码
+            map.put(INFO_EXPORT_ROWNAME[2],rtUser.getPhoneNumber());
 
+            expList.add(map);
+        }
+        ee.setDataList(expList);
+        exportExcelService.export(response, ee);
+    }
 
 
 }
