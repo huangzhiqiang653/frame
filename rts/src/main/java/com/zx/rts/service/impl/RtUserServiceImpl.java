@@ -47,7 +47,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     @Resource
     IRtRecordRepairService rtRecordRepairService;
 
-<<<<<<< HEAD
     @Resource
     ExportExcelService exportExcelService;
     /**
@@ -59,8 +58,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * 导出excel需使用的表头标记
      */
     static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号","所属区划", "手机号码"};
-=======
->>>>>>> 285c18d2ad865663d6fce3a252be2c4c74e6f728
     /**
      * 公共基础方法
      *
@@ -311,7 +308,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         return new ResponseBean(map);
     }
 
-<<<<<<< HEAD
     /**
      * 导出人员信息
      * wangzhicheng
@@ -343,7 +339,5 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         exportExcelService.export(response, ee);
     }
 
-=======
->>>>>>> 285c18d2ad865663d6fce3a252be2c4c74e6f728
 
 }
