@@ -1,8 +1,6 @@
 package com.zx.rts.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -11,7 +9,11 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.config.ExportExcel;
-import com.zx.rts.entity.*;
+import com.zx.rts.dto.RtUserDto;
+import com.zx.rts.entity.RtOrganization;
+import com.zx.rts.entity.RtRecordPump;
+import com.zx.rts.entity.RtRecordRepair;
+import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.*;
 import org.springframework.stereotype.Service;
@@ -21,9 +23,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>
@@ -87,6 +86,13 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case GET_PUMP:
+                return getPumpRepairInfo(requestBean);
+            case ADD_DRIVER:
+                return addDriver(requestBean);
+
+            case TELL_REPAIRED_PAGE:
+                return getRepairPage(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -104,9 +110,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      */
     public ResponseBean add(RequestBean requestBean) {
         try {
-            RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+            RtUserDto rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUserDto.class);
             if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-                return new ResponseBean(CommonConstants.FAIL.getCode(), "手机号不能为空");
+                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
             }
             //第一步，检查数据来源
             if ("1".equals(rtUser.getLy())) {
@@ -127,13 +133,14 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 rtUser.setTownCode(rtOrgan.getCode());
             }
             //第二步：校验用户是否存在
-            LambdaQueryWrapper<RtUser> lambda = Wrappers.<RtUser>lambdaQuery();
-            lambda.eq(RtUser::getDeleteFlag, CommonConstants.DELETE_NO.getCode());
-            lambda.eq(RtUser::getPhoneNumber, rtUser.getPhoneNumber());
-            Integer integer = baseMapper.selectCount(lambda);
+            QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
+            queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
+
+            Integer integer = baseMapper.selectCount(queryWrapper);
             if (integer > 0) {
                 //用户存在，不允许注册
-                return new ResponseBean(CommonConstants.FAIL.getCode(), "新增失败，该用户号码已存在");
+                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.USER_REPEAT.getValue());
             }
 
             return new ResponseBean(this.save(rtUser));
@@ -288,6 +295,10 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             if (!StringUtils.isEmpty(queryMap.get("phoneNumber"))) {
                 queryWrapper.eq("phone_number", queryMap.get("phoneNumber"));
             }
+            //审核信息
+            if (!StringUtils.isEmpty(queryMap.get("approvalStatus"))) {
+                queryWrapper.eq("approval_status", queryMap.get("approvalStatus"));
+            }
             //根据村居编码查询村名信息2020/2/24
             if(!StringUtils.isEmpty(queryMap.get("villageCode"))){
                 queryWrapper.eq("village_code", queryMap.get("villageCode"));
@@ -352,5 +363,39 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         return new ResponseBean(this.page(page, queryWrapper));
     }
 
+
+    //获取可分派维修人员数据
+    public ResponseBean getRepairPage(RequestBean requestBean){
+        Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
+        if (StringUtils.isEmpty(page)) {
+            page = new Page();
+        }
+
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode())
+        //指定维修人员
+        .like("user_type", CommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode())
+        //指定审核通过人
+        .eq("approval_status",CommonConstants.AUDIT_STATUS_TG.getCode());
+
+        if(!StringUtils.isEmpty(queryMap.get("name"))){
+            queryWrapper.like("name",queryMap.get("name"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("phoneNumber"))){
+            queryWrapper.eq("phone_number",queryMap.get("phoneNumber"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("villageCode"))){
+            queryWrapper.eq("village_code",queryMap.get("villageCode"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("townCode"))){
+            queryWrapper.eq("town_code",queryMap.get("townCode"));
+        }
+
+        return new ResponseBean(baseMapper.selectPageByRepair(page, queryWrapper));
+    }
 
 }

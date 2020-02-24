@@ -2,12 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zx.rts.mapper.RtCarsMapper">
 
-    <select id="selectPageRtCars" resultType="com.zx.rts.entity.RtCars">
+    <select id="selectPageRtCars" resultType="com.zx.rts.dto.RtCarsDto">
       select * from (
           SELECT t.*,u.name as name ,u.phone_number  as phone_number FROM t_rt_cars t
            LEFT JOIN t_rt_user u
            ON t.duty_user_id = u.id
       ) a  ${ew.customSqlSegment}
 
+    </select>
+
+    <select id="selectPageByPump" resultType="com.zx.rts.dto.RtCarsDto">
+        SELECT
+           u.*,
+          (SELECT  COUNT(1) FROM t_rt_record_pump
+           WHERE pump_car_id = u.id  AND repair_status != 2  )  AS   not_pump_num
+        FROM t_rt_cars u ${ew.customSqlSegment}
     </select>
 </mapper>

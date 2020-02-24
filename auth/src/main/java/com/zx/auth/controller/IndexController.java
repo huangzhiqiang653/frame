@@ -48,7 +48,8 @@ public class IndexController {
     private String redisSessionTimeout;
     @Value("${redis.dictionary.timeout}")
     private String redisDictionaryTimeout;
-
+    @Value("${login.isOpen}")
+    private String loginIsOpen;
     private final static String ticket_ = "ticket_";
 
     /**
@@ -58,6 +59,10 @@ public class IndexController {
      */
     @GetMapping("/toLogin")
     public ResponseBean loginValidate(HttpServletRequest request) {
+        if(!Boolean.valueOf(loginIsOpen)){
+            return new ResponseBean();
+        }
+
         Map<String, Object> map;
         //判断请求是手机端还是pc端发出
         String userAgent = request.getHeader("USER-AGENT");

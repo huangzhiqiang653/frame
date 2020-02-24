@@ -1,14 +1,18 @@
 package com.zx.rts.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zx.common.common.BaseEntityBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -40,7 +44,9 @@ public class RtRecordRepair extends BaseEntityBean {
     private String pumpCarId;
 
     @ApiModelProperty(value = "报修时间")
-    private LocalDateTime reportTime;
+  /*  @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")*/
+    private Date reportTime;
 
     @ApiModelProperty(value = "上门时间")
     private LocalDateTime repairTime;
@@ -62,6 +68,5 @@ public class RtRecordRepair extends BaseEntityBean {
 
     @ApiModelProperty(value = "是否超时 0未超时，1已超时")
     private Integer overtimeFlag;
-
 
 }
