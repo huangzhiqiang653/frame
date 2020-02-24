@@ -41,6 +41,8 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         switch (requestBean.getHandle()) {
             case ADD:
                 return add(requestBean);
+            case APP_ADD:
+                return appAdd(requestBean);
             case ADD_BATCH:
                 return addBatch(requestBean);
             case UPDATE_ALL:
@@ -78,6 +80,26 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
      */
     public ResponseBean add(RequestBean requestBean) {
         return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), RtRecordRepair.class)));
+    }
+    /**
+     * 手机端单个新增
+     * 报修
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean appAdd(RequestBean requestBean) {
+        RtRecordRepair repair=BaseHzq.convertValue(requestBean.getInfo(), RtRecordRepair.class);
+        if(!StringUtils.isEmpty(repair.getId())){
+            this.updateById(repair);
+        }
+        //报修申请检查
+        if(StringUtils.isEmpty(repair.getSubmitUserId())||StringUtils.isEmpty(repair.getTargetUserId())){
+            return new ResponseBean(CommonConstants.FAIL.getCode(),"报修人或待修人不能为空~");
+        }
+        if(StringUtils.isEmpty(repair.getProblem())){
+            return new ResponseBean(CommonConstants.FAIL.getCode(),"报修问题描述不能为空~");
+        }
+        return new ResponseBean(this.save(repair));
     }
 
     /**

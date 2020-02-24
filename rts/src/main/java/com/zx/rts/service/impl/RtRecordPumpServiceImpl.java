@@ -38,6 +38,8 @@ public class RtRecordPumpServiceImpl extends ServiceImpl<RtRecordPumpMapper, RtR
         switch (requestBean.getHandle()) {
             case ADD:
                 return add(requestBean);
+            case APP_ADD:
+                return appAdd(requestBean);
             case ADD_BATCH:
                 return addBatch(requestBean);
             case UPDATE_ALL:
@@ -74,6 +76,27 @@ public class RtRecordPumpServiceImpl extends ServiceImpl<RtRecordPumpMapper, RtR
     public ResponseBean add(RequestBean requestBean) {
         return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), RtRecordPump.class)));
     }
+    /**
+     * 手机端单个新增
+     * 报抽
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean appAdd(RequestBean requestBean) {
+        RtRecordPump pump=BaseHzq.convertValue(requestBean.getInfo(), RtRecordPump.class);
+        if(!StringUtils.isEmpty(pump.getId())){
+            this.updateById(pump);
+        }
+        //报抽申请检查
+        if(StringUtils.isEmpty(pump.getSubmitUserId())||StringUtils.isEmpty(pump.getTargetUserId())){
+            return new ResponseBean(CommonConstants.FAIL.getCode(),"报抽人或待抽人不能为空~");
+        }
+        if(StringUtils.isEmpty(pump.getProblem())){
+            return new ResponseBean(CommonConstants.FAIL.getCode(),"报抽问题描述不能为空~");
+        }
+        return new ResponseBean(this.save(pump));
+    }
+
 
     /**
      * 批量新增
