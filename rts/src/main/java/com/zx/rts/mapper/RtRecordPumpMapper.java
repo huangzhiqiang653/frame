@@ -13,4 +13,5 @@ import com.zx.rts.entity.RtRecordPump;
  */
 public interface RtRecordPumpMapper extends BaseMapper<RtRecordPump> {
 
+    public int pumpOvertimeTinspect(Integer dayTime);
 }

@@ -36,5 +36,17 @@
 
     </select>
 
+    <update id="repairOvertimeTinspect">
+        UPDATE t_rt_record_repair  SET overtime_flag = '1'
+        WHERE id IN(
+          SELECT  id  FROM (
+              SELECT id  FROM t_rt_record_repair t
+              WHERE
+                 <![CDATA[  DATE_ADD(t.report_time, INTERVAL ${dayTime} DAY) < NOW()
+                 AND t.repair_status != 2 AND overtime_flag !='1' ]]>
+                 ) AS temp
+
+                 )
+    </update>
 
 </mapper>

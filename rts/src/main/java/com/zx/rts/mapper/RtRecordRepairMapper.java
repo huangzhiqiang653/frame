@@ -24,4 +24,7 @@ public interface RtRecordRepairMapper extends BaseMapper<RtRecordRepair> {
 
     //自定义分页，合并报修报抽记录，并关联用户信息
     public IPage<RtRecordRepair> selectPageMergeRepairAndPump(IPage<RtRecordRepair> page, @Param(Constants.WRAPPER) Wrapper<RtRecordRepair> queryWrapper);
+
+
+    public int repairOvertimeTinspect(Integer dayTime);
 }
