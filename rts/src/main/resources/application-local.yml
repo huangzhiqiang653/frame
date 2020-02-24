@@ -79,3 +79,8 @@ redis:
 
 account:
   initialpwd: '000000'
+
+scheduler:
+  pumpOvertimeParamName: pump_overtime
+  repairOvertimeParamName: repair_overtime
+
