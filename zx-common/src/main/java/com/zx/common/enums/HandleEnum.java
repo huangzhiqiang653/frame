@@ -38,10 +38,16 @@ public enum HandleEnum {
     ADD_ROLE_ACCOUNTS_RELATION("addRoleAccountsRelation", "指定角色添加账号信息"),
     ADD_ACCOUNT_ROLES_RELATION("addAccountRolesRelation", "指定账号添加角色信息"),
     INIT_ACCOUNT_PWD("initialAccountPwd", "初始化账户密码"),
+
+    GET_MY_PAGE("getMyPage", "自定义分页查询"),
+    TELL_REPAIRED_PAGE("tellRrepairedPage", "报修信息分派信息"),
+    TELL_PUMP_PAGE("tellPumpPage", "报抽车辆分派信息"),
     //手机端的接口
     APP_ADD("appAdd","手机端报抽报修申请接口"),
     APP_GET_INFO_BY_ID("appGetInfoById","手机端查看详情接口")
     ;
+
+
 
     HandleEnum(String value, String desc) {
         this.value = value;

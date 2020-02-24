@@ -10,4 +10,12 @@
       ) a  ${ew.customSqlSegment}
 
     </select>
+
+    <select id="selectPageByPump" resultType="com.zx.rts.entity.RtCars">
+        SELECT
+           u.*,
+          (SELECT  COUNT(1) FROM t_rt_record_pump
+           WHERE pump_car_id = u.id  AND repair_status != 2  )  AS   not_pump_num
+        FROM t_rt_cars u ${ew.customSqlSegment}
+    </select>
 </mapper>

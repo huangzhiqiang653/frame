@@ -2,4 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zx.rts.mapper.RtUserMapper">
 
+    <select id="selectPageByRepair" resultType="com.zx.rts.entity.RtUser">
+        SELECT
+           u.*,
+          (SELECT  COUNT(1) FROM t_rt_record_repair
+           WHERE operation_user_id = u.id  AND repair_status != 2  )  as   not_repaired_num
+        FROM t_rt_user u
+        ${ew.customSqlSegment}
+    </select>
+
 </mapper>

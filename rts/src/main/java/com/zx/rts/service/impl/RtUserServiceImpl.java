@@ -2,6 +2,7 @@ package com.zx.rts.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -89,6 +90,11 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getPage(requestBean);
             case GET_PUMP:
                 return getPumpRepairInfo(requestBean);
+            case ADD_DRIVER:
+                return addDriver(requestBean);
+
+            case TELL_REPAIRED_PAGE:
+                return getRepairPage(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -108,7 +114,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         try {
             RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
             if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-                return new ResponseBean(CommonConstants.FAIL.getCode(), "手机号不能为空");
+                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
             }
             //第一步，检查数据来源
             if ("1".equals(rtUser.getLy())) {
@@ -125,7 +131,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             Integer integer = baseMapper.selectCount(lambda);
             if (integer > 0) {
                 //用户存在，不允许注册
-                return new ResponseBean(CommonConstants.FAIL.getCode(), "新增失败，用户已存在");
+                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.USER_REPEAT.getValue());
             }
 
             return new ResponseBean(this.save(rtUser));
@@ -264,47 +270,39 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             if (!StringUtils.isEmpty(queryMap.get("phoneNumber"))) {
                 queryWrapper.eq("phone_number", queryMap.get("phoneNumber"));
             }
-
+            //审核信息
+            if (!StringUtils.isEmpty(queryMap.get("approvalStatus"))) {
+                queryWrapper.eq("approval_status", queryMap.get("approvalStatus"));
+            }
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }
 
     /**
-     * 由保修人的主键id获取报修和报抽信息
-     *
+     * 由村民的主键id获取报修和报抽信息基本信息
+     * wangzhicheng
      * @param requestBean
      * @return
      */
     @Override
     public ResponseBean getPumpRepairInfo(RequestBean requestBean) {
         RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
-        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         QueryWrapper<RtRecordPump> queryWrapper1 = new QueryWrapper<>();
         QueryWrapper<RtRecordRepair> queryWrapper2 = new QueryWrapper<>();
         Map<String, Object> map = new HashMap<String, Object>();
-
-        if (!StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-            queryWrapper.like("phone_number", rtUser.getPhoneNumber());
-        }
-        if (!StringUtils.isEmpty(rtUser.getAddress())) {
-            queryWrapper.like("address", rtUser.getAddress());
-        }
         if (!StringUtils.isEmpty(rtUser.getId())) {
             queryWrapper1.eq("submit_user_id", rtUser.getId());
         }
         if (!StringUtils.isEmpty(rtUser.getId())) {
             queryWrapper2.eq("submit_user_id", rtUser.getId());
         }
-        if (!StringUtils.isEmpty(rtUser.getId())) {
-            queryWrapper1.eq("submit_user_id", rtUser.getId());
-        }
+        //获取村民报抽信息
         List<RtRecordPump> listPump = rtRecordPumpService.list(queryWrapper1);
-
+        //获取村民报修信息
         List<RtRecordRepair> listRepair = rtRecordRepairService.list(queryWrapper2);
-
         map.put("pump", listPump);
-
         map.put("repair", listRepair);
+        map.put("cunmin", rtUser);
         return new ResponseBean(map);
     }
 
@@ -339,5 +337,70 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         exportExcelService.export(response, ee);
     }
 
+    /**
+     * 新增单个驾驶员
+     * wang
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean addDriver(RequestBean requestBean) {
+
+        RtUser  rtUser=  BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+        rtUser.setUserType("driver");
+        return new ResponseBean(this.save(rtUser));
+    }
+
+    /**
+     * 获取驾驶员全部信息
+     * wangzhicheng
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getAllDriver(RequestBean requestBean) {
+        Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
+        if (StringUtils.isEmpty(page)) {
+            page = new Page();
+        }
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        // TODO 添加查询条件
+        // Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        queryWrapper.eq("user_type","driver").or().like("user_type","driver");
+        return new ResponseBean(this.page(page, queryWrapper));
+    }
+
+
+    //获取可分派维修人员数据
+    public ResponseBean getRepairPage(RequestBean requestBean){
+        Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
+        if (StringUtils.isEmpty(page)) {
+            page = new Page();
+        }
+
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        LambdaQueryWrapper<RtUser> lambda = Wrappers.<RtUser>lambdaQuery();
+        lambda.eq(RtUser::getDeleteFlag, CommonConstants.DELETE_NO.getCode())
+        //指定维修人员
+        .like(RtUser::getUserType, CommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode())
+        //指定审核通过人
+        .eq(RtUser::getApprovalStatus,CommonConstants.AUDIT_STATUS_TG.getCode());
+
+        if(!StringUtils.isEmpty(queryMap.get("name"))){
+            lambda.like(RtUser::getName,queryMap.get("name"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("phoneNumber"))){
+            lambda.eq(RtUser::getPhoneNumber,queryMap.get("phoneNumber"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("villageCode"))){
+            lambda.eq(RtUser::getVillageCode,queryMap.get("villageCode"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("townCode"))){
+            lambda.eq(RtUser::getTownCode,queryMap.get("townCode"));
+        }
+
+        return new ResponseBean(baseMapper.selectPageByRepair(page, lambda));
+    }
 
 }

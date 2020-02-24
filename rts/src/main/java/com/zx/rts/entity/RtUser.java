@@ -84,4 +84,8 @@ public class RtUser extends BaseEntityBean {
     @TableField(exist = false)
     private String ly;
 
+    @ApiModelProperty(value = "待维修数量")
+    @TableField(exist = false)
+    private String notRepairedNum;
+
 }

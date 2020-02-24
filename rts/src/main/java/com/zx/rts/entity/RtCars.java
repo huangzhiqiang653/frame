@@ -47,4 +47,9 @@ public class RtCars extends BaseEntityBean {
     @ApiModelProperty(value = "姓名")
     private String name;
 
+    @ApiModelProperty(value = "待抽取数量")
+    @TableField(exist = false)
+    private String notPumpNum;
+
+
 }

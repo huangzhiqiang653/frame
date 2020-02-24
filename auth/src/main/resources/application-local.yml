@@ -85,6 +85,7 @@ pool:
 
 ################################线程池配置-end#######################################
 login:
+  isOpen: false
   excludeUrl: /auth/index/login,/auth/index/logout,/auth/index/register
 redis:
   #登录session的失效时长 单位秒
