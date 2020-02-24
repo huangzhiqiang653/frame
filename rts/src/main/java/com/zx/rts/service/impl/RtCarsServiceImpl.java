@@ -13,6 +13,7 @@ import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.entity.RtCars;
 import com.zx.rts.entity.RtOrganization;
+import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtCarsMapper;
 import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtOrganizationService;
@@ -68,6 +69,8 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case TELL_PUMP_PAGE:
+                return getPumpPage(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -236,5 +239,25 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         // TODO 添加查询条件
         //return new ResponseBean(this.page(page, queryWrapper));
         return new ResponseBean(baseMapper.selectPageRtCars(page, queryWrapper));
+    }
+
+
+    //获取可分派维修人员数据
+    public ResponseBean getPumpPage(RequestBean requestBean){
+        Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
+        if (StringUtils.isEmpty(page)) {
+            page = new Page();
+        }
+
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        LambdaQueryWrapper<RtCars> lambda = Wrappers.<RtCars>lambdaQuery();
+        lambda.eq(RtCars::getDeleteFlag, CommonConstants.DELETE_NO.getCode());
+
+        if(!StringUtils.isEmpty(queryMap.get("carNo"))){
+            lambda.like(RtCars::getCarNo,queryMap.get("carNo").toString().toUpperCase().trim());
+        }
+
+
+        return new ResponseBean(baseMapper.selectPageByPump(page, lambda));
     }
 }

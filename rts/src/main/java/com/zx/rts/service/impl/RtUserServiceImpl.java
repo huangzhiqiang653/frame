@@ -2,6 +2,7 @@ package com.zx.rts.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -91,6 +92,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getPumpRepairInfo(requestBean);
             case ADD_DRIVER:
                 return addDriver(requestBean);
+
+            case TELL_REPAIRED_PAGE:
+                return getRepairPage(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -364,5 +368,39 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         return new ResponseBean(this.page(page, queryWrapper));
     }
 
+
+    //获取可分派维修人员数据
+    public ResponseBean getRepairPage(RequestBean requestBean){
+        Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
+        if (StringUtils.isEmpty(page)) {
+            page = new Page();
+        }
+
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        LambdaQueryWrapper<RtUser> lambda = Wrappers.<RtUser>lambdaQuery();
+        lambda.eq(RtUser::getDeleteFlag, CommonConstants.DELETE_NO.getCode())
+        //指定维修人员
+        .like(RtUser::getUserType, CommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode())
+        //指定审核通过人
+        .eq(RtUser::getApprovalStatus,CommonConstants.AUDIT_STATUS_TG.getCode());
+
+        if(!StringUtils.isEmpty(queryMap.get("name"))){
+            lambda.like(RtUser::getName,queryMap.get("name"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("phoneNumber"))){
+            lambda.eq(RtUser::getPhoneNumber,queryMap.get("phoneNumber"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("villageCode"))){
+            lambda.eq(RtUser::getVillageCode,queryMap.get("villageCode"));
+        }
+
+        if(!StringUtils.isEmpty(queryMap.get("townCode"))){
+            lambda.eq(RtUser::getTownCode,queryMap.get("townCode"));
+        }
+
+        return new ResponseBean(baseMapper.selectPageByRepair(page, lambda));
+    }
 
 }
