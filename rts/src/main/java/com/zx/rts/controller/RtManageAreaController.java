@@ -1,12 +1,14 @@
 package com.zx.rts.controller;
 
 
+import com.zx.common.common.BaseController;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
+import com.zx.rts.service.IRtManageAreaService;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
-import com.zx.common.common.BaseController;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -20,8 +22,11 @@ import com.zx.common.common.BaseController;
 @RequestMapping("/rts/rt-manage-area")
 public class RtManageAreaController extends BaseController {
 
+    @Resource
+    IRtManageAreaService baseService;
+
     @Override
     public ResponseBean base(RequestBean requestBean) {
-        return null;
+        return baseService.base(requestBean);
     }
 }
