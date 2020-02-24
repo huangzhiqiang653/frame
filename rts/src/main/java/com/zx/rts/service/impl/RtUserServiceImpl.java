@@ -108,7 +108,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         try {
             RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
             if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-                return new ResponseBean(CommonConstants.FAIL.getCode(), "手机号不能为空");
+                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
             }
             //第一步，检查数据来源
             if ("1".equals(rtUser.getLy())) {
@@ -125,7 +125,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             Integer integer = baseMapper.selectCount(lambda);
             if (integer > 0) {
                 //用户存在，不允许注册
-                return new ResponseBean(CommonConstants.FAIL.getCode(), "新增失败，用户已存在");
+                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.USER_REPEAT.getValue());
             }
 
             return new ResponseBean(this.save(rtUser));
@@ -264,7 +264,10 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             if (!StringUtils.isEmpty(queryMap.get("phoneNumber"))) {
                 queryWrapper.eq("phone_number", queryMap.get("phoneNumber"));
             }
-
+            //审核信息
+            if (!StringUtils.isEmpty(queryMap.get("approvalStatus"))) {
+                queryWrapper.eq("approval_status", queryMap.get("approvalStatus"));
+            }
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }
