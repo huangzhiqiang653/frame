@@ -237,7 +237,6 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
         }
         // TODO 添加查询条件
-        //return new ResponseBean(this.page(page, queryWrapper));
         return new ResponseBean(baseMapper.selectPageRtCars(page, queryWrapper));
     }
 
