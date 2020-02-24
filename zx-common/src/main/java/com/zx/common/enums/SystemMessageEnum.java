@@ -20,6 +20,10 @@ public enum SystemMessageEnum {
     ACCOUNT_PASSWORD_IS_ERROR("密码错误"),
     PHONE_NUMBER_IS_EMPTY("手机号不能为空"),
     USER_REPEAT("新增失败，用户已存在"),
+
+    CARS_REPEAT("车牌号已存在，添加失败"),
+    CARS_NUMBER_IS_EMPTY("车牌号不为空"),
+    CARS_FORMAT_ERROR("车牌号格式不正确"),
     ;
 
     SystemMessageEnum(String value) {

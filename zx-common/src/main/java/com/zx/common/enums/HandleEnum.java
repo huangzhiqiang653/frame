@@ -26,7 +26,6 @@ public enum HandleEnum {
     GET_LIST_BY_CONDITION("getListByCondition", "根据条件查询多个"),
     GET_ALL("getAll", "查询全部"),
     GET_PAGE("getPage", "查询全部"),
-    GET_MY_PAGE("getMyPage", "自定义分页查询"),
     EMPTY("", "空"),
     // 根据业务需要，增加积累
     DELETE_AND_ADD("deleteAndAdd", "删除之前的数据，并新增"),
@@ -40,7 +39,12 @@ public enum HandleEnum {
     LIST_ROLE_BY_ACCOUNT("listRoleByAccountId", "获取指定账号设定的角色信息"),
     ADD_ROLE_ACCOUNTS_RELATION("addRoleAccountsRelation", "指定角色添加账号信息"),
     ADD_ACCOUNT_ROLES_RELATION("addAccountRolesRelation", "指定账号添加角色信息"),
-    INIT_ACCOUNT_PWD("initialAccountPwd", "初始化账户密码");
+    INIT_ACCOUNT_PWD("initialAccountPwd", "初始化账户密码"),
+    GET_MY_PAGE("getMyPage", "自定义分页查询"),
+    TELL_REPAIRED_PAGE("tellRrepairedPage", "报修信息分派信息"),
+    TELL_PUMP_PAGE("tellPumpPage", "报抽车辆分派信息"),
+    ;
+
 
     HandleEnum(String value, String desc) {
         this.value = value;
