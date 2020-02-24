@@ -31,7 +31,7 @@ public enum HandleEnum {
     DELETE_AND_ADD("deleteAndAdd", "删除之前的数据，并新增"),
     UPDATE_SELF_INFO("updateSelfInfo", "更新主表自己"),
     GET_TREE("getTree", "获取树数据"),
-    GET_PUMP("getPump", "获取树数据"),
+    GET_PAGE_DRIVER("getAllDriver","获取驾驶员全部信息"),
     GET_MENU_BY_ROLE("getAuthMenu", "获取有权限的菜单"),
     LIST_ACCOUNT_BY_ROLE("listAccountByRole", "根据指定角色下的账号"),
     LIST_ROLE_BY_ACCOUNT("listRoleByAccountId", "获取指定账号设定的角色信息"),

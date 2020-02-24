@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -194,7 +196,13 @@ public class RtRecordPumpServiceImpl extends ServiceImpl<RtRecordPumpMapper, RtR
         }
         QueryWrapper<RtRecordPump> queryWrapper = new QueryWrapper<>();
         // TODO 添加查询条件
-
+        //根据用户主键id获取报抽信息  王志成
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        RtRecordPump rtRecordPump = BaseHzq.convertValue(queryMap, RtRecordPump.class);
+        // 查询条件
+        if (!StringUtils.isEmpty(rtRecordPump.getSubmitUserId())) {
+            queryWrapper.eq("submit_user_id",rtRecordPump.getSubmitUserId() );
+        }
         return new ResponseBean(this.page(page, queryWrapper));
     }
 }

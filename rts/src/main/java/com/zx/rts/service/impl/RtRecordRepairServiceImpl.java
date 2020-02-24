@@ -8,6 +8,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.entity.RtRecordPump;
 import com.zx.rts.entity.RtRecordRepair;
 import com.zx.rts.mapper.RtRecordRepairMapper;
 import com.zx.rts.service.IRtRecordRepairService;
