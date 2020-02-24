@@ -67,6 +67,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
                 return getPage(requestBean);
             case GET_TREE:
                 return getTree(requestBean);
+                
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
