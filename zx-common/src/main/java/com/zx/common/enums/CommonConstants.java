@@ -26,13 +26,29 @@ public enum CommonConstants {
     DELETE_YES("1", "已删除"),
 
     //审核状态--待审
-    AUDIT_STATUS_DS("0","待审核"),
+    AUDIT_STATUS_DS("0", "待审核"),
 
     //审核状态--审核通过
-    AUDIT_STATUS_TG("1","审核通过"),
+    AUDIT_STATUS_TG("1", "审核通过"),
 
     //审核状态--审核不通过
-    AUDIT_STATUS_BTG("2","审核不通过");
+    AUDIT_STATUS_BTG("2", "审核不通过"),
+
+    //用户身份--村名
+    USER_ROLE_VILLAGER("villager", "村名"),
+
+    //用户身份--村管
+    USER_ROLE_VILLAGEMANAGE("villageManage", "村管"),
+
+    //用户身份--系统管理员
+    USER_ROLE_SYSTEMMANAGE("systemManage", "系统管理员"),
+
+    //用户身份--维修人员
+    USER_ROLE_REPAIRPERSONNEL("repairPersonnel", "维修人员"),
+
+    //用户身份--司机
+    USER_ROLE_DRIVER("driver", "司机"),
+    ;
 
 
     @EnumValue
