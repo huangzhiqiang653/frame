@@ -1,7 +1,12 @@
 package com.zx.rts.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.zx.rts.entity.RtCars;
 import com.zx.rts.entity.RtRecordRepair;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +18,10 @@ import com.zx.rts.entity.RtRecordRepair;
  */
 public interface RtRecordRepairMapper extends BaseMapper<RtRecordRepair> {
 
+    //自定义分页，关联用户表
+    public IPage<RtRecordRepair> selectPageRtRecordRepair(IPage<RtRecordRepair> page, @Param(Constants.WRAPPER) Wrapper<RtRecordRepair> queryWrapper);
+
+
+    //自定义分页，合并报修报抽记录，并关联用户信息
+    public IPage<RtRecordRepair> selectPageMergeRepairAndPump(IPage<RtRecordRepair> page, @Param(Constants.WRAPPER) Wrapper<RtRecordRepair> queryWrapper);
 }
