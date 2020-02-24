@@ -48,6 +48,12 @@ public enum CommonConstants {
 
     //用户身份--司机
     USER_ROLE_DRIVER("driver", "司机"),
+
+    //数据来源手机端
+    DATA_TO_APP("1", "数据来源手机端"),
+
+    //数据来源WEB端
+    DATA_TO_WEB("0", "数据来源WEB端"),
     ;
 
 
