@@ -89,6 +89,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getPage(requestBean);
             case GET_PUMP:
                 return getPumpRepairInfo(requestBean);
+            case ADD_DRIVER:
+                return addDriver(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -273,41 +275,30 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     }
 
     /**
-     * 由保修人的主键id获取报修和报抽信息
-     *
+     * 由村民的主键id获取报修和报抽信息基本信息
+     * wangzhicheng
      * @param requestBean
      * @return
      */
     @Override
     public ResponseBean getPumpRepairInfo(RequestBean requestBean) {
         RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
-        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         QueryWrapper<RtRecordPump> queryWrapper1 = new QueryWrapper<>();
         QueryWrapper<RtRecordRepair> queryWrapper2 = new QueryWrapper<>();
         Map<String, Object> map = new HashMap<String, Object>();
-
-        if (!StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-            queryWrapper.like("phone_number", rtUser.getPhoneNumber());
-        }
-        if (!StringUtils.isEmpty(rtUser.getAddress())) {
-            queryWrapper.like("address", rtUser.getAddress());
-        }
         if (!StringUtils.isEmpty(rtUser.getId())) {
             queryWrapper1.eq("submit_user_id", rtUser.getId());
         }
         if (!StringUtils.isEmpty(rtUser.getId())) {
             queryWrapper2.eq("submit_user_id", rtUser.getId());
         }
-        if (!StringUtils.isEmpty(rtUser.getId())) {
-            queryWrapper1.eq("submit_user_id", rtUser.getId());
-        }
+        //获取村民报抽信息
         List<RtRecordPump> listPump = rtRecordPumpService.list(queryWrapper1);
-
+        //获取村民报修信息
         List<RtRecordRepair> listRepair = rtRecordRepairService.list(queryWrapper2);
-
         map.put("pump", listPump);
-
         map.put("repair", listRepair);
+        map.put("cunmin", rtUser);
         return new ResponseBean(map);
     }
 
@@ -340,6 +331,37 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         }
         ee.setDataList(expList);
         exportExcelService.export(response, ee);
+    }
+
+    /**
+     * 新增单个驾驶员
+     * wang
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean addDriver(RequestBean requestBean) {
+
+        RtUser  rtUser=  BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+        rtUser.setUserType("driver");
+        return new ResponseBean(this.save(rtUser));
+    }
+
+    /**
+     * 获取驾驶员全部信息
+     * wangzhicheng
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getAllDriver(RequestBean requestBean) {
+        Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
+        if (StringUtils.isEmpty(page)) {
+            page = new Page();
+        }
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        // TODO 添加查询条件
+        // Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        queryWrapper.eq("user_type","driver").or().like("user_type","driver");
+        return new ResponseBean(this.page(page, queryWrapper));
     }
 
 
