@@ -1,5 +1,6 @@
 package com.zx.rts.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zx.common.common.BaseEntityBean;
 import io.swagger.annotations.ApiModel;
@@ -63,5 +64,22 @@ public class RtRecordRepair extends BaseEntityBean {
     @ApiModelProperty(value = "是否超时 0未超时，1已超时")
     private Integer overtimeFlag;
 
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "待修人姓名")
+    private String targetUserName;
+
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "待修人手机号")
+    private String targetUserPhoneNumber;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "待修人所属村居编码")
+    private String targetUserVillageCode;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "待修人所属乡镇编码")
+    private String targetUserTownCode;
 
 }
