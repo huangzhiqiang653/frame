@@ -1,9 +1,6 @@
 package com.zx.rts.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -12,7 +9,10 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.config.ExportExcel;
-import com.zx.rts.entity.*;
+import com.zx.rts.entity.RtOrganization;
+import com.zx.rts.entity.RtRecordPump;
+import com.zx.rts.entity.RtRecordRepair;
+import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.*;
 import org.springframework.stereotype.Service;
@@ -22,9 +22,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>
@@ -125,10 +122,11 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
             }
             //第二步：校验用户是否存在
-            LambdaQueryWrapper<RtUser> lambda = Wrappers.<RtUser>lambdaQuery();
-            lambda.eq(RtUser::getDeleteFlag, CommonConstants.DELETE_NO.getCode());
-            lambda.eq(RtUser::getPhoneNumber, rtUser.getPhoneNumber());
-            Integer integer = baseMapper.selectCount(lambda);
+            QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
+            queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
+
+            Integer integer = baseMapper.selectCount(queryWrapper);
             if (integer > 0) {
                 //用户存在，不允许注册
                 return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.USER_REPEAT.getValue());
@@ -377,30 +375,30 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         }
 
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
-        LambdaQueryWrapper<RtUser> lambda = Wrappers.<RtUser>lambdaQuery();
-        lambda.eq(RtUser::getDeleteFlag, CommonConstants.DELETE_NO.getCode())
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode())
         //指定维修人员
-        .like(RtUser::getUserType, CommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode())
+        .like("user_type", CommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode())
         //指定审核通过人
-        .eq(RtUser::getApprovalStatus,CommonConstants.AUDIT_STATUS_TG.getCode());
+        .eq("approval_status",CommonConstants.AUDIT_STATUS_TG.getCode());
 
         if(!StringUtils.isEmpty(queryMap.get("name"))){
-            lambda.like(RtUser::getName,queryMap.get("name"));
+            queryWrapper.like("name",queryMap.get("name"));
         }
 
         if(!StringUtils.isEmpty(queryMap.get("phoneNumber"))){
-            lambda.eq(RtUser::getPhoneNumber,queryMap.get("phoneNumber"));
+            queryWrapper.eq("phone_number",queryMap.get("phoneNumber"));
         }
 
         if(!StringUtils.isEmpty(queryMap.get("villageCode"))){
-            lambda.eq(RtUser::getVillageCode,queryMap.get("villageCode"));
+            queryWrapper.eq("village_code",queryMap.get("villageCode"));
         }
 
         if(!StringUtils.isEmpty(queryMap.get("townCode"))){
-            lambda.eq(RtUser::getTownCode,queryMap.get("townCode"));
+            queryWrapper.eq("town_code",queryMap.get("townCode"));
         }
 
-        return new ResponseBean(baseMapper.selectPageByRepair(page, lambda));
+        return new ResponseBean(baseMapper.selectPageByRepair(page, queryWrapper));
     }
 
 }

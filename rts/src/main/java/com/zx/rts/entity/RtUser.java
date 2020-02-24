@@ -1,6 +1,5 @@
 package com.zx.rts.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zx.common.common.BaseEntityBean;
 import io.swagger.annotations.ApiModel;
@@ -79,13 +78,5 @@ public class RtUser extends BaseEntityBean {
 
     @ApiModelProperty(value = "车牌号")
     private String carNo;
-
-    @ApiModelProperty(value = "数据来源 0 平台 1手机用户")
-    @TableField(exist = false)
-    private String ly;
-
-    @ApiModelProperty(value = "待维修数量")
-    @TableField(exist = false)
-    private String notRepairedNum;
 
 }
