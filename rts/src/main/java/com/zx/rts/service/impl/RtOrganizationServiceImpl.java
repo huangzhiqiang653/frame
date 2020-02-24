@@ -66,7 +66,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
             case GET_PAGE:
                 return getPage(requestBean);
             case GET_TREE:
-                return getOrgTree(requestBean);
+                return getTree(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -133,7 +133,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
 
     /**
      * 单条逻辑删除
-     * 2020/2/20
+     * 2020/2/20  王志成
      * @param requestBean
      * @return
      */
@@ -218,12 +218,11 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
 
     /**
      * 获取区域树数据
-     * 2020-2-19
+     * 2020-2-19  王志成
      * @param requestBean
      * @return
      */
-    @Override
-    public ResponseBean getOrgTree(RequestBean requestBean) {
+    public ResponseBean getTree(RequestBean requestBean) {
         QueryWrapper<RtOrganization> queryWrapper = new QueryWrapper<RtOrganization>();
         queryWrapper.isNull("parent_id");
         List<RtOrganization> organizationList = this.list(queryWrapper);
@@ -243,7 +242,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
     }
     /**
      * 递归获取区域数据
-     * 2020-2-19
+     * 2020-2-19  王志成
      * @return
      */
     public void dGGetOrg(Map map) {

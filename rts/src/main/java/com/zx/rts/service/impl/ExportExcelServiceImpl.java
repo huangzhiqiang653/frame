@@ -24,7 +24,11 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 
-
+/**
+ * 王志成
+ * 导出表格方法封装
+ * 2020/2/24
+ */
 @Service
 public class ExportExcelServiceImpl  implements ExportExcelService {
     Logger logger = LoggerFactory.getLogger(ExportExcelServiceImpl.class);

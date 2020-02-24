@@ -8,6 +8,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.entity.RtRecordPump;
 import com.zx.rts.entity.RtRecordRepair;
 import com.zx.rts.mapper.RtRecordRepairMapper;
 import com.zx.rts.service.IRtRecordRepairService;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -171,6 +174,13 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         }
         QueryWrapper<RtRecordRepair> queryWrapper = new QueryWrapper<>();
         // TODO 添加查询条件
+        //根据用户主键id获取报修信息  王志成
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        RtRecordRepair rtRecordRepair = BaseHzq.convertValue(queryMap, RtRecordRepair.class);
+        // 查询条件
+        if (!StringUtils.isEmpty(rtRecordRepair.getSubmitUserId())) {
+            queryWrapper.eq("submit_user_id",rtRecordRepair.getSubmitUserId() );
+        }
 
         return new ResponseBean(this.page(page, queryWrapper));
     }
