@@ -9,6 +9,7 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.config.ExportExcel;
+import com.zx.rts.dto.RtUserDto;
 import com.zx.rts.entity.RtOrganization;
 import com.zx.rts.entity.RtRecordPump;
 import com.zx.rts.entity.RtRecordRepair;
@@ -109,7 +110,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      */
     public ResponseBean add(RequestBean requestBean) {
         try {
-            RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+            RtUserDto rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUserDto.class);
             if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
                 return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
             }
