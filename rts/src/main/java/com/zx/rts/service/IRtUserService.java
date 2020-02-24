@@ -5,6 +5,8 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.rts.entity.RtUser;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * <p>
  * 用户表 服务类
@@ -30,5 +32,15 @@ public interface IRtUserService extends IService<RtUser> {
      * @return
      */
     public ResponseBean getPumpRepairInfo(RequestBean requestBean);
+
+
+
+    /**
+     * 导出人员信息
+     *
+     * @param response
+     * @return
+     */
+    void ExportRtUser( HttpServletResponse response);
 
 }
