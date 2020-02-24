@@ -86,11 +86,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
-            case GET_PUMP:
-                return getPumpRepairInfo(requestBean);
-            case ADD_DRIVER:
-                return addDriver(requestBean);
-
             case TELL_REPAIRED_PAGE:
                 return getRepairPage(requestBean);
             default:
