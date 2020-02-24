@@ -1,8 +1,6 @@
 package com.zx.rts.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -12,8 +10,6 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.entity.RtCars;
-import com.zx.rts.entity.RtOrganization;
-import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtCarsMapper;
 import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtOrganizationService;
@@ -103,10 +99,10 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         }
 
         //第二步：校验车牌是否存在
-        LambdaQueryWrapper<RtCars> lambda = Wrappers.<RtCars>lambdaQuery();
-        lambda.eq(RtCars::getCarNo, rtCars.getCarNo());
-        lambda.eq(RtCars::getDeleteFlag,  CommonConstants.DELETE_NO.getCode());
-        Integer integer = baseMapper.selectCount(lambda);
+        QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("car_no", rtCars.getCarNo());
+        queryWrapper.eq("delete_flag",  CommonConstants.DELETE_NO.getCode());
+        Integer integer = baseMapper.selectCount(queryWrapper);
         if (integer > 0) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.CARS_REPEAT.getValue());
         }
@@ -240,8 +236,11 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         return new ResponseBean(baseMapper.selectPageRtCars(page, queryWrapper));
     }
 
-
-    //获取可分派维修人员数据
+    /**
+     * 获取可分派维修人员数据
+     * @param requestBean
+     * @return
+     */
     public ResponseBean getPumpPage(RequestBean requestBean){
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
         if (StringUtils.isEmpty(page)) {
@@ -249,14 +248,13 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         }
 
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
-        LambdaQueryWrapper<RtCars> lambda = Wrappers.<RtCars>lambdaQuery();
-        lambda.eq(RtCars::getDeleteFlag, CommonConstants.DELETE_NO.getCode());
+
+        QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
 
         if(!StringUtils.isEmpty(queryMap.get("carNo"))){
-            lambda.like(RtCars::getCarNo,queryMap.get("carNo").toString().toUpperCase().trim());
+            queryWrapper.like("car_no",queryMap.get("carNo").toString().toUpperCase().trim());
         }
-
-
-        return new ResponseBean(baseMapper.selectPageByPump(page, lambda));
+        return new ResponseBean(baseMapper.selectPageByPump(page, queryWrapper));
     }
 }
