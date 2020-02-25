@@ -163,7 +163,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
 
     /**
      * 获取分页数据和条件查询
-     * 2020-2-21
+     * 2020-2-21 王志成
      * @param requestBean
      * @return
      */

@@ -67,7 +67,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
                 return getPage(requestBean);
             case GET_TREE:
                 return getTree(requestBean);
-                
+
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -144,7 +144,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
         RtOrganization rtOrganization1=this.getById((String) requestBean.getInfo());
         // 校验该区域下可有人员数据，无可以删
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<RtUser>();
-        // 2020-2-20待修改
+        // 2020-2-20
         queryWrapper.eq("village_code", rtOrganization1.getCode()).or().eq("town_code", rtOrganization1.getCode());
         List<RtUser> list = rtUserService.list(queryWrapper);
         if (list != null && list.size() > 0) {
