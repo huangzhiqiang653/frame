@@ -9,6 +9,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.common.RtsMessageEnum;
 import com.zx.rts.entity.RtCars;
 import com.zx.rts.mapper.RtCarsMapper;
 import com.zx.rts.service.IRtCarsService;
@@ -88,14 +89,14 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         //车辆新增，需要验证车牌号是否存在，及车牌号是否正确
         //第一步:校验车牌号
         if (StringUtils.isEmpty(rtCars.getCarNo())) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.CARS_FORMAT_ERROR.getValue());
+            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_NUMBER_IS_EMPTY.getValue());
         } else {
             //忽略车牌大小写
             rtCars.setCarNo(rtCars.getCarNo().toUpperCase().trim());
         }
         ;
         if (!CommonUtil.checkPlateNumberFormat(rtCars.getCarNo())) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.CARS_FORMAT_ERROR.getValue());
+            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_FORMAT_ERROR.getValue());
         }
 
         //第二步：校验车牌是否存在
@@ -104,7 +105,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         queryWrapper.eq("delete_flag",  CommonConstants.DELETE_NO.getCode());
         Integer integer = baseMapper.selectCount(queryWrapper);
         if (integer > 0) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.CARS_REPEAT.getValue());
+            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_REPEAT.getValue());
         }
         return new ResponseBean(this.save(rtCars));
     }

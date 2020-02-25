@@ -8,11 +8,11 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.common.RtsCommonConstants;
+import com.zx.rts.common.RtsMessageEnum;
 import com.zx.rts.config.ExportExcel;
 import com.zx.rts.dto.RtUserDto;
 import com.zx.rts.entity.RtOrganization;
-import com.zx.rts.entity.RtRecordPump;
-import com.zx.rts.entity.RtRecordRepair;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.*;
@@ -56,7 +56,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 导出excel需使用的表头标记
      */
-    static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号","所属区划", "手机号码"};
+    static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号", "所属区划", "手机号码"};
+
     /**
      * 公共基础方法
      *
@@ -107,26 +108,26 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         try {
             RtUserDto rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUserDto.class);
             if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
+                return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
             }
             //第一步，检查数据来源
             if ("1".equals(rtUser.getLy())) {
                 // 数据来源手机用户
-            } else if("0".equals(rtUser.getLy())) {
+            } else if ("0".equals(rtUser.getLy())) {
                 // 数据来源平台，平台新增，无需审核
                 rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
-               //王志成 2020-2-24 保存用户区域信息编号 由village_code获取town_code编号
+                //王志成 2020-2-24 保存用户区域信息编号 由village_code获取town_code编号
                 QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<>();
-                if(!StringUtils.isEmpty(rtUser)&&!StringUtils.isEmpty(rtUser.getVillageCode())){
+                if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getVillageCode())) {
                     queryWrapperOrgan.eq("code", rtUser.getVillageCode());
                 }
-                 List<RtOrganization>    list=rtOrganizationService.list(queryWrapperOrgan);
-                 RtOrganization    rtOrgan=new   RtOrganization();
-                 if(!StringUtils.isEmpty(list)&&list.size()==1){
-                     rtOrgan=rtOrganizationService.getById(list.get(0).getParentId());
+                List<RtOrganization> list = rtOrganizationService.list(queryWrapperOrgan);
+                RtOrganization rtOrgan = new RtOrganization();
+                if (!StringUtils.isEmpty(list) && list.size() == 1) {
+                    rtOrgan = rtOrganizationService.getById(list.get(0).getParentId());
                 }
                 rtUser.setTownCode(rtOrgan.getCode());
-            }else{
+            } else {
                 // 数据来源平台，平台新增，无需审核,添加驾驶员信息
                 rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
                 rtUser.setUserType("driver");
@@ -139,7 +140,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             Integer integer = baseMapper.selectCount(queryWrapper);
             if (integer > 0) {
                 //用户存在，不允许注册
-                return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.USER_REPEAT.getValue());
+                return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.USER_REPEAT.getValue());
             }
 
             return new ResponseBean(this.save(rtUser));
@@ -162,6 +163,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 更新单条数据所有字段
      * 王志成
+     *
      * @param requestBean
      * @return
      */
@@ -170,23 +172,23 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
         //获取区域上级编码
         QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<>();
-        if(!StringUtils.isEmpty(rtUser)&&!StringUtils.isEmpty(rtUser.getVillageCode())){
+        if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getVillageCode())) {
             queryWrapperOrgan.eq("code", rtUser.getVillageCode());
         }
-        List<RtOrganization>    listOrgan=rtOrganizationService.list(queryWrapperOrgan);
-        RtOrganization    rtOrgan=new   RtOrganization();
-        if(!StringUtils.isEmpty(listOrgan)&&listOrgan.size()==1){
-            rtOrgan=rtOrganizationService.getById(listOrgan.get(0).getParentId());
+        List<RtOrganization> listOrgan = rtOrganizationService.list(queryWrapperOrgan);
+        RtOrganization rtOrgan = new RtOrganization();
+        if (!StringUtils.isEmpty(listOrgan) && listOrgan.size() == 1) {
+            rtOrgan = rtOrganizationService.getById(listOrgan.get(0).getParentId());
         }
         rtUser.setTownCode(rtOrgan.getCode());
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
-        if (!StringUtils.isEmpty(rtUser)&&!StringUtils.isEmpty(rtUser.getPhoneNumber())) {
+        if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getPhoneNumber())) {
             queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
-            queryWrapper.ne("id",rtUser.getId());
-            List<RtUser>  list=list(queryWrapper);
+            queryWrapper.ne("id", rtUser.getId());
+            List<RtUser> list = list(queryWrapper);
             if (list != null && list.size() > 0) {
                 return new ResponseBean(
-                        CommonConstants.FAIL.getCode(), SystemMessageEnum.USER_NUMBER.getValue());
+                        CommonConstants.FAIL.getCode(), RtsMessageEnum.USER_NUMBER.getValue());
             }
         }
         return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), RtUser.class)));
@@ -262,6 +264,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 获取分页数据
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -297,12 +300,12 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 queryWrapper.eq("approval_status", queryMap.get("approvalStatus"));
             }
             //根据村居编码查询村名信息2020/2/24
-            if(!StringUtils.isEmpty(queryMap.get("villageCode"))){
+            if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
                 queryWrapper.eq("village_code", queryMap.get("villageCode"));
             }
 
             //根据乡镇编码查询村名信息2020/2/24
-            if(!StringUtils.isEmpty(queryMap.get("townCode"))){
+            if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
                 queryWrapper.eq("town_code", queryMap.get("townCode"));
             }
 
@@ -314,36 +317,39 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 导出人员信息
      * wangzhicheng
+     *
      * @param response
      * @return
      */
     @Override
-    public  void ExportRtUser(HttpServletResponse response){
+    public void ExportRtUser(HttpServletResponse response) {
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.ne("delete_flag",1);
+        queryWrapper.ne("delete_flag", 1);
         List<RtUser> list = this.list(queryWrapper);
         ExportExcel ee = new ExportExcel();
         ee.setTitle(INFO_EXPORT_TITLE);
         ee.setRowName(INFO_EXPORT_ROWNAME);
         List<Map<String, Object>> expList = new ArrayList<Map<String, Object>>();
-        int  i=1;
-        for(RtUser rtUser:list){
+        int i = 1;
+        for (RtUser rtUser : list) {
             Map<String, Object> map = new HashMap<String, Object>();
             //序号
-            map.put(INFO_EXPORT_ROWNAME[0],i++);
+            map.put(INFO_EXPORT_ROWNAME[0], i++);
             //所属区划 //待修改
-            map.put(INFO_EXPORT_ROWNAME[1],rtUser.getTownCode());
+            map.put(INFO_EXPORT_ROWNAME[1], rtUser.getTownCode());
             //手机号码
-            map.put(INFO_EXPORT_ROWNAME[2],rtUser.getPhoneNumber());
+            map.put(INFO_EXPORT_ROWNAME[2], rtUser.getPhoneNumber());
 
             expList.add(map);
         }
         ee.setDataList(expList);
         exportExcelService.export(response, ee);
     }
+
     /**
      * 获取驾驶员全部信息
      * wangzhicheng
+     *
      * @param requestBean
      * @return
      */
@@ -355,13 +361,13 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         // TODO 添加查询条件
         // Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
-        queryWrapper.eq("user_type","driver").or().like("user_type","driver");
+        queryWrapper.eq("user_type", "driver").or().like("user_type", "driver");
         return new ResponseBean(this.page(page, queryWrapper));
     }
 
 
     //获取可分派维修人员数据
-    public ResponseBean getRepairPage(RequestBean requestBean){
+    public ResponseBean getRepairPage(RequestBean requestBean) {
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
         if (StringUtils.isEmpty(page)) {
             page = new Page();
@@ -370,25 +376,25 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode())
-        //指定维修人员
-        .like("user_type", CommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode())
-        //指定审核通过人
-        .eq("approval_status",CommonConstants.AUDIT_STATUS_TG.getCode());
+                //指定维修人员
+                .like("user_type", RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode())
+                //指定审核通过人
+                .eq("approval_status", CommonConstants.AUDIT_STATUS_TG.getCode());
 
-        if(!StringUtils.isEmpty(queryMap.get("name"))){
-            queryWrapper.like("name",queryMap.get("name"));
+        if (!StringUtils.isEmpty(queryMap.get("name"))) {
+            queryWrapper.like("name", queryMap.get("name"));
         }
 
-        if(!StringUtils.isEmpty(queryMap.get("phoneNumber"))){
-            queryWrapper.eq("phone_number",queryMap.get("phoneNumber"));
+        if (!StringUtils.isEmpty(queryMap.get("phoneNumber"))) {
+            queryWrapper.eq("phone_number", queryMap.get("phoneNumber"));
         }
 
-        if(!StringUtils.isEmpty(queryMap.get("villageCode"))){
-            queryWrapper.eq("village_code",queryMap.get("villageCode"));
+        if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
+            queryWrapper.eq("village_code", queryMap.get("villageCode"));
         }
 
-        if(!StringUtils.isEmpty(queryMap.get("townCode"))){
-            queryWrapper.eq("town_code",queryMap.get("townCode"));
+        if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
+            queryWrapper.eq("town_code", queryMap.get("townCode"));
         }
 
         return new ResponseBean(baseMapper.selectPageByRepair(page, queryWrapper));
