@@ -93,6 +93,10 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getPage(requestBean);
             case TELL_REPAIRED_PAGE:
                 return getRepairPage(requestBean);
+            case GET_USER_IDS:
+                return getUserIds(requestBean);
+            case GET_PAGE_DRIVER:
+                return getAllDriver(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -192,7 +196,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         if (!StringUtils.isEmpty(listOrgan) && listOrgan.size() == 1) {
             rtOrgan = rtOrganizationService.getById(listOrgan.get(0).getParentId());
         }
-        rtUser.setTownCode(rtOrgan.getCode());
+        if (!StringUtils.isEmpty(rtOrgan.getCode())) {
+            rtUser.setTownCode(rtOrgan.getCode());
+        }
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getPhoneNumber())) {
             queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
@@ -329,16 +335,19 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             if (!StringUtils.isEmpty(queryMap.get("approvalStatus"))) {
                 queryWrapper.eq("approval_status", queryMap.get("approvalStatus"));
             }
-            //根据村居编码查询村名信息2020/2/24
+
+            //根据村居编码查询村名信息2020/2/24   --王志成
             if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-                queryWrapper.eq("village_code", queryMap.get("villageCode"));
+                QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<RtOrganization>();
+                queryWrapperOrgan.eq("code", queryMap.get("villageCode"));
+                List<RtOrganization> list = rtOrganizationService.list(queryWrapperOrgan);
+                if (!StringUtils.isEmpty(list) && list.size() == 1 && !StringUtils.isEmpty(list.get(0).getParentId())) {
+                    queryWrapper.eq("village_code", queryMap.get("villageCode")).or().eq("town_code", queryMap.get("villageCode"));
+                } else {
+                    //展示所有数据
+                    return new ResponseBean(this.page(page, queryWrapper));
+                }
             }
-
-            //根据乡镇编码查询村名信息2020/2/24
-            if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
-                queryWrapper.eq("town_code", queryMap.get("townCode"));
-            }
-
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }
@@ -396,13 +405,26 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     }
 
     /**
-     * 获取用户id信息
+     * 获取用户id信息,添加驾驶员类型
      * 王志成
-     *
      * @param requestBean
      * @return
      */
+    public ResponseBean getUserIds(RequestBean requestBean) {
+        //获取用户id
+        String ids = (String) requestBean.getInfo();
+        String[] orgs = ids.split(",");
+        for (String e : orgs) {
+            if (!StringUtils.isEmpty(e)) {
+                RtUser rtUser = this.getById(e);
+                rtUser.setUserType(rtUser.getUserType() + "," + "driver");
+                this.updateById(rtUser);
 
+            }
+        }
+        return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.ADD_USER_SUCCESS.getValue());
+
+    }
 
     //获取可分派维修人员数据
     public ResponseBean getRepairPage(RequestBean requestBean) {

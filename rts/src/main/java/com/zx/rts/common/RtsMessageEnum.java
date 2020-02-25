@@ -16,6 +16,7 @@ public enum RtsMessageEnum {
     CARS_REPEAT("车牌号已存在，操作失败"),
     CARS_NUMBER_IS_EMPTY("车牌号不为空"),
     CARS_FORMAT_ERROR("车牌号格式不正确"),
+    ADD_USER_SUCCESS("添加驾驶员信息成功"),
     ;
 
     RtsMessageEnum(String value) {
