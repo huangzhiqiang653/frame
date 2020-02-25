@@ -91,6 +91,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getRepairPage(requestBean);
             case GET_USER_IDS:
                 return getUserIds(requestBean);
+            case GET_PAGE_DRIVER:
+                return getAllDriver(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -297,15 +299,23 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             if (!StringUtils.isEmpty(queryMap.get("approvalStatus"))) {
                 queryWrapper.eq("approval_status", queryMap.get("approvalStatus"));
             }
-            //根据村居编码查询村名信息2020/2/24
-            if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-                queryWrapper.eq("village_code", queryMap.get("villageCode"));
-            }
 
-            //根据乡镇编码查询村名信息2020/2/24
-            if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
-                queryWrapper.eq("town_code", queryMap.get("townCode"));
+            //根据村居编码查询村名信息2020/2/24   --王志成
+            if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
+                QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<RtOrganization>();
+                queryWrapperOrgan.eq("code", queryMap.get("villageCode"));
+                List<RtOrganization> list = rtOrganizationService.list(queryWrapperOrgan);
+                if (!StringUtils.isEmpty(list) && list.size() == 1 && !StringUtils.isEmpty(list.get(0).getParentId())) {
+                    queryWrapper.eq("village_code", queryMap.get("villageCode")).or().eq("town_code", queryMap.get("villageCode"));
+                } else {
+                    //展示所有数据
+                    return new ResponseBean(this.page(page, queryWrapper));
+                }
             }
+            //根据乡镇编码查询村名信息2020/2/24
+            /*if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
+                queryWrapper.eq("town_code", queryMap.get("townCode"));
+            }*/
 
         }
         return new ResponseBean(this.page(page, queryWrapper));
