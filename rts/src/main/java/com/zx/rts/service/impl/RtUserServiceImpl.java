@@ -113,7 +113,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             //第一步，检查数据来源
             if ("1".equals(rtUser.getLy())) {
                 // 数据来源手机用户
-            } else if ("0".equals(rtUser.getLy())) {
+            } else  {
                 // 数据来源平台，平台新增，无需审核
                 rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
                 //王志成 2020-2-24 保存用户区域信息编号 由village_code获取town_code编号
@@ -127,10 +127,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                     rtOrgan = rtOrganizationService.getById(list.get(0).getParentId());
                 }
                 rtUser.setTownCode(rtOrgan.getCode());
-            } else {
-                // 数据来源平台，平台新增，无需审核,添加驾驶员信息
-                rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
-                rtUser.setUserType("driver");
             }
             //第二步：校验用户是否存在
             QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
@@ -364,6 +360,14 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         queryWrapper.eq("user_type", "driver").or().like("user_type", "driver");
         return new ResponseBean(this.page(page, queryWrapper));
     }
+
+    /**
+     * 获取用户id信息
+     * 王志成
+     * @param requestBean
+     * @return
+     */
+
 
 
     //获取可分派维修人员数据

@@ -38,7 +38,7 @@ public enum HandleEnum {
     ADD_ROLE_ACCOUNTS_RELATION("addRoleAccountsRelation", "指定角色添加账号信息"),
     ADD_ACCOUNT_ROLES_RELATION("addAccountRolesRelation", "指定账号添加角色信息"),
     INIT_ACCOUNT_PWD("initialAccountPwd", "初始化账户密码"),
-
+    GET_USER_IDS("getUserIds","获取用户id信息"),
     GET_MY_PAGE("getMyPage", "自定义分页查询"),
     TELL_REPAIRED_PAGE("tellRrepairedPage", "报修信息分派信息"),
     TELL_PUMP_PAGE("tellPumpPage", "报抽车辆分派信息"),
