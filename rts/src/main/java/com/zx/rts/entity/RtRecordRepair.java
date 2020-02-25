@@ -1,6 +1,5 @@
 package com.zx.rts.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zx.common.common.BaseEntityBean;
@@ -11,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -44,15 +42,19 @@ public class RtRecordRepair extends BaseEntityBean {
     private String pumpCarId;
 
     @ApiModelProperty(value = "报修时间")
-  /*  @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")*/
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date reportTime;
 
     @ApiModelProperty(value = "上门时间")
-    private LocalDateTime repairTime;
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date repairTime;
 
     @ApiModelProperty(value = "完成时间")
-    private LocalDateTime finishTime;
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date finishTime;
 
     @ApiModelProperty(value = "维修状态 0未上门，1维修中，2已维修")
     private Integer repairStatus;

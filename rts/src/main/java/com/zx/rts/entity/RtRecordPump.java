@@ -1,14 +1,16 @@
 package com.zx.rts.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zx.common.common.BaseEntityBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -40,13 +42,17 @@ public class RtRecordPump extends BaseEntityBean {
     private String pumpCarId;
 
     @ApiModelProperty(value = "报修时间")
-    private LocalDateTime reportTime;
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date reportTime;
 
     @ApiModelProperty(value = "冗余字段1 0未上门，1维修中，2已维修")
     private Integer repairStatus;
 
     @ApiModelProperty(value = "完成时间")
-    private LocalDateTime finishTime;
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date finishTime;
 
     @ApiModelProperty(value = "状态 0未抽，1已抽")
     private Integer pumpStatus;
