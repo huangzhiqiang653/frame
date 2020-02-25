@@ -10,9 +10,13 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.common.RtsMessageEnum;
+import com.zx.rts.dto.RtCarsDto;
 import com.zx.rts.entity.RtCars;
+import com.zx.rts.entity.RtManageArea;
+import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtCarsMapper;
 import com.zx.rts.service.IRtCarsService;
+import com.zx.rts.service.IRtManageAreaService;
 import com.zx.rts.service.IRtOrganizationService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +25,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +40,9 @@ import java.util.Map;
 public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> implements IRtCarsService {
     @Resource
     IRtOrganizationService rtOrganizationService;
+
+    @Resource
+    private IRtManageAreaService iRtManageAreaService;
 
 
     /**
@@ -85,7 +93,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
      */
     public ResponseBean add(RequestBean requestBean) {
 
-        RtCars rtCars = BaseHzq.convertValue(requestBean.getInfo(), RtCars.class);
+        RtCarsDto rtCars = BaseHzq.convertValue(requestBean.getInfo(), RtCarsDto.class);
         //车辆新增，需要验证车牌号是否存在，及车牌号是否正确
         //第一步:校验车牌号
         if (StringUtils.isEmpty(rtCars.getCarNo())) {
@@ -102,12 +110,24 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         //第二步：校验车牌是否存在
         QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("car_no", rtCars.getCarNo());
-        queryWrapper.eq("delete_flag",  CommonConstants.DELETE_NO.getCode());
+        queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
         Integer integer = baseMapper.selectCount(queryWrapper);
         if (integer > 0) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_REPEAT.getValue());
         }
-        return new ResponseBean(this.save(rtCars));
+        //第三步保存车辆基本信息
+        this.save(rtCars);
+
+        //第四步保存车辆关联配置区域
+        if (!StringUtils.isEmpty(rtCars.getListManageArea()) && rtCars.getListManageArea().size() > 0) {
+            for (RtManageArea bean : rtCars.getListManageArea()) {
+                bean.setTargetId(rtCars.getId());
+            }
+            //添加关联
+            iRtManageAreaService.saveBatch(rtCars.getListManageArea());
+        }
+
+        return new ResponseBean(true);
     }
 
     /**
@@ -127,7 +147,39 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
      * @return
      */
     public ResponseBean updateAllField(RequestBean requestBean) {
-        return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), RtCars.class)));
+        //检查用户号码唯一
+        RtCarsDto carsDto = BaseHzq.convertValue(requestBean.getInfo(), RtCarsDto.class);
+        if (!StringUtils.isEmpty(carsDto) && !StringUtils.isEmpty(carsDto.getCarNo())) {
+            carsDto.setCarNo(carsDto.getCarNo().toUpperCase().trim());//转换大小写
+            QueryWrapper<RtCars> queryWrapper = new QueryWrapper();
+            queryWrapper.eq("car_no", carsDto.getCarNo());
+            queryWrapper.ne("id", carsDto.getId());
+            List<RtCars> list = super.list(queryWrapper);
+            if (list != null && list.size() > 0) {
+                return new ResponseBean(
+                        CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_REPEAT.getValue());
+            }
+        }
+
+
+        //关联区划配置
+        QueryWrapper<RtManageArea> wrapper = new QueryWrapper();
+        wrapper.eq("target_id",carsDto.getId() );
+        if (!StringUtils.isEmpty(carsDto.getRemoveManageAreaFlag())) {
+            //删除关联配置标识不为空时，表示删除
+            iRtManageAreaService.remove(wrapper);
+        }else{
+            //检查是否修改
+            if (!StringUtils.isEmpty(carsDto.getListManageArea()) && carsDto.getListManageArea().size() > 0) {
+                iRtManageAreaService.remove(wrapper);
+                for (RtManageArea bean : carsDto.getListManageArea()) {
+                    bean.setTargetId(carsDto.getId());
+                }
+                //添加关联
+                iRtManageAreaService.saveBatch(carsDto.getListManageArea());
+            }
+        }
+        return new ResponseBean(this.updateById(carsDto));
     }
 
     /**
@@ -239,10 +291,11 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
     /**
      * 获取可分派维修人员数据
+     *
      * @param requestBean
      * @return
      */
-    public ResponseBean getPumpPage(RequestBean requestBean){
+    public ResponseBean getPumpPage(RequestBean requestBean) {
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
         if (StringUtils.isEmpty(page)) {
             page = new Page();
@@ -253,8 +306,8 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         QueryWrapper<RtCars> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
 
-        if(!StringUtils.isEmpty(queryMap.get("carNo"))){
-            queryWrapper.like("car_no",queryMap.get("carNo").toString().toUpperCase().trim());
+        if (!StringUtils.isEmpty(queryMap.get("carNo"))) {
+            queryWrapper.like("car_no", queryMap.get("carNo").toString().toUpperCase().trim());
         }
         return new ResponseBean(baseMapper.selectPageByPump(page, queryWrapper));
     }

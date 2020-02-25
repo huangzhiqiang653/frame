@@ -23,7 +23,8 @@ public class RoadScheduler {
     @Autowired
     private RtSchedulerService rtSchedulerService;
 
-    @Scheduled(cron = "0/10 * * * * ?")//每隔10秒执行一次
+    //@Scheduled(cron = "0/10 * * * * ?")//每隔10秒执行一次
+    @Scheduled(cron = "0 0 10 * * ?")//每隔10分钟 执行一次
     public void schedule() {
         logger.info("开启定时任务，检查超时状态");
         rtSchedulerService.SchedulerRepairOvertime();

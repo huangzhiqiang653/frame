@@ -12,6 +12,7 @@ import com.zx.rts.common.RtsCommonConstants;
 import com.zx.rts.common.RtsMessageEnum;
 import com.zx.rts.config.ExportExcel;
 import com.zx.rts.dto.RtUserDto;
+import com.zx.rts.entity.RtManageArea;
 import com.zx.rts.entity.RtOrganization;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
@@ -48,6 +49,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     @Resource
     ExportExcelService exportExcelService;
+
+    @Resource
+    private IRtManageAreaService iRtManageAreaService;
     /**
      * 导出excel需使用的表头标记
      */
@@ -111,9 +115,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
             }
             //第一步，检查数据来源
-            if ("1".equals(rtUser.getLy())) {
+            if (RtsCommonConstants.DATA_TO_APP.getCode().equals(rtUser.getLy())) {
                 // 数据来源手机用户
-            } else  {
+            } else {
                 // 数据来源平台，平台新增，无需审核
                 rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
                 //王志成 2020-2-24 保存用户区域信息编号 由village_code获取town_code编号
@@ -139,7 +143,19 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.USER_REPEAT.getValue());
             }
 
-            return new ResponseBean(this.save(rtUser));
+            //保存用户数据
+            this.save(rtUser);
+
+            //添加关联配置
+            if (!StringUtils.isEmpty(rtUser.getListManageArea()) && rtUser.getListManageArea().size() > 0) {
+                for (RtManageArea bean : rtUser.getListManageArea()) {
+                    bean.setTargetId(rtUser.getId());
+                }
+                //批量添加关联
+                iRtManageAreaService.saveBatch(rtUser.getListManageArea());
+            }
+
+            return new ResponseBean(true);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return new ResponseBean(CommonConstants.FAIL.getCode(), e.getMessage());
@@ -165,7 +181,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      */
     public ResponseBean updateAllField(RequestBean requestBean) {
         //检查用户号码唯一
-        RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+        RtUserDto rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUserDto.class);
         //获取区域上级编码
         QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<>();
         if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getVillageCode())) {
@@ -187,7 +203,25 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                         CommonConstants.FAIL.getCode(), RtsMessageEnum.USER_NUMBER.getValue());
             }
         }
-        return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), RtUser.class)));
+
+        //关联配置
+        QueryWrapper<RtManageArea> wrapper = new QueryWrapper();
+        wrapper.eq("target_id",rtUser.getId() );
+        if (!StringUtils.isEmpty(rtUser.getRemoveManageAreaFlag())) {
+            //删除关联配置标识不为空时，表示删除
+            iRtManageAreaService.remove(wrapper);
+        }else{
+            //检查是否修改
+            if (!StringUtils.isEmpty(rtUser.getListManageArea()) && rtUser.getListManageArea().size() > 0) {
+                iRtManageAreaService.remove(wrapper);
+                for (RtManageArea bean : rtUser.getListManageArea()) {
+                    bean.setTargetId(rtUser.getId());
+                }
+                //添加关联
+                iRtManageAreaService.saveBatch(rtUser.getListManageArea());
+            }
+        }
+        return new ResponseBean(this.updateById(rtUser));
     }
 
     /**
@@ -364,10 +398,10 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 获取用户id信息
      * 王志成
+     *
      * @param requestBean
      * @return
      */
-
 
 
     //获取可分派维修人员数据

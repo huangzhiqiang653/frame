@@ -2,9 +2,12 @@ package com.zx.rts.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.zx.rts.entity.RtCars;
+import com.zx.rts.entity.RtManageArea;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 /**
  * 车辆信息DTO
@@ -23,4 +26,16 @@ public class RtCarsDto extends RtCars {
 
     @ApiModelProperty(value = "待抽取数量")
     private String notPumpNum;
+
+
+
+    @ApiModelProperty(value = "关联配置")
+    @TableField(exist = false)
+    private List<RtManageArea> listManageArea;
+
+
+    @ApiModelProperty(value = "删除关联标识")
+    @TableField(exist = false)
+    private String removeManageAreaFlag;
+
 }
