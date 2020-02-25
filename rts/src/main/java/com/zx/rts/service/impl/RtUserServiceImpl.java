@@ -180,7 +180,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         if (!StringUtils.isEmpty(listOrgan) && listOrgan.size() == 1) {
             rtOrgan = rtOrganizationService.getById(listOrgan.get(0).getParentId());
         }
-        rtUser.setTownCode(rtOrgan.getCode());
+        if (!StringUtils.isEmpty(rtOrgan.getCode())) {
+            rtUser.setTownCode(rtOrgan.getCode());
+        }
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getPhoneNumber())) {
             queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
@@ -191,7 +193,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                         CommonConstants.FAIL.getCode(), RtsMessageEnum.USER_NUMBER.getValue());
             }
         }
-        return new ResponseBean(this.updateById(BaseHzq.convertValue(requestBean.getInfo(), RtUser.class)));
+        return new ResponseBean(this.updateById(BaseHzq.convertValue(rtUser, RtUser.class)));
     }
 
     /**
@@ -312,11 +314,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                     return new ResponseBean(this.page(page, queryWrapper));
                 }
             }
-            //根据乡镇编码查询村名信息2020/2/24
-            /*if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
-                queryWrapper.eq("town_code", queryMap.get("townCode"));
-            }*/
-
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }
