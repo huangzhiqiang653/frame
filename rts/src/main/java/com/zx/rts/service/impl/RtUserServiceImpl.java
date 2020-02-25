@@ -375,7 +375,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         String ids = (String) requestBean.getInfo();
         String[] orgs = ids.split(",");
         for (String e : orgs) {
-            if (StringUtils.isEmpty(e)) {
+            if (!StringUtils.isEmpty(e)) {
                 RtUser rtUser = this.getById(e);
                 rtUser.setUserType(rtUser.getUserType() + "," + "driver");
                 this.updateById(rtUser);
