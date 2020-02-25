@@ -8,6 +8,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.common.RtsMessageEnum;
 import com.zx.rts.entity.RtOrganization;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtOrganizationMapper;
@@ -80,6 +81,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
     /**
      * 单个新增
      * 2020/2/20
+     *
      * @param requestBean
      * @return
      */
@@ -91,11 +93,11 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
         List<RtOrganization> list = rtOrganizationService.list(queryWrapper);
         if (list != null && list.size() > 0) {
             return new ResponseBean(
-                    CommonConstants.FAIL.getCode(),
-                    "code已有请修改");
+                    CommonConstants.FAIL.getCode(), RtsMessageEnum.CODE_LIVE.getValue()
+            );
         }
         boolean saveFlag = this.save(rtOrganization);
-        return saveFlag ? new ResponseBean(rtOrganization) : new ResponseBean(CommonConstants.FAIL.getCode(), "保存失败");
+        return saveFlag ? new ResponseBean(rtOrganization) : new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.SAVE_FALURE.getValue());
     }
 
     /**
@@ -111,6 +113,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
     /**
      * 更新单条数据所有字段
      * 2020/2/20
+     *
      * @param requestBean
      * @return
      */
@@ -135,13 +138,14 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
     /**
      * 单条逻辑删除
      * 2020/2/20  王志成
+     *
      * @param requestBean
      * @return
      */
     public ResponseBean deleteLogicalSingle(RequestBean requestBean) {
         String orgId = (String) requestBean.getInfo();
         //由主键id获取区域对象
-        RtOrganization rtOrganization1=this.getById((String) requestBean.getInfo());
+        RtOrganization rtOrganization1 = this.getById((String) requestBean.getInfo());
         // 校验该区域下可有人员数据，无可以删
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<RtUser>();
         // 2020-2-20
@@ -150,7 +154,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
         if (list != null && list.size() > 0) {
             return new ResponseBean(
                     CommonConstants.FAIL.getCode(),
-                    "请先删除该区域下的人员数据");
+                    RtsMessageEnum.DISTRICT_LIVE_PEOPLE.getValue());
         }
         return new ResponseBean(this.removeById(orgId));
     }
@@ -168,6 +172,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
     /**
      * 根据主键获取单条数据
      * 2020/2/20
+     *
      * @param requestBean
      * @return
      */
@@ -216,10 +221,10 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
     }
 
 
-
     /**
      * 获取区域树数据
      * 2020-2-19  王志成
+     *
      * @param requestBean
      * @return
      */
@@ -237,13 +242,15 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
         } else {
             return new ResponseBean(
                     CommonConstants.FAIL.getCode(),
-                    "获取树根节点数据失败"
+                    RtsMessageEnum.TREE_POINT.getValue()
             );
         }
     }
+
     /**
      * 递归获取区域数据
      * 2020-2-19  王志成
+     *
      * @return
      */
     public void dGGetOrg(Map map) {
