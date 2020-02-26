@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -355,13 +356,17 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     /**
      * 导出人员信息
-     * wangzhicheng
+     * 王志成
      *
      * @param response
      * @return
      */
     @Override
     public void ExportRtUser(HttpServletResponse response) {
+        //获取所有区划集合数据
+        List<RtOrganization> listOrganization = rtOrganizationService.list();
+        //将List集合数据转成Map集合
+        Map<String, RtOrganization> organnizaMap = listOrganization.stream().collect(Collectors.toMap(RtOrganization::getCode, RtOrganization -> RtOrganization));
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.ne("delete_flag", 1);
         List<RtUser> list = this.list(queryWrapper);
@@ -374,8 +379,20 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             Map<String, Object> map = new HashMap<String, Object>();
             //序号
             map.put(INFO_EXPORT_ROWNAME[0], i++);
-            //所属区划 //待修改
-            map.put(INFO_EXPORT_ROWNAME[1], rtUser.getTownCode());
+            //所属区划由人员villageCode乡村编码获取名称
+            RtOrganization rtOrgan=new RtOrganization();
+            if (!StringUtils.isEmpty(rtUser.getVillageCode())){
+                rtOrgan=organnizaMap.get(rtUser.getVillageCode());
+                if(!StringUtils.isEmpty(rtOrgan)&&!StringUtils.isEmpty(rtUser.getVillageCode())){
+                    map.put(INFO_EXPORT_ROWNAME[1], rtOrgan.getName());
+                }else{
+                    map.put(INFO_EXPORT_ROWNAME[1], "无");
+                }
+
+            }else{
+                map.put(INFO_EXPORT_ROWNAME[1], "无");
+
+            }
             //手机号码
             map.put(INFO_EXPORT_ROWNAME[2], rtUser.getPhoneNumber());
 
