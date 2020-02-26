@@ -46,10 +46,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
     @Resource
     private ExportExcelService exportExcelService;
 
-    /**
-     * 导出excel需使用的表头标记
-     */
-    public static final String INFO_EXPORT_TITLE = "车辆信息";
+
 
     /**
      * 导出excel需使用的表头标记
@@ -106,7 +103,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
         List<RtCarsDto> list = baseMapper.selectCarList(new RtCars());
         ExportExcel ee = new ExportExcel();
-        ee.setTitle(INFO_EXPORT_TITLE);
+        ee.setTitle(RtsMessageEnum.INFO_EXPORT_TITLE_CARS.getValue());
         ee.setRowName(INFO_EXPORT_ROWNAME);
         List<Map<String, Object>> expList = new ArrayList<Map<String, Object>>();
         int i = 1;
@@ -117,7 +114,10 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
             //人员姓名
             map.put(INFO_EXPORT_ROWNAME[1], rtCars.getName());
             //所属区划
-            map.put(INFO_EXPORT_ROWNAME[2], rtCars.getTownCode() + rtCars.getVillageCode());
+            String qh =
+                    (StringUtils.isEmpty(rtCars.getTownCode())?"":rtCars.getTownCode())  +
+                    (StringUtils.isEmpty(rtCars.getVillageCode())?"":rtCars.getVillageCode());
+            map.put(INFO_EXPORT_ROWNAME[2],  qh );
             //手机号
             map.put(INFO_EXPORT_ROWNAME[3], rtCars.getPhoneNumber());
             //车牌号

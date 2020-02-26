@@ -1,5 +1,6 @@
 package com.zx.rts.controller;
 
+import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtUserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,17 +15,27 @@ import javax.servlet.http.HttpServletResponse;
  * 王志成
  */
 @RestController
-@RequestMapping("/rts/rt-user")
+@RequestMapping("/rts/rt-export")
 public class ExportExcelController {
 
     @Resource
-    IRtUserService rtUserService;
+    private IRtUserService rtUserService;
+
+    @Resource
+    private IRtCarsService iRtCarsService;
 
 
     @GetMapping(value = "/exportRtUser")
     @ResponseBody
     public void ExportRtUser(HttpServletResponse response) {
+
         rtUserService.ExportRtUser(response);
+    }
+
+    @GetMapping(value = "/exportRtCar")
+    public void ExportRtCar(HttpServletResponse response) {
+
+        iRtCarsService.ExportRtCar(response);
     }
 
 }

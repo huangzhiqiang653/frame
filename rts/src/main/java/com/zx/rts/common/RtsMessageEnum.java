@@ -20,7 +20,8 @@ public enum RtsMessageEnum {
     CODE_LIVE("code已有请修改"),
     SAVE_FALURE("保存失败"),
     DISTRICT_LIVE_PEOPLE("请先删除该区域下的人员数据"),
-    TREE_POINT("获取树根节点数据失败");
+    TREE_POINT("获取树根节点数据失败"),
+    INFO_EXPORT_TITLE_CARS("车辆信息");
 
     RtsMessageEnum(String value) {
         this.value = value;

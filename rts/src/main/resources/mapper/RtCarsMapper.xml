@@ -19,8 +19,19 @@
         FROM t_rt_cars u ${ew.customSqlSegment}
     </select>
 
-    <select id="selectCarList" resultType="com.zx.rts.dto.RtCarsDto" >
-      select * from t_rt_cars
-
+    <select id="selectCarList" resultType="com.zx.rts.dto.RtCarsDto">
+      SELECT
+         t.car_no,u.name AS NAME ,u.phone_number  AS phone_number ,
+         a.name AS village_code,
+         (
+          SELECT NAME  FROM t_rt_organization WHERE CODE = (
+            SELECT parent_code  FROM t_rt_organization WHERE CODE =t.village_code AND parent_code IS NOT NULL
+          )) AS  town_code
+         FROM t_rt_cars  t
+         LEFT JOIN t_rt_organization a
+         ON a.code =t.village_code
+         LEFT JOIN t_rt_user u
+         ON t.duty_user_id = u.id
+         WHERE   t.delete_flag ='0'
     </select>
 </mapper>
