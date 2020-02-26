@@ -213,11 +213,11 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
         //关联配置
         QueryWrapper<RtManageArea> wrapper = new QueryWrapper();
-        wrapper.eq("target_id",rtUser.getId() );
+        wrapper.eq("target_id", rtUser.getId());
         if (!StringUtils.isEmpty(rtUser.getRemoveManageAreaFlag())) {
             //删除关联配置标识不为空时，表示删除
             iRtManageAreaService.remove(wrapper);
-        }else{
+        } else {
             //检查是否修改
             if (!StringUtils.isEmpty(rtUser.getListManageArea()) && rtUser.getListManageArea().size() > 0) {
                 iRtManageAreaService.remove(wrapper);
@@ -337,18 +337,19 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 queryWrapper.eq("approval_status", queryMap.get("approvalStatus"));
             }
 
-            //根据村居编码查询村名信息2020/2/24   --王志成
+            //所属村居编码 -2020-2-26
             if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-                QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<RtOrganization>();
-                queryWrapperOrgan.eq("code", queryMap.get("villageCode"));
-                List<RtOrganization> list = rtOrganizationService.list(queryWrapperOrgan);
-                if (!StringUtils.isEmpty(list) && list.size() == 1 && !StringUtils.isEmpty(list.get(0).getParentId())) {
-                    queryWrapper.eq("village_code", queryMap.get("villageCode")).or().eq("town_code", queryMap.get("villageCode"));
-                } else {
-                    //展示所有数据
-                    return new ResponseBean(this.page(page, queryWrapper));
-                }
+                String sql = " SELECT a.code FROM t_rt_organization a " +
+                        "  LEFT JOIN t_rt_organization b  " +
+                        "  ON a.parent_code = b.code " +
+                        "  WHERE a.`code`= " + queryMap.get("villageCode") +
+                        "  OR a.parent_code=" + queryMap.get("villageCode") +
+                        "  OR b.parent_code=" + queryMap.get("villageCode");
+                queryWrapper.inSql("village_code", sql);
+
             }
+
+
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }
@@ -380,16 +381,16 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             //序号
             map.put(INFO_EXPORT_ROWNAME[0], i++);
             //所属区划由人员villageCode乡村编码获取名称
-            RtOrganization rtOrgan=new RtOrganization();
-            if (!StringUtils.isEmpty(rtUser.getVillageCode())){
-                rtOrgan=organnizaMap.get(rtUser.getVillageCode());
-                if(!StringUtils.isEmpty(rtOrgan)&&!StringUtils.isEmpty(rtUser.getVillageCode())){
+            RtOrganization rtOrgan = new RtOrganization();
+            if (!StringUtils.isEmpty(rtUser.getVillageCode())) {
+                rtOrgan = organnizaMap.get(rtUser.getVillageCode());
+                if (!StringUtils.isEmpty(rtOrgan) && !StringUtils.isEmpty(rtUser.getVillageCode())) {
                     map.put(INFO_EXPORT_ROWNAME[1], rtOrgan.getName());
-                }else{
+                } else {
                     map.put(INFO_EXPORT_ROWNAME[1], "无");
                 }
 
-            }else{
+            } else {
                 map.put(INFO_EXPORT_ROWNAME[1], "无");
 
             }
@@ -424,6 +425,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 获取用户id信息,添加驾驶员类型
      * 王志成
+     *
      * @param requestBean
      * @return
      */
