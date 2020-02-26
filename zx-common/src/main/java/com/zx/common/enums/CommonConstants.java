@@ -34,6 +34,10 @@ public enum CommonConstants {
     //审核状态--审核不通过
     AUDIT_STATUS_BTG("2", "审核不通过"),
 
+    FILE_EXCEL_XLS("xls", "xls格式文件"),
+
+    FILE_EXCEL_XLSX("xlsx", "xlsx格式文件"),
+
     ;
 
 
