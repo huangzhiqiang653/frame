@@ -29,7 +29,7 @@ public class ExportExcelController {
      */
     @GetMapping(value = "/exportRtUser")
     @ResponseBody
-    public void ExportRtUser(HttpServletResponse response) {
+    public void exportRtUser(HttpServletResponse response) {
 
         rtUserService.exportRtUser(response);
     }

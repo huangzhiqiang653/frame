@@ -91,3 +91,4 @@ scheduler:
 excel:
   type:
     cars: carNo,villageCode
+    users: name,phoneNumber,villageCode
