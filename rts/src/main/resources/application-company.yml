@@ -79,3 +79,11 @@ redis:
 
 account:
   initialpwd: '000000'
+
+#定时任务配置参数
+scheduler:
+  #报抽超时字典类别
+  pumpOvertimeParamName: pump_overtime
+
+  #报修超时字典类别
+  repairOvertimeParamName: repair_overtime
