@@ -10,11 +10,12 @@ import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.common.RtsMessageEnum;
+import com.zx.rts.config.ExportExcel;
 import com.zx.rts.dto.RtCarsDto;
 import com.zx.rts.entity.RtCars;
 import com.zx.rts.entity.RtManageArea;
-import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtCarsMapper;
+import com.zx.rts.service.ExportExcelService;
 import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtManageAreaService;
 import com.zx.rts.service.IRtOrganizationService;
@@ -23,10 +24,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * <p>
@@ -44,6 +43,18 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
     @Resource
     private IRtManageAreaService iRtManageAreaService;
 
+    @Resource
+    private ExportExcelService exportExcelService;
+
+    /**
+     * 导出excel需使用的表头标记
+     */
+    public static final String INFO_EXPORT_TITLE = "车辆信息";
+
+    /**
+     * 导出excel需使用的表头标记
+     */
+    public static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号", "人员信息", "所属区划", "手机号码", "车牌号码"};
 
     /**
      * 公共基础方法
@@ -83,6 +94,39 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
                 );
 
         }
+    }
+
+    /**
+     * 车辆信息导出
+     *
+     * @param response
+     */
+    @Override
+    public void ExportRtCar(HttpServletResponse response) {
+
+        List<RtCarsDto> list = baseMapper.selectCarList(new RtCars());
+        ExportExcel ee = new ExportExcel();
+        ee.setTitle(INFO_EXPORT_TITLE);
+        ee.setRowName(INFO_EXPORT_ROWNAME);
+        List<Map<String, Object>> expList = new ArrayList<Map<String, Object>>();
+        int i = 1;
+        for (RtCarsDto rtCars : list) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            //序号
+            map.put(INFO_EXPORT_ROWNAME[0], i++);
+            //人员姓名
+            map.put(INFO_EXPORT_ROWNAME[1], rtCars.getName());
+            //所属区划
+            map.put(INFO_EXPORT_ROWNAME[2], rtCars.getTownCode() + rtCars.getVillageCode());
+            //手机号
+            map.put(INFO_EXPORT_ROWNAME[3], rtCars.getPhoneNumber());
+            //车牌号
+            map.put(INFO_EXPORT_ROWNAME[4], rtCars.getCarNo());
+            expList.add(map);
+        }
+        ee.setDataList(expList);
+        exportExcelService.export(response, ee);
+
     }
 
     /**
@@ -164,11 +208,11 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
         //关联区划配置
         QueryWrapper<RtManageArea> wrapper = new QueryWrapper();
-        wrapper.eq("target_id",carsDto.getId() );
+        wrapper.eq("target_id", carsDto.getId());
         if (!StringUtils.isEmpty(carsDto.getRemoveManageAreaFlag())) {
             //删除关联配置标识不为空时，表示删除
             iRtManageAreaService.remove(wrapper);
-        }else{
+        } else {
             //检查是否修改
             if (!StringUtils.isEmpty(carsDto.getListManageArea()) && carsDto.getListManageArea().size() > 0) {
                 iRtManageAreaService.remove(wrapper);
@@ -267,11 +311,14 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
             //所属村居编码
             if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-                queryWrapper.eq("village_code", queryMap.get("villageCode"));
-            }
-            //所属乡镇编码
-            if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
-                queryWrapper.eq("town_code", queryMap.get("townCode"));
+                String sql = " SELECT a.code FROM t_rt_organization a " +
+                        "  LEFT JOIN t_rt_organization b  " +
+                        "  ON a.parent_code = b.code " +
+                        "  WHERE a.`code`= " + queryMap.get("villageCode") +
+                        "  OR a.parent_code=" + queryMap.get("villageCode") +
+                        "  OR b.parent_code=" + queryMap.get("villageCode");
+                queryWrapper.inSql("village_code", sql);
+
             }
 
             //姓名
