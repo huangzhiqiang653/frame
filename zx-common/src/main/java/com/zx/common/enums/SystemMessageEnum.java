@@ -18,7 +18,8 @@ public enum SystemMessageEnum {
     ACCOUNT_IS_NULL("账号不存在"),
     ACCOUNT_IS_LIVE("账号已存在"),
     ACCOUNT_PASSWORD_IS_ERROR("密码错误"),
-
+    FILE_IS_EMPTY_ERROR("文件为空"),
+    FILE_IS_GS_ERROR("文件格式不支持，仅支持(xls和xlsx格式的文件)")
     ;
     SystemMessageEnum(String value) {
         this.value = value;

@@ -2,10 +2,8 @@ package com.zx.rts.controller;
 
 import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtUserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -32,10 +30,23 @@ public class ExportExcelController {
         rtUserService.ExportRtUser(response);
     }
 
+    /**
+     * 车辆信息导出
+     * @param response
+     */
     @GetMapping(value = "/exportRtCar")
-    public void ExportRtCar(HttpServletResponse response) {
+    public void exportRtCar(HttpServletResponse response) {
 
         iRtCarsService.ExportRtCar(response);
     }
+
+    @PostMapping(value = "/importRtCar")
+    public void importRtCar(@RequestParam MultipartFile file) {
+
+        iRtCarsService.importRtCar(file);
+    }
+
+
+
 
 }
