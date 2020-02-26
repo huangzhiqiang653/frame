@@ -100,7 +100,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
      * @param response
      */
     @Override
-    public void ExportRtCar(HttpServletResponse response) {
+    public void exportRtCar(HttpServletResponse response) {
 
         List<RtCarsDto> list = baseMapper.selectCarList(new RtCars());
         ExportExcel ee = new ExportExcel();
@@ -132,8 +132,8 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
     /**
      * 车辆信息导入
-     *
      * @param file
+     * @return
      */
     @Override
     public ResponseBean importRtCar(MultipartFile file) {

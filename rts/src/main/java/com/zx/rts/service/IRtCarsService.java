@@ -30,11 +30,12 @@ public interface IRtCarsService extends IService<RtCars> {
      * 车辆信息导出
      * @param response
      */
-    public void ExportRtCar(HttpServletResponse response);
-
+    public void exportRtCar(HttpServletResponse response);
 
     /**
-     * 车辆信息导入
+     * 车辆信息导出
+     * @param file
+     * @return
      */
     public ResponseBean importRtCar(MultipartFile file);
 }

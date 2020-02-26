@@ -37,8 +37,13 @@ public class ExportExcelController {
     @GetMapping(value = "/exportRtCar")
     public void exportRtCar(HttpServletResponse response) {
 
-        iRtCarsService.ExportRtCar(response);
+        iRtCarsService.exportRtCar(response);
     }
+
+    /**
+     * 车辆信息导入
+     * @param file
+     */
 
     @PostMapping(value = "/importRtCar")
     public void importRtCar(@RequestParam MultipartFile file) {
