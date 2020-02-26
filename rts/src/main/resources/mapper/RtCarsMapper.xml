@@ -18,4 +18,9 @@
            WHERE pump_car_id = u.id  AND repair_status != 2  )  AS   not_pump_num
         FROM t_rt_cars u ${ew.customSqlSegment}
     </select>
+
+    <select id="selectCarList" resultType="com.zx.rts.dto.RtCarsDto" >
+      select * from t_rt_cars
+
+    </select>
 </mapper>

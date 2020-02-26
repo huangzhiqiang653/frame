@@ -5,9 +5,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zx.rts.dto.RtCarsDto;
 import com.zx.rts.entity.RtCars;
 import com.zx.rts.entity.RtUser;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -25,4 +28,9 @@ public interface RtCarsMapper extends BaseMapper<RtCars> {
 
     //分派车辆信息
     public IPage<RtCars> selectPageByPump(IPage<RtCars> page, @Param(Constants.WRAPPER) Wrapper<RtCars> queryWrapper);
+
+
+    //车辆导出信息
+    public List<RtCarsDto> selectCarList(@Param(Constants.WRAPPER_ENTITY) RtCars RtCars);
+
 }
