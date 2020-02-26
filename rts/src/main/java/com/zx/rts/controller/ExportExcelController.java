@@ -22,16 +22,22 @@ public class ExportExcelController {
     @Resource
     private IRtCarsService iRtCarsService;
 
-
+    /**
+     * 人员信息导出
+     *
+     * @param response
+     */
     @GetMapping(value = "/exportRtUser")
     @ResponseBody
     public void ExportRtUser(HttpServletResponse response) {
 
-        rtUserService.ExportRtUser(response);
+        rtUserService.exportRtUser(response);
     }
+
 
     /**
      * 车辆信息导出
+     *
      * @param response
      */
     @GetMapping(value = "/exportRtCar")
@@ -41,17 +47,28 @@ public class ExportExcelController {
     }
 
     /**
-     * 车辆信息导入
+     * 沈阳
+     * 车辆导入
+     *
      * @param file
      */
-
     @PostMapping(value = "/importRtCar")
     public void importRtCar(@RequestParam MultipartFile file) {
 
         iRtCarsService.importRtCar(file);
     }
 
+    /**
+     * wangzhicheng
+     * 人员导入
+     *
+     * @param file
+     */
+    @PostMapping(value = "/importRtUser")
+    public void importRtUser(@RequestParam MultipartFile file) {
 
+        rtUserService.importRtUser(file);
+    }
 
 
 }

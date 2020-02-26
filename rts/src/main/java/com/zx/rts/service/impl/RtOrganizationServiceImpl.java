@@ -90,6 +90,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
         //检测code是否唯一
         QueryWrapper<RtOrganization> queryWrapper = new QueryWrapper<RtOrganization>();
         queryWrapper.eq("code", rtOrganization.getCode());
+        queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
         List<RtOrganization> list = rtOrganizationService.list(queryWrapper);
         if (list != null && list.size() > 0) {
             return new ResponseBean(
