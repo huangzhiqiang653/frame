@@ -1,6 +1,6 @@
 ## 项目配置
 server:
-  port: 9073
+  port: 9072
   servlet:
     context-path: /rts
     session:

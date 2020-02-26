@@ -230,7 +230,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
      */
     public ResponseBean getTree(RequestBean requestBean) {
         QueryWrapper<RtOrganization> queryWrapper = new QueryWrapper<RtOrganization>();
-        queryWrapper.isNull("parent_id");
+        queryWrapper.isNull("parent_code");
         List<RtOrganization> organizationList = this.list(queryWrapper);
         if (organizationList != null && organizationList.size() == 1) {
             RtOrganization root = organizationList.get(0);
@@ -255,7 +255,7 @@ public class RtOrganizationServiceImpl extends ServiceImpl<RtOrganizationMapper,
      */
     public void dGGetOrg(Map map) {
         QueryWrapper<RtOrganization> queryWrapper = new QueryWrapper<RtOrganization>();
-        queryWrapper.orderByAsc("sort").eq("parent_id", map.get("id"));
+        queryWrapper.orderByAsc("sort").eq("parent_code", map.get("code"));
         List<RtOrganization> rtOrganizations = this.list(queryWrapper);
         if (rtOrganizations != null && rtOrganizations.size() > 0) {
             List<Map> children = new ArrayList<Map>();
