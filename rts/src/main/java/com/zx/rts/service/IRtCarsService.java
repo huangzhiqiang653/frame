@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.rts.entity.RtCars;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,4 +31,10 @@ public interface IRtCarsService extends IService<RtCars> {
      * @param response
      */
     public void ExportRtCar(HttpServletResponse response);
+
+
+    /**
+     * 车辆信息导入
+     */
+    public ResponseBean importRtCar(MultipartFile file);
 }

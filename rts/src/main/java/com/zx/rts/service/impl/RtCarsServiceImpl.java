@@ -3,10 +3,7 @@ package com.zx.rts.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.zx.common.common.BaseHzq;
-import com.zx.common.common.CommonUtil;
-import com.zx.common.common.RequestBean;
-import com.zx.common.common.ResponseBean;
+import com.zx.common.common.*;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.common.RtsMessageEnum;
@@ -19,9 +16,11 @@ import com.zx.rts.service.ExportExcelService;
 import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtManageAreaService;
 import com.zx.rts.service.IRtOrganizationService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +45,8 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
     @Resource
     private ExportExcelService exportExcelService;
 
+    @Value("${excel.type.cars}")
+    private String carsExcelType;
 
 
     /**
@@ -115,9 +116,9 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
             map.put(INFO_EXPORT_ROWNAME[1], rtCars.getName());
             //所属区划
             String qh =
-                    (StringUtils.isEmpty(rtCars.getTownCode())?"":rtCars.getTownCode())  +
-                    (StringUtils.isEmpty(rtCars.getVillageCode())?"":rtCars.getVillageCode());
-            map.put(INFO_EXPORT_ROWNAME[2],  qh );
+                    (StringUtils.isEmpty(rtCars.getTownCode()) ? "" : rtCars.getTownCode()) +
+                            (StringUtils.isEmpty(rtCars.getVillageCode()) ? "" : rtCars.getVillageCode());
+            map.put(INFO_EXPORT_ROWNAME[2], qh);
             //手机号
             map.put(INFO_EXPORT_ROWNAME[3], rtCars.getPhoneNumber());
             //车牌号
@@ -130,6 +131,37 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
     }
 
     /**
+     * 车辆信息导入
+     *
+     * @param file
+     */
+    @Override
+    public ResponseBean importRtCar(MultipartFile file) {
+        //获取EXCEL数据
+        ResponseBean responseBean = ExcelUtil.excelAnalysis(file, carsExcelType);
+        //承载错误信息
+        List<ResponseBean> errMessage =new ArrayList<>();
+
+        if (CommonConstants.SUCCESS.getCode().equals(responseBean.getCode())) {
+            List<Map<String, String>> list =(List<Map<String, String>>) responseBean.getData();
+            for (int i = 0; i < list.size(); i++) {
+                RtCarsDto rtCars = new RtCarsDto();
+                rtCars.setCarNo(list.get(i).get("carNo"));
+                rtCars.setVillageCode(list.get(i).get("villageCode"));
+                ResponseBean res = this.baseSave(rtCars);
+                if(CommonConstants.FAIL.getCode().equals(res.getCode())){
+                    res.setData(rtCars);
+                    errMessage.add(res);
+                }
+            }
+            return new ResponseBean(errMessage);
+        } else {
+            return responseBean;
+        }
+
+    }
+
+    /**
      * 单个新增
      *
      * @param requestBean
@@ -138,6 +170,15 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
     public ResponseBean add(RequestBean requestBean) {
 
         RtCarsDto rtCars = BaseHzq.convertValue(requestBean.getInfo(), RtCarsDto.class);
+        return this.baseSave(rtCars);
+    }
+
+    /**
+     * 车辆新增公共方法提取
+     * @param rtCars
+     * @return
+     */
+    private ResponseBean baseSave(RtCarsDto rtCars) {
         //车辆新增，需要验证车牌号是否存在，及车牌号是否正确
         //第一步:校验车牌号
         if (StringUtils.isEmpty(rtCars.getCarNo())) {
