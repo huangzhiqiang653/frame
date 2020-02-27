@@ -1,5 +1,11 @@
 package com.zx.rts.service;
 
+
+/**
+ * @author shenyang
+ * @since 2020-02-27
+ * 定时任务业务类
+ */
 public interface RtSchedulerService {
 
     /**
