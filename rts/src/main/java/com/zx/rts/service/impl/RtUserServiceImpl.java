@@ -1,6 +1,7 @@
 package com.zx.rts.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -127,7 +128,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      */
     public ResponseBean add(RequestBean requestBean) {
         RtUserDto rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUserDto.class);
-        return   new ResponseBean(baseSaveUser(rtUser));
+        return new ResponseBean(baseSaveUser(rtUser));
     }
 
     /**
@@ -194,46 +195,57 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         }
         return new ResponseBean(this.updateById(rtUser));
     }
+
     /**
      * 删除角色接口
-     * @author shenyang
+     *
      * @param requestBean
      * @return
+     * @author shenyang
      */
     public ResponseBean removeUserRole(RequestBean requestBean) {
         RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
-        String remmoveType=rtUser.getUserType();//获取需要删除的角色
+        String remmoveType = rtUser.getUserType();//获取需要删除的角色
 
         RtUser rtUser1 = baseMapper.selectById(rtUser.getId());
         String userType =
-                         rtUser1.getUserType()
-                        .replace(remmoveType+",", "")
-                        .replace(","+remmoveType, "")
+                rtUser1.getUserType()
+                        .replace(remmoveType + ",", "")
+                        .replace("," + remmoveType, "")
                         .replace(remmoveType, "");
         rtUser1.setUserType(userType);
-        if(RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode().equals(remmoveType)){
+        if (RtsCommonConstants.USER_ROLE_DRIVER.getCode().equals(remmoveType)) {
             //如果删除的是驾驶员角色，则将关联车辆清空
             rtUser1.setCarNo("");
+        } else if (RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode().equals(remmoveType)) {
+
+            //删除维修人员时，删除相关的维修区域
+            RtManageArea bean = new RtManageArea();
+            bean.setDeleteFlag(Integer.parseInt(CommonConstants.DELETE_YES.getCode()));
+            UpdateWrapper<RtManageArea> queryWrapper = new UpdateWrapper();
+            queryWrapper.eq("target_id",rtUser.getId());
+            iRtManageAreaService.update(bean,queryWrapper);
         }
-        QueryWrapper<RtUser> queryWrapper =new QueryWrapper<RtUser>(rtUser1);
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<RtUser>(rtUser1);
         return new ResponseBean(this.updateById(rtUser1));
     }
 
     /**
      * 批量新增车辆维修人员
-     * @author shenyang
+     *
      * @param requestBean
      * @return
+     * @author shenyang
      */
     public ResponseBean savaBatchPersonnel(RequestBean requestBean) {
-        Map<String,String> map =(HashMap) requestBean.getInfo();
-        if(StringUtils.isEmpty(map.get("ids"))||StringUtils.isEmpty(map.get("carNo"))){
-            return new ResponseBean(CommonConstants.FAIL.getCode(),RtsMessageEnum.PARAMS_ERROR.getValue());
+        Map<String, String> map = (HashMap) requestBean.getInfo();
+        if (StringUtils.isEmpty(map.get("ids")) || StringUtils.isEmpty(map.get("carNo"))) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.PARAMS_ERROR.getValue());
         }
         return new ResponseBean(
                 baseMapper.updateBatctPepairPersonnel(
-                ","+RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode(),
-                map.get("carNo"),map.get("ids"))
+                        "," + RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode(),
+                        map.get("carNo"), map.get("ids"))
         );
     }
 
@@ -327,14 +339,14 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 queryWrapper.eq("car_no", queryMap.get("carNo"));
             }
             //用户类型 villager村名(默认)，villageManage村管，systemManage系统管理员，repairPersonnel维修人员，driver司机
-            if(!StringUtils.isEmpty(queryMap.get("remark"))  &&
-               !StringUtils.isEmpty(queryMap.get("userType")) &&
-               RtsCommonConstants.NOT_LIKE_ROLE.equals(queryMap.get("remark"))){
+            if (!StringUtils.isEmpty(queryMap.get("remark")) &&
+                    !StringUtils.isEmpty(queryMap.get("userType")) &&
+                    RtsCommonConstants.NOT_LIKE_ROLE.equals(queryMap.get("remark"))) {
 
-               //不等当前传入角色的其他用户
-               queryWrapper.notLike("user_type", queryMap.get("userType"));
+                //不等当前传入角色的其他用户
+                queryWrapper.notLike("user_type", queryMap.get("userType"));
 
-            }else if (!StringUtils.isEmpty(queryMap.get("userType"))) {
+            } else if (!StringUtils.isEmpty(queryMap.get("userType"))) {
                 queryWrapper.like("user_type", queryMap.get("userType"));
             }
 
@@ -458,11 +470,13 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.ADD_USER_SUCCESS.getValue());
 
     }
+
     /**
      * 获取可分派维修人员数据
-     * @author shenyang
+     *
      * @param requestBean
      * @return
+     * @author shenyang
      */
     public ResponseBean getRepairPage(RequestBean requestBean) {
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
@@ -534,6 +548,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 人员新增公共方法提取
      * wangzhicheng
+     *
      * @param rtUserImport
      * @return
      */
@@ -558,7 +573,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 RtOrganization rtOrgan = new RtOrganization();
                 if (!StringUtils.isEmpty(list) && list.size() == 1) {
                     //rtOrgan = rtOrganizationService.getById(list.get(0).getParentId());
-                    rtOrgan=list.get(0);
+                    rtOrgan = list.get(0);
 
                 }
                 if (!StringUtils.isEmpty(rtOrgan) && !StringUtils.isEmpty(rtOrgan.getCode())) {
