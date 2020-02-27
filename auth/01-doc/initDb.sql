@@ -30,6 +30,7 @@ DROP TABLE if exists auth_zx_account;/*SkipError*/
 CREATE TABLE auth_zx_account
 (
     id               VARCHAR(64) NOT NULL COMMENT '主键',
+    user_id VARCHAR(64)    COMMENT '用户主键' ,
     account_name     VARCHAR(64) COMMENT '账户名称',
     account_password VARCHAR(64) COMMENT '账户密码',
     status           INT                  DEFAULT 0 COMMENT '账号状态 0启用(默认)，1禁用',
