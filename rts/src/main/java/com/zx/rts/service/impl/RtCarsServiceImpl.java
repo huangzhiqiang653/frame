@@ -294,11 +294,9 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         this.removeById(id);
 
         //删除车辆管理区域
-        RtManageArea bean = new RtManageArea();
-        bean.setDeleteFlag(Integer.parseInt(CommonConstants.DELETE_YES.getCode()));
-        UpdateWrapper<RtManageArea> queryWrapper = new UpdateWrapper();
+        QueryWrapper<RtManageArea> queryWrapper = new QueryWrapper();
         queryWrapper.eq("target_id",id);
-        iRtManageAreaService.update(bean,queryWrapper);
+        iRtManageAreaService.remove(queryWrapper);
 
 
         return new ResponseBean(true);
