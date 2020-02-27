@@ -1,6 +1,6 @@
 ## 项目配置
 server:
-  port: 9073
+  port: 9074
   servlet:
     context-path: /zxauth
     session:
@@ -9,9 +9,9 @@ server:
 spring:
   datasource:
     name: zx_frame_db
-    url: jdbc:p6spy:mysql://localhost:3306/zx_frame_db?useUnicode=true&useSSL=false&characterEncoding=utf8
+    url: jdbc:p6spy:mysql://192.168.1.224:3306/zx_frame_db?useUnicode=true&useSSL=false&characterEncoding=utf8
     username: root
-    password: root
+    password: 123456
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver
   ###邮件发送
   mail:
