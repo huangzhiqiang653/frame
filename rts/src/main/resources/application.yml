@@ -30,4 +30,9 @@ logging:
   level:
     com.baomidou.mybatisplus.samples.pagination: debug
 debug: true
+excel:
+  type:
+    cars: carNo,villageCode
+    users: name,phoneNumber,villageCode
+
 
