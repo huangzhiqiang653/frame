@@ -42,4 +42,9 @@ public class RtUserDto extends RtUser {
     @ApiModelProperty(value = "删除关联标识")
     @TableField(exist = false)
     private String removeManageAreaFlag;
+
+
+    @ApiModelProperty(value = "村民所属地")
+    @TableField(exist = false)
+    private String addressName;
 }
