@@ -106,6 +106,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getUserIds(requestBean);
             case GET_PAGE_DRIVER:
                 return getAllDriver(requestBean);
+            case REMOVE_USER_ROLE:
+                return removeUserRole(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -240,6 +242,29 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             }
         }
         return new ResponseBean(this.updateById(rtUser));
+    }
+    /**
+     * 删除角色接口
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean removeUserRole(RequestBean requestBean) {
+        RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
+        String remmoveType=rtUser.getUserType();//获取需要删除的角色
+
+        RtUser rtUser1 = baseMapper.selectById(rtUser.getId());
+        String userType =
+                         rtUser1.getUserType()
+                        .replace(remmoveType+",", "")
+                        .replace(","+remmoveType, "")
+                        .replace(remmoveType, "");
+        rtUser1.setUserType(userType);
+        if(RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode().equals(remmoveType)){
+            //如果删除的是驾驶员角色，则将车辆清空
+            rtUser1.setCarNo("");
+        }
+        QueryWrapper<RtUser> queryWrapper =new QueryWrapper<RtUser>(rtUser1);
+        return new ResponseBean(this.updateById(rtUser1));
     }
 
     /**
