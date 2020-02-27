@@ -359,8 +359,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                         "  WHERE a.`code`= " + queryMap.get("villageCode") +
                         "  OR a.parent_code=" + queryMap.get("villageCode") +
                         "  OR b.parent_code=" + queryMap.get("villageCode");
-                queryWrapper.inSql("village_code", sql);
-
+                    queryWrapper.inSql("village_code", sql);
             }
 
 
