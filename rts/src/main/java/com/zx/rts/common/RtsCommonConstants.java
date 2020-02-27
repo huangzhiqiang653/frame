@@ -31,6 +31,20 @@ public enum RtsCommonConstants {
     //数据来源WEB端
     DATA_TO_WEB("0", "数据来源WEB端"),
 
+    //成功
+    SUCCESS("success", "成功"),
+
+    //失败
+    ERROR("error", "失败"),
+
+    //是
+    YSE("0", "成功"),
+
+    //否
+    NO("1", "失败"),
+
+
+    NOT_LIKE_ROLE("notListRole", "除去当前角色的其他用户"),
     ;
 
     @EnumValue
