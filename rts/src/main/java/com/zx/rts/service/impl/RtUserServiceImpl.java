@@ -247,6 +247,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     }
     /**
      * 删除角色接口
+     * @author shenyang
      * @param requestBean
      * @return
      */
@@ -271,6 +272,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     /**
      * 批量新增车辆维修人员
+     * @author shenyang
      * @param requestBean
      * @return
      */
@@ -507,8 +509,12 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.ADD_USER_SUCCESS.getValue());
 
     }
-
-    //获取可分派维修人员数据
+    /**
+     * 获取可分派维修人员数据
+     * @author shenyang
+     * @param requestBean
+     * @return
+     */
     public ResponseBean getRepairPage(RequestBean requestBean) {
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
         if (StringUtils.isEmpty(page)) {
