@@ -108,6 +108,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return getAllDriver(requestBean);
             case REMOVE_USER_ROLE:
                 return removeUserRole(requestBean);
+            case UPDATE_BATCH_PERSONNEL:
+                return savaBatchPersonnel(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -260,11 +262,28 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                         .replace(remmoveType, "");
         rtUser1.setUserType(userType);
         if(RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode().equals(remmoveType)){
-            //如果删除的是驾驶员角色，则将车辆清空
+            //如果删除的是驾驶员角色，则将关联车辆清空
             rtUser1.setCarNo("");
         }
         QueryWrapper<RtUser> queryWrapper =new QueryWrapper<RtUser>(rtUser1);
         return new ResponseBean(this.updateById(rtUser1));
+    }
+
+    /**
+     * 批量新增车辆维修人员
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean savaBatchPersonnel(RequestBean requestBean) {
+        Map<String,String> map =(HashMap) requestBean.getInfo();
+        if(StringUtils.isEmpty(map.get("ids"))||StringUtils.isEmpty(map.get("carNo"))){
+            return new ResponseBean(CommonConstants.FAIL.getCode(),RtsMessageEnum.PARAMS_ERROR.getValue());
+        }
+        return new ResponseBean(
+                baseMapper.updateBatctPepairPersonnel(
+                ","+RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode(),
+                map.get("carNo"),map.get("ids"))
+        );
     }
 
     /**

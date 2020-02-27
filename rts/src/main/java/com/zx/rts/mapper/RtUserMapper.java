@@ -20,4 +20,7 @@ public interface RtUserMapper extends BaseMapper<RtUser> {
 
     //获取维修人员及相关维修数量
     public IPage<RtUser> selectPageByRepair(IPage<RtUser> page, @Param(Constants.WRAPPER) Wrapper<RtUser> queryWrapper);
+
+
+    public int updateBatctPepairPersonnel(@Param("userType")String userType,@Param("carNo")String carNo,@Param("ids")String ids);
 }
