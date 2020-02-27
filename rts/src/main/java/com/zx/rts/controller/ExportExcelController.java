@@ -67,6 +67,7 @@ public class ExportExcelController {
      * @param file
      */
     @PostMapping(value = "/importRtUser")
+    @ResponseBody
     public void importRtUser(@RequestParam MultipartFile file) {
 
         rtUserService.importRtUser(file);
