@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
+import com.zx.common.common.ExcelUtil;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
@@ -17,9 +18,11 @@ import com.zx.rts.entity.RtOrganization;
 import com.zx.rts.entity.RtUser;
 import com.zx.rts.mapper.RtUserMapper;
 import com.zx.rts.service.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -53,6 +56,11 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     @Resource
     private IRtManageAreaService iRtManageAreaService;
+
+
+    @Value("${excel.type.users}")
+    private String usersExcelType;
+
     /**
      * 导出excel需使用的表头标记
      */
@@ -135,7 +143,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 if (!StringUtils.isEmpty(list) && list.size() == 1) {
                     rtOrgan = rtOrganizationService.getById(list.get(0).getParentId());
                 }
-                rtUser.setTownCode(rtOrgan.getCode());
+                if (!StringUtils.isEmpty(rtOrgan) && !StringUtils.isEmpty(rtOrgan.getCode())) {
+                    rtUser.setTownCode(rtOrgan.getCode());
+                }
             }
             //第二步：校验用户是否存在
             QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
@@ -204,6 +214,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getPhoneNumber())) {
             queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
             queryWrapper.ne("id", rtUser.getId());
+            queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
             List<RtUser> list = list(queryWrapper);
             if (list != null && list.size() > 0) {
                 return new ResponseBean(
@@ -371,7 +382,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * @return
      */
     @Override
-    public void ExportRtUser(HttpServletResponse response) {
+    public void exportRtUser(HttpServletResponse response) {
         //获取所有区划集合数据
         List<RtOrganization> listOrganization = rtOrganizationService.list();
         //将List集合数据转成Map集合
@@ -486,5 +497,66 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
         return new ResponseBean(baseMapper.selectPageByRepair(page, queryWrapper));
     }
+
+
+    /**
+     * 人员信息导入
+     *
+     * @param file
+     * @return
+     */
+    @Override
+    public ResponseBean importRtUser(MultipartFile file) {
+        //获取EXCEL数据
+        ResponseBean responseBean = ExcelUtil.excelAnalysis(file, usersExcelType);
+        //承载错误信息
+        List<ResponseBean> errMessage = new ArrayList<>();
+        if (CommonConstants.SUCCESS.getCode().equals(responseBean.getCode())) {
+            List<Map<String, String>> list = (List<Map<String, String>>) responseBean.getData();
+            for (int i = 0; i < list.size(); i++) {
+                RtUser rtUser = new RtUser();
+                rtUser.setName(list.get(i).get("name"));
+                rtUser.setPhoneNumber(list.get(i).get("phoneNumber"));
+                rtUser.setVillageCode(list.get(i).get("villageCode"));
+                ResponseBean res = this.baseSaveUser(rtUser);
+                if (CommonConstants.FAIL.getCode().equals(res.getCode())) {
+                    res.setData(rtUser);
+                    errMessage.add(res);
+                }
+            }
+            return new ResponseBean(errMessage);
+        } else {
+            return responseBean;
+        }
+
+
+    }
+
+    /**
+     * 人员新增公共方法提取
+     *
+     * @param rtUser
+     * @return
+     */
+    private ResponseBean baseSaveUser(RtUser rtUser) {
+        //1.电话号码不为空
+        if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_NUMBER_IS_EMPTY.getValue());
+        }
+
+        //2.号码不能重复
+        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
+        queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
+        List<RtUser> list = list(queryWrapper);
+        if (null != list && list.size() > 0) {
+            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_REPEAT.getValue());
+        }
+        //3.保存人员基本信息
+        this.save(rtUser);
+
+        return new ResponseBean(true);
+    }
+
 
 }

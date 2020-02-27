@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.rts.entity.RtUser;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,13 +27,22 @@ public interface IRtUserService extends IService<RtUser> {
     public ResponseBean base(RequestBean requestBean);
 
 
-
     /**
      * 导出人员信息
      *
      * @param response
      * @return
      */
-    void ExportRtUser( HttpServletResponse response);
+    void exportRtUser(HttpServletResponse response);
+
+
+    /**
+     * 人员信息导入
+     *
+     * @param file
+     * @return
+     */
+    public ResponseBean importRtUser(MultipartFile file);
+
 
 }

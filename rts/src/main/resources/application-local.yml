@@ -87,7 +87,3 @@ scheduler:
 
   #报修超时字典类别
   repairOvertimeParamName: repair_overtime
-
-excel:
-  type:
-    cars: carNo,villageCode
