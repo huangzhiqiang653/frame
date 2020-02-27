@@ -14,7 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-
+/**
+ * @author shenyang
+ * @since 2020-02-27
+ * 定时任务业务类
+ */
 @Service
 public class SchedulerServiceImpl implements RtSchedulerService {
 

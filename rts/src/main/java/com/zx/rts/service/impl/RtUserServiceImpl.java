@@ -332,9 +332,17 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 queryWrapper.eq("car_no", queryMap.get("carNo"));
             }
             //用户类型 villager村名(默认)，villageManage村管，systemManage系统管理员，repairPersonnel维修人员，driver司机
-            if (!StringUtils.isEmpty(queryMap.get("userType"))) {
+            if(!StringUtils.isEmpty(queryMap.get("remark"))  &&
+               !StringUtils.isEmpty(queryMap.get("userType")) &&
+               RtsCommonConstants.NOT_LIKE_ROLE.equals(queryMap.get("remark"))){
+
+               //不等当前传入角色的其他用户
+               queryWrapper.notLike("user_type", queryMap.get("userType"));
+
+            }else if (!StringUtils.isEmpty(queryMap.get("userType"))) {
                 queryWrapper.like("user_type", queryMap.get("userType"));
             }
+
             //姓名
             if (!StringUtils.isEmpty(queryMap.get("name"))) {
                 queryWrapper.like("name", queryMap.get("name"));
