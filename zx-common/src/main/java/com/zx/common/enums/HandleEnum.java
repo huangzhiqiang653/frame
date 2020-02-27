@@ -48,6 +48,9 @@ public enum HandleEnum {
     //删除人员角色接口
     REMOVE_USER_ROLE("removeUserRole","删除人员角色接口"),
 
+    //批量新增维修人员接口
+    UPDATE_BATCH_PERSONNEL("updateBatchPersonnel","批量新增维修人员"),
+
     ;
 
 
