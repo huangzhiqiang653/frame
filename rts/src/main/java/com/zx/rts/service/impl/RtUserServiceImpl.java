@@ -126,59 +126,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * @return
      */
     public ResponseBean add(RequestBean requestBean) {
-        try {
-            RtUserDto rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUserDto.class);
-            if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-                return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
-            }
-            //第一步，检查数据来源
-            if (RtsCommonConstants.DATA_TO_APP.getCode().equals(rtUser.getLy())) {
-                // 数据来源手机用户
-            } else {
-                // 数据来源平台，平台新增，无需审核
-                rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
-                //王志成 2020-2-24 保存用户区域信息编号 由village_code获取town_code编号
-                QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<>();
-                if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getVillageCode())) {
-                    queryWrapperOrgan.eq("code", rtUser.getVillageCode());
-                }
-                List<RtOrganization> list = rtOrganizationService.list(queryWrapperOrgan);
-                RtOrganization rtOrgan = new RtOrganization();
-                if (!StringUtils.isEmpty(list) && list.size() == 1) {
-                    rtOrgan = rtOrganizationService.getById(list.get(0).getParentId());
-                }
-                if (!StringUtils.isEmpty(rtOrgan) && !StringUtils.isEmpty(rtOrgan.getCode())) {
-                    rtUser.setTownCode(rtOrgan.getCode());
-                }
-            }
-            //第二步：校验用户是否存在
-            QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
-            queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
-
-            Integer integer = baseMapper.selectCount(queryWrapper);
-            if (integer > 0) {
-                //用户存在，不允许注册
-                return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.USER_REPEAT.getValue());
-            }
-
-            //保存用户数据
-            this.save(rtUser);
-
-            //添加关联配置
-            if (!StringUtils.isEmpty(rtUser.getListManageArea()) && rtUser.getListManageArea().size() > 0) {
-                for (RtManageArea bean : rtUser.getListManageArea()) {
-                    bean.setTargetId(rtUser.getId());
-                }
-                //批量添加关联
-                iRtManageAreaService.saveBatch(rtUser.getListManageArea());
-            }
-
-            return new ResponseBean(true);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return new ResponseBean(CommonConstants.FAIL.getCode(), e.getMessage());
-        }
+        RtUserDto rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUserDto.class);
+        return   new ResponseBean(baseSaveUser(rtUser));
     }
 
     /**
@@ -564,7 +513,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         if (CommonConstants.SUCCESS.getCode().equals(responseBean.getCode())) {
             List<Map<String, String>> list = (List<Map<String, String>>) responseBean.getData();
             for (int i = 0; i < list.size(); i++) {
-                RtUser rtUser = new RtUser();
+                RtUserDto rtUser = new RtUserDto();
                 rtUser.setName(list.get(i).get("name"));
                 rtUser.setPhoneNumber(list.get(i).get("phoneNumber"));
                 rtUser.setVillageCode(list.get(i).get("villageCode"));
@@ -584,28 +533,67 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
 
     /**
      * 人员新增公共方法提取
-     *
-     * @param rtUser
+     * wangzhicheng
+     * @param rtUserImport
      * @return
      */
-    private ResponseBean baseSaveUser(RtUser rtUser) {
-        //1.电话号码不为空
-        if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_NUMBER_IS_EMPTY.getValue());
-        }
+    private ResponseBean baseSaveUser(RtUserDto rtUserImport) {
+        try {
+            RtUserDto rtUser = rtUserImport;
+            if (StringUtils.isEmpty(rtUser.getPhoneNumber())) {
+                return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.PHONE_NUMBER_IS_EMPTY.getValue());
+            }
+            //第一步，检查数据来源
+            if (RtsCommonConstants.DATA_TO_APP.getCode().equals(rtUser.getLy())) {
+                // 数据来源手机用户
+            } else {
+                // 数据来源平台，平台新增，无需审核
+                rtUser.setApprovalStatus(Integer.parseInt(CommonConstants.AUDIT_STATUS_TG.getCode()));
+                //王志成 2020-2-24 保存用户区域信息编号 由village_code获取town_code编号
+                QueryWrapper<RtOrganization> queryWrapperOrgan = new QueryWrapper<>();
+                if (!StringUtils.isEmpty(rtUser) && !StringUtils.isEmpty(rtUser.getVillageCode())) {
+                    queryWrapperOrgan.eq("code", rtUser.getVillageCode());
+                }
+                List<RtOrganization> list = rtOrganizationService.list(queryWrapperOrgan);
+                RtOrganization rtOrgan = new RtOrganization();
+                if (!StringUtils.isEmpty(list) && list.size() == 1) {
+                    //rtOrgan = rtOrganizationService.getById(list.get(0).getParentId());
+                    rtOrgan=list.get(0);
 
-        //2.号码不能重复
-        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
-        queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
-        List<RtUser> list = list(queryWrapper);
-        if (null != list && list.size() > 0) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.CARS_REPEAT.getValue());
-        }
-        //3.保存人员基本信息
-        this.save(rtUser);
+                }
+                if (!StringUtils.isEmpty(rtOrgan) && !StringUtils.isEmpty(rtOrgan.getCode())) {
+                    //rtUser.setTownCode(rtOrgan.getCode());
+                    rtUser.setTownCode(rtOrgan.getParentCode());
+                }
+            }
+            //第二步：校验用户是否存在
+            QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("delete_flag", CommonConstants.DELETE_NO.getCode());
+            queryWrapper.eq("phone_number", rtUser.getPhoneNumber());
 
-        return new ResponseBean(true);
+            Integer integer = baseMapper.selectCount(queryWrapper);
+            if (integer > 0) {
+                //用户存在，不允许注册
+                return new ResponseBean(CommonConstants.FAIL.getCode(), RtsMessageEnum.USER_REPEAT.getValue());
+            }
+
+            //保存用户数据
+            this.save(rtUser);
+
+            //添加关联配置
+            if (!StringUtils.isEmpty(rtUser.getListManageArea()) && rtUser.getListManageArea().size() > 0) {
+                for (RtManageArea bean : rtUser.getListManageArea()) {
+                    bean.setTargetId(rtUser.getId());
+                }
+                //批量添加关联
+                iRtManageAreaService.saveBatch(rtUser.getListManageArea());
+            }
+
+            return new ResponseBean(true);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return new ResponseBean(CommonConstants.FAIL.getCode(), e.getMessage());
+        }
     }
 
 
