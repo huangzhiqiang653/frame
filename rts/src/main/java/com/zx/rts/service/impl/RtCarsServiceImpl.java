@@ -1,6 +1,7 @@
 package com.zx.rts.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.*;
@@ -281,12 +282,26 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
     /**
      * 单条逻辑删除
-     *
+     * @author shenyang
      * @param requestBean
      * @return
      */
     public ResponseBean deleteLogicalSingle(RequestBean requestBean) {
-        return new ResponseBean(this.removeById((String) requestBean.getInfo()));
+        //获取需要删除的主键
+        String id =   (String) requestBean.getInfo();
+
+        //删除车辆信息
+        this.removeById(id);
+
+        //删除车辆管理区域
+        RtManageArea bean = new RtManageArea();
+        bean.setDeleteFlag(Integer.parseInt(CommonConstants.DELETE_YES.getCode()));
+        UpdateWrapper<RtManageArea> queryWrapper = new UpdateWrapper();
+        queryWrapper.eq("target_id",id);
+        iRtManageAreaService.update(bean,queryWrapper);
+
+
+        return new ResponseBean(true);
     }
 
     /**
@@ -381,7 +396,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
     /**
      * 获取可分派维修人员数据
-     *
+     * @author shenyang
      * @param requestBean
      * @return
      */

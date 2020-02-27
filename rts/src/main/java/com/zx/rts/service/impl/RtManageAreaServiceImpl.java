@@ -137,14 +137,17 @@ public class RtManageAreaServiceImpl extends ServiceImpl<RtManageAreaMapper, RtM
 
     /**
      * 根据条件查询数据
-     *
+     * @author shenyang
      * @param requestBean
      * @return
      */
     public ResponseBean getListByCondition(RequestBean requestBean) {
+        RtManageArea rtManageArea = BaseHzq.convertValue(requestBean.getInfo(), RtManageArea.class);
         QueryWrapper<RtManageArea> queryWrapper = new QueryWrapper<>();
         // TODO 添加查询条件
-
+        if(!StringUtils.isEmpty(rtManageArea.getTargetId())){
+            queryWrapper.eq("target_id",rtManageArea.getTargetId());
+        }
         return new ResponseBean(this.list(queryWrapper));
     }
 

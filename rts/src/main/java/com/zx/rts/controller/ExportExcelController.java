@@ -1,5 +1,6 @@
 package com.zx.rts.controller;
 
+import com.zx.common.common.ResponseBean;
 import com.zx.rts.service.IRtCarsService;
 import com.zx.rts.service.IRtUserService;
 import org.springframework.web.bind.annotation.*;
@@ -53,9 +54,10 @@ public class ExportExcelController {
      * @param file
      */
     @PostMapping(value = "/importRtCar")
-    public void importRtCar(@RequestParam MultipartFile file) {
+    @ResponseBody
+    public ResponseBean importRtCar(@RequestParam MultipartFile file) {
 
-        iRtCarsService.importRtCar(file);
+       return   iRtCarsService.importRtCar(file);
     }
 
     /**
@@ -65,6 +67,7 @@ public class ExportExcelController {
      * @param file
      */
     @PostMapping(value = "/importRtUser")
+    @ResponseBody
     public void importRtUser(@RequestParam MultipartFile file) {
 
         rtUserService.importRtUser(file);

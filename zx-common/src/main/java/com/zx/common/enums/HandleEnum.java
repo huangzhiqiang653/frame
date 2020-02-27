@@ -44,7 +44,13 @@ public enum HandleEnum {
     TELL_PUMP_PAGE("tellPumpPage", "报抽车辆分派信息"),
     //手机端的接口
     APP_ADD("appAdd","手机端报抽报修申请接口"),
-    APP_GET_INFO_BY_ID("appGetInfoById","手机端查看详情接口")
+    APP_GET_INFO_BY_ID("appGetInfoById","手机端查看详情接口"),
+    //删除人员角色接口
+    REMOVE_USER_ROLE("removeUserRole","删除人员角色接口"),
+
+    //批量新增维修人员接口
+    UPDATE_BATCH_PERSONNEL("updateBatchPersonnel","批量新增维修人员"),
+
     ;
 
 

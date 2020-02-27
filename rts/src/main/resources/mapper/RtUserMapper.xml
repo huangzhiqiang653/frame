@@ -11,4 +11,15 @@
         ${ew.customSqlSegment}
     </select>
 
+    <update id="updateBatctPepairPersonnel">
+
+          UPDATE t_rt_user
+
+          SET
+            user_type = CONCAT(IFNULL(user_type,'villager') ,#{userType}) ,
+            car_no = #{carNo}
+
+          WHERE FIND_IN_SET( id , #{ids})
+    </update>
+
 </mapper>
