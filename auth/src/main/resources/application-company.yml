@@ -1,6 +1,6 @@
 ## 项目配置
 server:
-  port: 9073
+  port: 9074
   servlet:
     context-path: /zxauth
     session:
