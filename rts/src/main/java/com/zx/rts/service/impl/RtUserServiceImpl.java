@@ -244,7 +244,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         }
         return new ResponseBean(
                 baseMapper.updateBatctPepairPersonnel(
-                        "," + RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode(),
+                        "," + RtsCommonConstants.USER_ROLE_DRIVER.getCode(),
                         map.get("carNo"), map.get("ids"))
         );
     }
