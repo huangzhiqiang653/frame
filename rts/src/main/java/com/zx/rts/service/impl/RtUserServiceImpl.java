@@ -69,7 +69,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 导出excel需使用的表头标记
      */
-    static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号", "所属区划", "手机号码"};
+    static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号", "姓名","所属区划", "手机号码"};
 
     /**
      * 公共基础方法
