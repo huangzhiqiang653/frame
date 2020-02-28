@@ -220,11 +220,9 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         } else if (RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode().equals(remmoveType)) {
 
             //删除维修人员时，删除相关的维修区域
-            RtManageArea bean = new RtManageArea();
-            bean.setDeleteFlag(Integer.parseInt(CommonConstants.DELETE_YES.getCode()));
-            UpdateWrapper<RtManageArea> queryWrapper = new UpdateWrapper();
+            QueryWrapper<RtManageArea> queryWrapper = new QueryWrapper();
             queryWrapper.eq("target_id",rtUser.getId());
-            iRtManageAreaService.update(bean,queryWrapper);
+            iRtManageAreaService.remove(queryWrapper);
         }
         QueryWrapper<RtUser> queryWrapper = new QueryWrapper<RtUser>(rtUser1);
         return new ResponseBean(this.updateById(rtUser1));
