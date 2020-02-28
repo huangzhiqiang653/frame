@@ -8,6 +8,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.common.RtsMessageEnum;
 import com.zx.rts.entity.RtConfig;
 import com.zx.rts.mapper.RtConfigMapper;
 import com.zx.rts.service.IRtConfigService;
@@ -59,6 +60,8 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
                 return getAll();
             case GET_PAGE:
                 return getPage(requestBean);
+            case REMOVE_CONFIGS:
+                return deleteConfigs(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -71,6 +74,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 单个新增
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -91,6 +95,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 更新单条数据所有字段
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -111,6 +116,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 单条逻辑删除
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -131,6 +137,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 根据主键获取单条数据
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -164,6 +171,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 获取分页数据和条件查询
      * 2020-2-21 王志成
+     *
      * @param requestBean
      * @return
      */
@@ -192,4 +200,23 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
         }
         return new ResponseBean(this.page(page, queryWrapper));
     }
+
+    /**
+     * 批量删除配置信息
+     * 王志成
+     */
+    public ResponseBean deleteConfigs(RequestBean requestBean) {
+        //配置信息id
+        String ids = (String) requestBean.getInfo();
+        String[] orgs = ids.split(",");
+        for (String e : orgs) {
+            if (!StringUtils.isEmpty(e)) {
+                this.removeById(e);
+            }
+        }
+        return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.DELETE_CONFIG_SUCCESS.getValue());
+
+    }
+
+
 }

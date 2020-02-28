@@ -18,6 +18,7 @@ public enum RtsMessageEnum {
     CARS_FORMAT_ERROR("车牌号格式不正确"),
     ADD_USER_SUCCESS("添加驾驶员信息成功"),
     DELETE_USERS_SUCCESS("批量删除人员成功"),
+    DELETE_CONFIG_SUCCESS("批量删除配置信息成功"),
     CODE_LIVE("code已有请修改"),
     SAVE_FALURE("保存失败"),
     DISTRICT_LIVE_PEOPLE("请先删除该区域下的人员数据"),

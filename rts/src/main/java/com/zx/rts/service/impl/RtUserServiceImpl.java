@@ -489,7 +489,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             }
         }
         return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.DELETE_USERS_SUCCESS.getValue());
-
     }
 
 
