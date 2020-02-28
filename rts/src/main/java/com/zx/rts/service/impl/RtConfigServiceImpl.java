@@ -61,7 +61,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
             case GET_PAGE:
                 return getPage(requestBean);
             case REMOVE_CONFIGS:
-                return  deleteConfigs(requestBean);
+                return deleteConfigs(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -74,6 +74,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 单个新增
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -94,6 +95,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 更新单条数据所有字段
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -114,6 +116,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 单条逻辑删除
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -134,6 +137,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 根据主键获取单条数据
      * 2020-2-21
+     *
      * @param requestBean
      * @return
      */
@@ -167,6 +171,7 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 获取分页数据和条件查询
      * 2020-2-21 王志成
+     *
      * @param requestBean
      * @return
      */
@@ -212,12 +217,6 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
         return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.DELETE_CONFIG_SUCCESS.getValue());
 
     }
-
-
-
-
-
-
 
 
 }
