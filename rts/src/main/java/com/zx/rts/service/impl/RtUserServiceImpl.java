@@ -1,7 +1,6 @@
 package com.zx.rts.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zx.common.common.BaseHzq;
@@ -208,26 +207,29 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     public ResponseBean removeUserRole(RequestBean requestBean) {
         RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
         String remmoveType = rtUser.getUserType();//获取需要删除的角色
+        String[] array = rtUser.getId().split(",");
+        for (String id : array ) {
+            RtUser rtUser1 = baseMapper.selectById(id);
+            String userType =
+                    rtUser1.getUserType()
+                            .replace(remmoveType + ",", "")
+                            .replace("," + remmoveType, "")
+                            .replace(remmoveType, "");
+            rtUser1.setUserType(userType);
+            if (RtsCommonConstants.USER_ROLE_DRIVER.getCode().equals(remmoveType)) {
+                //如果删除的是驾驶员角色，则将关联车辆清空
+                rtUser1.setCarNo("");
+            } else if (RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode().equals(remmoveType)) {
 
-        RtUser rtUser1 = baseMapper.selectById(rtUser.getId());
-        String userType =
-                rtUser1.getUserType()
-                        .replace(remmoveType + ",", "")
-                        .replace("," + remmoveType, "")
-                        .replace(remmoveType, "");
-        rtUser1.setUserType(userType);
-        if (RtsCommonConstants.USER_ROLE_DRIVER.getCode().equals(remmoveType)) {
-            //如果删除的是驾驶员角色，则将关联车辆清空
-            rtUser1.setCarNo("");
-        } else if (RtsCommonConstants.USER_ROLE_REPAIRPERSONNEL.getCode().equals(remmoveType)) {
-
-            //删除维修人员时，删除相关的维修区域
-            QueryWrapper<RtManageArea> queryWrapper = new QueryWrapper();
-            queryWrapper.eq("target_id",rtUser.getId());
-            iRtManageAreaService.remove(queryWrapper);
+                //删除维修人员时，删除相关的维修区域
+                QueryWrapper<RtManageArea> queryWrapper = new QueryWrapper();
+                queryWrapper.eq("target_id", rtUser.getId());
+                iRtManageAreaService.remove(queryWrapper);
+            }
+            QueryWrapper<RtUser> queryWrapper = new QueryWrapper<RtUser>(rtUser1);
+            this.updateById(rtUser1);
         }
-        QueryWrapper<RtUser> queryWrapper = new QueryWrapper<RtUser>(rtUser1);
-        return new ResponseBean(this.updateById(rtUser1));
+        return new ResponseBean(true);
     }
 
     /**
