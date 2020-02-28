@@ -18,9 +18,20 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface RtUserMapper extends BaseMapper<RtUser> {
 
-    //获取维修人员及相关维修数量
+    /**
+     * 获取维修人员及相关维修数量
+     * @param page
+     * @param queryWrapper
+     * @return
+     */
     public IPage<RtUser> selectPageByRepair(IPage<RtUser> page, @Param(Constants.WRAPPER) Wrapper<RtUser> queryWrapper);
 
-
+    /**
+     * 批量修改驾驶员
+     * @param userType
+     * @param carNo
+     * @param ids
+     * @return
+     */
     public int updateBatctPepairPersonnel(@Param("userType")String userType,@Param("carNo")String carNo,@Param("ids")String ids);
 }
