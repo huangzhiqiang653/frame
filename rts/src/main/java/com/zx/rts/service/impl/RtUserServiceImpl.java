@@ -371,7 +371,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                             "  WHERE a.`code`= " + queryMap.get("villageCode") +
                             "  OR a.parent_code=" + queryMap.get("villageCode") +
                             "  OR b.parent_code=" + queryMap.get("villageCode");
-                        queryWrapper.inSql("village_code", sql);
+                    queryWrapper.inSql("village_code", sql);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -472,6 +472,24 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.ADD_USER_SUCCESS.getValue());
 
     }
+
+    /**
+     * 批量删除人员接口
+     * 王志成
+     */
+    public ResponseBean deleteUsers(RequestBean requestBean) {
+        //获取用户id
+        String ids = (String) requestBean.getInfo();
+        String[] orgs = ids.split(",");
+        for (String e : orgs) {
+            if (!StringUtils.isEmpty(e)) {
+                this.removeById(e);
+            }
+        }
+        return new ResponseBean(CommonConstants.SUCCESS.getCode(), RtsMessageEnum.DELETE_USERS_SUCCESS.getValue());
+
+    }
+
 
     /**
      * 获取可分派维修人员数据
