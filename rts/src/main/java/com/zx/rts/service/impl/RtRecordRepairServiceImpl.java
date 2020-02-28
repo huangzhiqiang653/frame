@@ -299,7 +299,9 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
             };
             //维修状态 0未上门，1维修中，2已维修
             if(!StringUtils.isEmpty(queryMap.get("repairStatus"))){
-                queryWrapper.eq("repair_status", queryMap.get("repairStatus"));
+                queryWrapper.eq("repair_status", queryMap.get("repairStatus"))
+                            .or()
+                            .eq("pump_status", queryMap.get("repairStatus"));
             };
             //是否超时 0未超时，1已超时
             if(!StringUtils.isEmpty(queryMap.get("overtimeFlag"))){

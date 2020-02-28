@@ -59,6 +59,9 @@ public class RtRecordRepair extends BaseEntityBean {
     @ApiModelProperty(value = "维修状态 0未上门，1维修中，2已维修")
     private Integer repairStatus;
 
+    @ApiModelProperty(value = "状态 0未抽，1已抽")
+    private Integer pumpStatus;
+
     @ApiModelProperty(value = "问题描述")
     private String problem;
 

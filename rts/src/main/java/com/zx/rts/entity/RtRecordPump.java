@@ -54,6 +54,12 @@ public class RtRecordPump extends BaseEntityBean {
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date finishTime;
 
+
+    @ApiModelProperty(value = "上门时间")
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date repairTime;
+
     @ApiModelProperty(value = "状态 0未抽，1已抽")
     private Integer pumpStatus;
 
