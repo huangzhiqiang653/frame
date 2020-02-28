@@ -410,22 +410,22 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             Map<String, Object> map = new HashMap<String, Object>();
             //序号
             map.put(INFO_EXPORT_ROWNAME[0], i++);
-            //所属区划由人员villageCode乡村编码获取名称
-            RtOrganization rtOrgan = new RtOrganization();
-            if (!StringUtils.isEmpty(rtUser.getVillageCode())) {
-                rtOrgan = organnizaMap.get(rtUser.getVillageCode());
-                if (!StringUtils.isEmpty(rtOrgan) && !StringUtils.isEmpty(rtUser.getVillageCode())) {
-                    map.put(INFO_EXPORT_ROWNAME[1], rtOrgan.getName());
-                } else {
-                    map.put(INFO_EXPORT_ROWNAME[1], "无");
+            //姓名
+            map.put(INFO_EXPORT_ROWNAME[1], rtUser.getName());
+            String[] codes = rtUser.getVillageCode().split(",");
+            String   codeName="";
+            for (String e : codes) {
+                if (!StringUtils.isEmpty(e)) {
+                    RtOrganization  rtOr=organnizaMap.get(e);
+                     codeName = codeName +rtOr.getName();
+                }else{
+                     codeName = codeName +"无";
                 }
-
-            } else {
-                map.put(INFO_EXPORT_ROWNAME[1], "无");
-
             }
+            map.put(INFO_EXPORT_ROWNAME[2], codeName);
+
             //手机号码
-            map.put(INFO_EXPORT_ROWNAME[2], rtUser.getPhoneNumber());
+            map.put(INFO_EXPORT_ROWNAME[3], rtUser.getPhoneNumber());
 
             expList.add(map);
         }
