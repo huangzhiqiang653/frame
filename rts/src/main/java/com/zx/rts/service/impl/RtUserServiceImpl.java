@@ -111,6 +111,8 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 return removeUserRole(requestBean);
             case UPDATE_BATCH_PERSONNEL:
                 return savaBatchPersonnel(requestBean);
+            case REMOVE_USERS:
+                return deleteUsers(requestBean);
             default:
                 return new ResponseBean(
                         CommonConstants.FAIL.getCode(),
@@ -322,7 +324,6 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
      * @return
      */
     public ResponseBean getPage(RequestBean requestBean) {
-
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
         if (StringUtils.isEmpty(page)) {
             page = new Page();
@@ -575,12 +576,12 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
                 if (!StringUtils.isEmpty(list) && list.size() == 1) {
                     //rtOrgan = rtOrganizationService.getById(list.get(0).getParentId());
                     rtOrgan = list.get(0);
-
                 }
                 if (!StringUtils.isEmpty(rtOrgan) && !StringUtils.isEmpty(rtOrgan.getCode())) {
                     //rtUser.setTownCode(rtOrgan.getCode());
                     rtUser.setTownCode(rtOrgan.getParentCode());
                 }
+
             }
             //第二步：校验用户是否存在
             QueryWrapper<RtUser> queryWrapper = new QueryWrapper<>();
