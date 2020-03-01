@@ -11,7 +11,6 @@ import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.entity.RtRecordRepair;
 import com.zx.rts.mapper.RtRecordRepairMapper;
 import com.zx.rts.service.IRtRecordRepairService;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -357,69 +356,7 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         //车辆维修条件构造
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         QueryWrapper<RtRecordRepair> queryWrapper = new QueryWrapper<>();
-
-        commonQueryWrapper(queryMap,queryWrapper);
-
-       /* if (!CollectionUtils.isEmpty(queryMap)) {
-            //报修人主键
-            if (!StringUtils.isEmpty(queryMap.get("submitUserId"))) {
-                queryWrapper.eq("submit_user_id", queryMap.get("submitUserId"));
-            }
-            ;
-            //待修人主键
-            if (!StringUtils.isEmpty(queryMap.get("targetUserId"))) {
-                queryWrapper.eq("target_user_id", queryMap.get("targetUserId"));
-            }
-            ;
-            //待修人姓名
-            if (!StringUtils.isEmpty(queryMap.get("targetUserName"))) {
-                queryWrapper.like("target_user_name", queryMap.get("targetUserName"));
-            }
-            ;
-
-            //待修人手机号
-            if (!StringUtils.isEmpty(queryMap.get("targetUserPhoneNumber"))) {
-                queryWrapper.eq("target_user_phone_number", queryMap.get("targetUserPhoneNumber"));
-
-            }
-            ;
-            //待修人所属村居编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserVillageCode"))) {
-                queryWrapper.eq("target_user_village_code", queryMap.get("targetUserVillageCode"));
-
-            }
-            ;
-            //待修人所属乡镇编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserTownCode"))) {
-                queryWrapper.eq("target_user_town_code", queryMap.get("targetUserTownCode"));
-
-            }
-            ;
-
-            //维修人主键
-            if (!StringUtils.isEmpty(queryMap.get("operationUserId"))) {
-                queryWrapper.eq("operation_user_id", queryMap.get("operationUserId"));
-
-            }
-            ;
-            //维修状态 0未上门，1维修中，2已维修
-            if (!StringUtils.isEmpty(queryMap.get("repairStatus"))) {
-                queryWrapper.eq("repair_status", queryMap.get("repairStatus"));
-            }
-            ;
-            //是否超时 0未超时，1已超时
-            if (!StringUtils.isEmpty(queryMap.get("overtimeFlag"))) {
-                queryWrapper.eq("overtime_flag", queryMap.get("overtimeFlag"));
-            }
-            ;
-
-            //类型 0报修，1报抽
-            if (!StringUtils.isEmpty(queryMap.get("type"))) {
-                queryWrapper.eq("type", queryMap.get("type"));
-            }
-            ;
-
-        }*/
+        commonQueryWrapper(queryMap, queryWrapper);
         return new ResponseBean(baseMapper.selectPageRecordRepairCar(page, queryWrapper));
     }
 
@@ -438,68 +375,7 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         //车辆维修条件构造
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         QueryWrapper<RtRecordRepair> queryWrapper = new QueryWrapper<>();
-        commonQueryWrapper(queryMap,queryWrapper);
-
-      /*  if (!CollectionUtils.isEmpty(queryMap)) {
-            //报修人主键
-            if (!StringUtils.isEmpty(queryMap.get("submitUserId"))) {
-                queryWrapper.eq("submit_user_id", queryMap.get("submitUserId"));
-            }
-            ;
-            //待修人主键
-            if (!StringUtils.isEmpty(queryMap.get("targetUserId"))) {
-                queryWrapper.eq("target_user_id", queryMap.get("targetUserId"));
-            }
-            ;
-            //待修人姓名
-            if (!StringUtils.isEmpty(queryMap.get("targetUserName"))) {
-                queryWrapper.like("target_user_name", queryMap.get("targetUserName"));
-            }
-            ;
-
-            //待修人手机号
-            if (!StringUtils.isEmpty(queryMap.get("targetUserPhoneNumber"))) {
-                queryWrapper.eq("target_user_phone_number", queryMap.get("targetUserPhoneNumber"));
-
-            }
-            ;
-            //待修人所属村居编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserVillageCode"))) {
-                queryWrapper.eq("target_user_village_code", queryMap.get("targetUserVillageCode"));
-
-            }
-            ;
-            //待修人所属乡镇编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserTownCode"))) {
-                queryWrapper.eq("target_user_town_code", queryMap.get("targetUserTownCode"));
-
-            }
-            ;
-
-            //维修人主键
-            if (!StringUtils.isEmpty(queryMap.get("operationUserId"))) {
-                queryWrapper.eq("operation_user_id", queryMap.get("operationUserId"));
-
-            }
-            ;
-            //维修状态 0未上门，1维修中，2已维修
-            if (!StringUtils.isEmpty(queryMap.get("pumpStatus"))) {
-                queryWrapper.eq("pump_status", queryMap.get("pumpStatus"));
-            }
-            ;
-            //是否超时 0未超时，1已超时
-            if (!StringUtils.isEmpty(queryMap.get("overtimeFlag"))) {
-                queryWrapper.eq("overtime_flag", queryMap.get("overtimeFlag"));
-            }
-            ;
-
-            //类型 0报修，1报抽
-            if (!StringUtils.isEmpty(queryMap.get("type"))) {
-                queryWrapper.eq("type", queryMap.get("type"));
-            }
-            ;
-
-        }*/
+        commonQueryWrapper(queryMap, queryWrapper);
         return new ResponseBean(baseMapper.selectPageRecordPumpCar(page, queryWrapper));
     }
 
@@ -508,7 +384,7 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
      *
      * @param queryWrapper
      */
-    public    void   commonQueryWrapper(Map queryMap,QueryWrapper<?> queryWrapper){
+    public void commonQueryWrapper(Map queryMap, QueryWrapper<?> queryWrapper) {
 
         if (!CollectionUtils.isEmpty(queryMap)) {
             //报修人主键
@@ -576,15 +452,7 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         }
 
 
-
-
-
-
-
-
-
     }
-
 
 
 }
