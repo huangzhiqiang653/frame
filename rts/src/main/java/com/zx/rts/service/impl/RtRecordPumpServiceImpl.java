@@ -203,6 +203,8 @@ public class RtRecordPumpServiceImpl extends ServiceImpl<RtRecordPumpMapper, RtR
         if (!StringUtils.isEmpty(rtRecordPump.getSubmitUserId())) {
             queryWrapper.eq("submit_user_id",rtRecordPump.getSubmitUserId() );
         }
+
+
         return new ResponseBean(this.page(page, queryWrapper));
     }
 }

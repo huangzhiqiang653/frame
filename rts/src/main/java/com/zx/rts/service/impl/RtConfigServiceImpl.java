@@ -204,6 +204,9 @@ public class RtConfigServiceImpl extends ServiceImpl<RtConfigMapper, RtConfig> i
     /**
      * 批量删除配置信息
      * 王志成
+     *
+     * @param requestBean
+     * @return
      */
     public ResponseBean deleteConfigs(RequestBean requestBean) {
         //配置信息id
