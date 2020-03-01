@@ -26,7 +26,8 @@ public enum HandleEnum {
     GET_LIST_BY_CONDITION("getListByCondition", "根据条件查询多个"),
     GET_ALL("getAll", "查询全部"),
     GET_PAGE("getPage", "查询全部"),
-    GET_PAGE_RESPAIR_CAR("getPageRecordRepairCar","获取维修信息和车辆信息"),
+    GET_PAGE_RESPAIR_CAR("getPageRecordRepairCar", "获取人员维修信息和车辆信息"),
+    GET_PAGE_PUMP_CAR("getPageRecordPumpCar", "获取人员报抽信息和车辆信息"),
     EMPTY("", "空"),
     // 根据业务需要，增加积累
     DELETE_AND_ADD("deleteAndAdd", "删除之前的数据，并新增"),
