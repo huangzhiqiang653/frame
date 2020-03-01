@@ -86,25 +86,23 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
     public ResponseBean add(RequestBean requestBean) {
         return new ResponseBean(this.save(BaseHzq.convertValue(requestBean.getInfo(), RtRecordRepair.class)));
     }
-
     /**
      * 手机端单个新增
      * 报修
-     *
      * @param requestBean
      * @return
      */
     public ResponseBean appAdd(RequestBean requestBean) {
-        RtRecordRepair repair = BaseHzq.convertValue(requestBean.getInfo(), RtRecordRepair.class);
-        if (!StringUtils.isEmpty(repair.getId())) {
+        RtRecordRepair repair=BaseHzq.convertValue(requestBean.getInfo(), RtRecordRepair.class);
+        if(!StringUtils.isEmpty(repair.getId())){
             this.updateById(repair);
         }
         //报修申请检查
-        if (StringUtils.isEmpty(repair.getSubmitUserId()) || StringUtils.isEmpty(repair.getTargetUserId())) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(), "报修人或待修人不能为空~");
+        if(StringUtils.isEmpty(repair.getSubmitUserId())||StringUtils.isEmpty(repair.getTargetUserId())){
+            return new ResponseBean(CommonConstants.FAIL.getCode(),"报修人或待修人不能为空~");
         }
-        if (StringUtils.isEmpty(repair.getProblem())) {
-            return new ResponseBean(CommonConstants.FAIL.getCode(), "报修问题描述不能为空~");
+        if(StringUtils.isEmpty(repair.getProblem())){
+            return new ResponseBean(CommonConstants.FAIL.getCode(),"报修问题描述不能为空~");
         }
         return new ResponseBean(this.save(repair));
     }
@@ -208,56 +206,47 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         QueryWrapper<RtRecordRepair> queryWrapper = new QueryWrapper<>();
         if (!CollectionUtils.isEmpty(queryMap)) {
             //报修人主键
-            if (!StringUtils.isEmpty(queryMap.get("submitUserId"))) {
+            if(!StringUtils.isEmpty(queryMap.get("submitUserId"))){
                 queryWrapper.eq("submit_user_id", queryMap.get("submitUserId"));
-            }
-            ;
+            };
             //待修人主键
-            if (!StringUtils.isEmpty(queryMap.get("targetUserId"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserId"))){
                 queryWrapper.eq("target_user_id", queryMap.get("targetUserId"));
-            }
-            ;
+            };
             //待修人姓名
-            if (!StringUtils.isEmpty(queryMap.get("targetUserName"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserName"))){
                 queryWrapper.like("target_user_name", queryMap.get("targetUserName"));
-            }
-            ;
+            };
 
             //待修人手机号
-            if (!StringUtils.isEmpty(queryMap.get("targetUserPhoneNumber"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserPhoneNumber"))){
                 queryWrapper.eq("target_user_phone_number", queryMap.get("targetUserPhoneNumber"));
 
-            }
-            ;
+            };
             //待修人所属村居编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserVillageCode"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserVillageCode"))){
                 queryWrapper.eq("target_user_village_code", queryMap.get("targetUserVillageCode"));
 
-            }
-            ;
+            };
             //待修人所属乡镇编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserTownCode"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserTownCode"))){
                 queryWrapper.eq("target_user_town_code", queryMap.get("targetUserTownCode"));
 
-            }
-            ;
+            };
 
             //维修人主键
-            if (!StringUtils.isEmpty(queryMap.get("operationUserId"))) {
+            if(!StringUtils.isEmpty(queryMap.get("operationUserId"))){
                 queryWrapper.eq("operation_user_id", queryMap.get("operationUserId"));
 
-            }
-            ;
+            };
             //维修状态 0未上门，1维修中，2已维修
-            if (!StringUtils.isEmpty(queryMap.get("repairStatus"))) {
+            if(!StringUtils.isEmpty(queryMap.get("repairStatus"))){
                 queryWrapper.eq("repair_status", queryMap.get("repairStatus"));
-            }
-            ;
+            };
             //是否超时 0未超时，1已超时
-            if (!StringUtils.isEmpty(queryMap.get("overtimeFlag"))) {
+            if(!StringUtils.isEmpty(queryMap.get("overtimeFlag"))){
                 queryWrapper.eq("overtime_flag", queryMap.get("overtimeFlag"));
-            }
-            ;
+            };
 
         }
         return new ResponseBean(baseMapper.selectPageRtRecordRepair(page, queryWrapper));
@@ -266,7 +255,6 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
 
     /**
      * 管理工作太分页列表，合并报修记录和报抽记录
-     *
      * @param requestBean
      * @return
      */
@@ -280,62 +268,54 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         QueryWrapper<RtRecordRepair> queryWrapper = new QueryWrapper<>();
         if (!CollectionUtils.isEmpty(queryMap)) {
             //报修人主键
-            if (!StringUtils.isEmpty(queryMap.get("submitUserId"))) {
+            if(!StringUtils.isEmpty(queryMap.get("submitUserId"))){
                 queryWrapper.eq("submit_user_id", queryMap.get("submitUserId"));
-            }
-            ;
+            };
             //待修人主键
-            if (!StringUtils.isEmpty(queryMap.get("targetUserId"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserId"))){
                 queryWrapper.eq("target_user_id", queryMap.get("targetUserId"));
-            }
-            ;
+            };
             //待修人姓名
-            if (!StringUtils.isEmpty(queryMap.get("targetUserName"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserName"))){
                 queryWrapper.like("target_user_name", queryMap.get("targetUserName"));
-            }
-            ;
+            };
 
             //待修人手机号
-            if (!StringUtils.isEmpty(queryMap.get("targetUserPhoneNumber"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserPhoneNumber"))){
                 queryWrapper.eq("target_user_phone_number", queryMap.get("targetUserPhoneNumber"));
 
-            }
-            ;
+            };
             //待修人所属村居编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserVillageCode"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserVillageCode"))){
                 queryWrapper.eq("target_user_village_code", queryMap.get("targetUserVillageCode"));
 
-            }
-            ;
+            };
             //待修人所属乡镇编码
-            if (!StringUtils.isEmpty(queryMap.get("targetUserTownCode"))) {
+            if(!StringUtils.isEmpty(queryMap.get("targetUserTownCode"))){
                 queryWrapper.eq("target_user_town_code", queryMap.get("targetUserTownCode"));
 
-            }
-            ;
+            };
 
             //维修人主键
-            if (!StringUtils.isEmpty(queryMap.get("operationUserId"))) {
+            if(!StringUtils.isEmpty(queryMap.get("operationUserId"))){
                 queryWrapper.eq("operation_user_id", queryMap.get("operationUserId"));
 
-            }
-            ;
+            };
             //维修状态 0未上门，1维修中，2已维修
-            if (!StringUtils.isEmpty(queryMap.get("repairStatus"))) {
-                queryWrapper.eq("repair_status", queryMap.get("repairStatus"));
-            }
-            ;
+            if(!StringUtils.isEmpty(queryMap.get("repairStatus"))){
+                queryWrapper.eq("repair_status", queryMap.get("repairStatus"))
+                            .or()
+                            .eq("pump_status", queryMap.get("repairStatus"));
+            };
             //是否超时 0未超时，1已超时
-            if (!StringUtils.isEmpty(queryMap.get("overtimeFlag"))) {
+            if(!StringUtils.isEmpty(queryMap.get("overtimeFlag"))){
                 queryWrapper.eq("overtime_flag", queryMap.get("overtimeFlag"));
-            }
-            ;
+            };
 
             //类型 0报修，1报抽
-            if (!StringUtils.isEmpty(queryMap.get("type"))) {
+            if(!StringUtils.isEmpty(queryMap.get("type"))){
                 queryWrapper.eq("type", queryMap.get("type"));
-            }
-            ;
+            };
 
         }
         return new ResponseBean(baseMapper.selectPageMergeRepairAndPump(page, queryWrapper));
