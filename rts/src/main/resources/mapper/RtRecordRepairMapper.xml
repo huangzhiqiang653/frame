@@ -27,7 +27,8 @@
             r.name AS pepair_User_Name ,
             r.phone_number AS pepair_User_Phone_Number ,
             r.village_code AS pepair_User_Village_Code ,
-            r.town_code AS pepair_User_Town_Code
+            r.town_code AS pepair_User_Town_Code,
+             c.car_no   AS   car_brand_number
             FROM (
                 SELECT * FROM t_rt_record_repair
                 UNION ALL
@@ -37,6 +38,8 @@
             ON a.target_user_id = u.id
             LEFT JOIN t_rt_user AS r
             ON a.operation_user_id = r.id
+            LEFT JOIN t_rt_cars  AS  c
+            ON  a.pump_car_id = c.id
          )  t   ${ew.customSqlSegment}
 
 
