@@ -89,7 +89,6 @@
     </select>
 
 
-
     <update id="repairOvertimeTinspect">
         UPDATE t_rt_record_repair  SET overtime_flag = '1'
         WHERE id IN(
