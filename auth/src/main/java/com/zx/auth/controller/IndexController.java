@@ -48,8 +48,6 @@ public class IndexController {
     private String redisSessionTimeout;
     @Value("${redis.dictionary.timeout}")
     private String redisDictionaryTimeout;
-    @Value("${login.isOpen}")
-    private String loginIsOpen;
     private final static String ticket_ = "ticket_";
 
     /**
@@ -59,10 +57,6 @@ public class IndexController {
      */
     @GetMapping("/toLogin")
     public ResponseBean loginValidate(HttpServletRequest request) {
-        if(!Boolean.valueOf(loginIsOpen)){
-            return new ResponseBean();
-        }
-
         Map<String, Object> map;
         //判断请求是手机端还是pc端发出
         String userAgent = request.getHeader("USER-AGENT");
@@ -182,19 +176,20 @@ public class IndexController {
             return new ResponseBean(CommonConstants.FAIL.getCode(), e.getMessage());
         }
     }
+
     /**
      * 注册新用户
      *
-     *@param requestBean
+     * @param requestBean
      */
     @PostMapping("/register")
-    public ResponseBean toRegister(@RequestBody RequestBean   requestBean) {
-        Map   object= (LinkedHashMap) requestBean.getInfo() ;
+    public ResponseBean toRegister(@RequestBody RequestBean requestBean) {
+        Map object = (LinkedHashMap) requestBean.getInfo();
         if (CollectionUtils.isEmpty(object)) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
         }
-        ZxAccount  account=BaseHzq.convertValue(object.get("account"),ZxAccount.class);
-        ZxUser  user=BaseHzq.convertValue(object.get("user"),ZxUser.class);
+        ZxAccount account = BaseHzq.convertValue(object.get("account"), ZxAccount.class);
+        ZxUser user = BaseHzq.convertValue(object.get("user"), ZxUser.class);
         //验证账号唯一性
         ZxAccount zxAccount2 = new ZxAccount();
         zxAccount2.setAccountName(account.getAccountName());
@@ -207,11 +202,11 @@ public class IndexController {
             e.printStackTrace();
         }
         //注册用户名非空验证
-        if (StringUtils.isEmpty(user.getUserName())||StringUtils.isEmpty(user.getPhoneNumber())){
+        if (StringUtils.isEmpty(user.getUserName()) || StringUtils.isEmpty(user.getPhoneNumber())) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
         }
         //保存用户信息
-         zxUserService.save(user);
+        zxUserService.save(user);
         //验证账号密码非空
         if (StringUtils.isEmpty(account.getAccountName()) || StringUtils.isEmpty(account.getAccountPassword())) {
             return new ResponseBean(CommonConstants.FAIL.getCode(), SystemMessageEnum.ENTITY_IS_NULL.getValue());
