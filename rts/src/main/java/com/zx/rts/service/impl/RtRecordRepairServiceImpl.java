@@ -8,6 +8,7 @@ import com.zx.common.common.RequestBean;
 import com.zx.common.common.ResponseBean;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
+import com.zx.rts.common.RtsCommonConstants;
 import com.zx.rts.entity.RtRecordRepair;
 import com.zx.rts.mapper.RtRecordRepairMapper;
 import com.zx.rts.service.IRtRecordRepairService;
@@ -316,6 +317,35 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
             if(!StringUtils.isEmpty(queryMap.get("type"))){
                 queryWrapper.eq("type", queryMap.get("type"));
             };
+
+
+            //分派状态
+            if (!StringUtils.isEmpty(queryMap.get("assignStatus"))) {
+                if (RtsCommonConstants.ASSIGN_STATUS_ASSIGNED.getCode().equals(queryMap.get("assignStatus"))) {
+                    //已分派
+                    queryWrapper
+                            .isNotNull("operation_user_id").eq("type", RtsCommonConstants.BX_FLAG.getCode())
+                            .or()
+                            .isNotNull("pump_car_id").eq("type", RtsCommonConstants.BC_FLAG.getCode())
+                            .isNull("finish_time");
+
+
+
+                } else if (RtsCommonConstants.ASSIGN_STATUS_FINISH.getCode().equals(queryMap.get("assignStatus"))) {
+                    //已办结
+                    queryWrapper.isNotNull("finish_time");
+
+
+                } else if (RtsCommonConstants.ASSIGN_STATUS_UNASSIGNED.getCode().equals(queryMap.get("assignStatus"))) {
+                    //未分派
+                    queryWrapper
+                            .isNull("operation_user_id").eq("type", RtsCommonConstants.BX_FLAG.getCode())
+                            .or()
+                            .isNull("pump_car_id").eq("type", RtsCommonConstants.BC_FLAG.getCode());
+
+                }
+
+            }
 
         }
         return new ResponseBean(baseMapper.selectPageMergeRepairAndPump(page, queryWrapper));

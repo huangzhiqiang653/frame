@@ -45,6 +45,21 @@ public enum RtsCommonConstants {
 
 
     NOT_LIKE_ROLE("notListRole", "除去当前角色的其他用户"),
+
+    //分派状态 --已分派
+    ASSIGN_STATUS_ASSIGNED("assigned", "已分派"),
+
+    //分派状态 --已结办
+    ASSIGN_STATUS_FINISH("finish", "已办结"),
+
+    //分派状态--未分派
+    ASSIGN_STATUS_UNASSIGNED("unassigned", "未分派"),
+
+    //报修标识
+    BX_FLAG("0", "报修"),
+
+    //报抽标识
+    BC_FLAG("1", "保抽"),
     ;
 
     @EnumValue
