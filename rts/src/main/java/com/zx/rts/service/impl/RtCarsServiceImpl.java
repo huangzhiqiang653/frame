@@ -367,12 +367,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
 
             //所属村居编码
             if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-                String sql = " SELECT a.code FROM t_rt_organization a " +
-                        "  LEFT JOIN t_rt_organization b  " +
-                        "  ON a.parent_code = b.code " +
-                        "  WHERE a.`code`= " + queryMap.get("villageCode") +
-                        "  OR a.parent_code=" + queryMap.get("villageCode") +
-                        "  OR b.parent_code=" + queryMap.get("villageCode");
+                String sql = CommonUtil.getSql(queryMap.get("villageCode").toString());
                 queryWrapper.inSql("village_code", sql);
 
             }
@@ -414,12 +409,7 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         }
 
         if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-            String sql = " SELECT a.code FROM t_rt_organization a " +
-                    "  LEFT JOIN t_rt_organization b  " +
-                    "  ON a.parent_code = b.code " +
-                    "  WHERE a.`code`= " + queryMap.get("villageCode") +
-                    "  OR a.parent_code=" + queryMap.get("villageCode") +
-                    "  OR b.parent_code=" + queryMap.get("villageCode");
+            String sql = CommonUtil.getSql(queryMap.get("villageCode").toString());
             queryWrapper.inSql("village_code", sql);
         }
 

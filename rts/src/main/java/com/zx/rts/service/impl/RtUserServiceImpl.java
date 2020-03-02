@@ -3,10 +3,7 @@ package com.zx.rts.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.zx.common.common.BaseHzq;
-import com.zx.common.common.ExcelUtil;
-import com.zx.common.common.RequestBean;
-import com.zx.common.common.ResponseBean;
+import com.zx.common.common.*;
 import com.zx.common.enums.CommonConstants;
 import com.zx.common.enums.SystemMessageEnum;
 import com.zx.rts.common.RtsCommonConstants;
@@ -69,7 +66,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
     /**
      * 导出excel需使用的表头标记
      */
-    static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号", "姓名","所属区划", "手机号码"};
+    static final String[] INFO_EXPORT_ROWNAME = new String[]{"序号", "姓名", "所属区划", "手机号码"};
 
     /**
      * 公共基础方法
@@ -208,7 +205,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         RtUser rtUser = BaseHzq.convertValue(requestBean.getInfo(), RtUser.class);
         String remmoveType = rtUser.getUserType();//获取需要删除的角色
         String[] array = rtUser.getId().split(",");
-        for (String id : array ) {
+        for (String id : array) {
             RtUser rtUser1 = baseMapper.selectById(id);
             String userType =
                     rtUser1.getUserType()
@@ -367,12 +364,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             //所属村居编码 -2020-2-26
             try {
                 if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-                    String sql = " SELECT a.code FROM t_rt_organization a " +
-                            "  LEFT JOIN t_rt_organization b  " +
-                            "  ON a.parent_code = b.code " +
-                            "  WHERE a.`code`= " + queryMap.get("villageCode") +
-                            "  OR a.parent_code=" + queryMap.get("villageCode") +
-                            "  OR b.parent_code=" + queryMap.get("villageCode");
+                    String sql = CommonUtil.getSql(queryMap.get("villageCode").toString());
                     queryWrapper.inSql("village_code", sql);
                 }
             } catch (Exception e) {
@@ -413,13 +405,13 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
             //姓名
             map.put(INFO_EXPORT_ROWNAME[1], rtUser.getName());
             String[] codes = rtUser.getVillageCode().split(",");
-            String   codeName="";
+            String codeName = "";
             for (String e : codes) {
                 if (!StringUtils.isEmpty(e)) {
-                    RtOrganization  rtOr=organnizaMap.get(e);
-                     codeName = codeName +rtOr.getName();
-                }else{
-                     codeName = codeName +"无";
+                    RtOrganization rtOr = organnizaMap.get(e);
+                    codeName = codeName + rtOr.getName();
+                } else {
+                    codeName = codeName + "无";
                 }
             }
             map.put(INFO_EXPORT_ROWNAME[2], codeName);
@@ -522,12 +514,7 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         }
 
         if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-            String sql = " SELECT a.code FROM t_rt_organization a " +
-                    "  LEFT JOIN t_rt_organization b  " +
-                    "  ON a.parent_code = b.code " +
-                    "  WHERE a.`code`= " + queryMap.get("villageCode") +
-                    "  OR a.parent_code=" + queryMap.get("villageCode") +
-                    "  OR b.parent_code=" + queryMap.get("villageCode");
+            String sql = CommonUtil.getSql(queryMap.get("villageCode").toString());
             queryWrapper.inSql("village_code", sql);
         }
 
