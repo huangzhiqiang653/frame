@@ -522,12 +522,15 @@ public class RtUserServiceImpl extends ServiceImpl<RtUserMapper, RtUser> impleme
         }
 
         if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
-            queryWrapper.eq("village_code", queryMap.get("villageCode"));
+            String sql = " SELECT a.code FROM t_rt_organization a " +
+                    "  LEFT JOIN t_rt_organization b  " +
+                    "  ON a.parent_code = b.code " +
+                    "  WHERE a.`code`= " + queryMap.get("villageCode") +
+                    "  OR a.parent_code=" + queryMap.get("villageCode") +
+                    "  OR b.parent_code=" + queryMap.get("villageCode");
+            queryWrapper.inSql("village_code", sql);
         }
 
-        if (!StringUtils.isEmpty(queryMap.get("townCode"))) {
-            queryWrapper.eq("town_code", queryMap.get("townCode"));
-        }
 
         return new ResponseBean(baseMapper.selectPageByRepair(page, queryWrapper));
     }

@@ -412,6 +412,17 @@ public class RtCarsServiceImpl extends ServiceImpl<RtCarsMapper, RtCars> impleme
         if (!StringUtils.isEmpty(queryMap.get("carNo"))) {
             queryWrapper.like("car_no", queryMap.get("carNo").toString().toUpperCase().trim());
         }
+
+        if (!StringUtils.isEmpty(queryMap.get("villageCode"))) {
+            String sql = " SELECT a.code FROM t_rt_organization a " +
+                    "  LEFT JOIN t_rt_organization b  " +
+                    "  ON a.parent_code = b.code " +
+                    "  WHERE a.`code`= " + queryMap.get("villageCode") +
+                    "  OR a.parent_code=" + queryMap.get("villageCode") +
+                    "  OR b.parent_code=" + queryMap.get("villageCode");
+            queryWrapper.inSql("village_code", sql);
+        }
+
         return new ResponseBean(baseMapper.selectPageByPump(page, queryWrapper));
     }
 }
