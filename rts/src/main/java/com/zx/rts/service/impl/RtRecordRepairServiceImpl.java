@@ -65,6 +65,8 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
                 return getMyPage(requestBean);
             case GET_PAGE_RESPAIR_CAR:
                 return getPageRecordRepairCar(requestBean);
+            case GET_PAGE_PUMP_CAR:
+                return getPageRecordPumpCar(requestBean);
 
             default:
                 return new ResponseBean(
@@ -320,7 +322,8 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
     }
 
     /**
-     * 获取分页维修信息以及该维修车辆信息
+     * 获取分页人员,报修,以及报修车辆信息
+     * 王志成
      *
      * @param requestBean
      * @return
@@ -333,6 +336,36 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
         //车辆维修条件构造
         Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
         QueryWrapper<RtRecordRepair> queryWrapper = new QueryWrapper<>();
+        commonQueryWrapper(queryMap, queryWrapper);
+        return new ResponseBean(baseMapper.selectPageRecordRepairCar(page, queryWrapper));
+    }
+
+    /**
+     * 获取分页人员,报抽,以及报修车辆信息
+     * 王志成
+     *
+     * @param requestBean
+     * @return
+     */
+    public ResponseBean getPageRecordPumpCar(RequestBean requestBean) {
+        Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
+        if (StringUtils.isEmpty(page)) {
+            page = new Page();
+        }
+        //车辆维修条件构造
+        Map queryMap = page.getRecords().size() > 0 ? (HashMap) page.getRecords().get(0) : null;
+        QueryWrapper<RtRecordRepair> queryWrapper = new QueryWrapper<>();
+        commonQueryWrapper(queryMap, queryWrapper);
+        return new ResponseBean(baseMapper.selectPageRecordPumpCar(page, queryWrapper));
+    }
+
+    /**
+     * 封装查询条件
+     *
+     * @param queryWrapper
+     */
+    public void commonQueryWrapper(Map queryMap, QueryWrapper<?> queryWrapper) {
+
         if (!CollectionUtils.isEmpty(queryMap)) {
             //报修人主键
             if (!StringUtils.isEmpty(queryMap.get("submitUserId"))) {
@@ -379,6 +412,10 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
             if (!StringUtils.isEmpty(queryMap.get("repairStatus"))) {
                 queryWrapper.eq("repair_status", queryMap.get("repairStatus"));
             }
+            //状态 0未抽，1已抽
+            if (!StringUtils.isEmpty(queryMap.get("pumpStatus"))) {
+                queryWrapper.eq("pump_status", queryMap.get("pumpStatus"));
+            }
             ;
             //是否超时 0未超时，1已超时
             if (!StringUtils.isEmpty(queryMap.get("overtimeFlag"))) {
@@ -393,7 +430,8 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
             ;
 
         }
-        return new ResponseBean(baseMapper.selectPageRecordRepairCar(page, queryWrapper));
+
+
     }
 
 

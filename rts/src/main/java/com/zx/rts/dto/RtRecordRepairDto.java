@@ -52,14 +52,12 @@ public class RtRecordRepairDto extends RtRecordRepair {
     @ApiModelProperty(value = "维修人所属乡镇编码")
     private String pepairUserTownCode;
 
-
-
-
-
-
     @TableField(exist = false)
     @ApiModelProperty(value = "待修人所用车辆号")
     private String carBrandNumber;
+
+   /* @ApiModelProperty(value = "状态 0未抽，1已抽")
+    private Integer pumpStatus;*/
 
 
 }
