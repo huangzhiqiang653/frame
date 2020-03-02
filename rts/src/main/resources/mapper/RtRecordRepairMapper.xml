@@ -48,16 +48,16 @@
 
         SELECT * FROM (
             SELECT a.*,
-            u.name AS target_User_Name ,
-            u.phone_number AS target_User_Phone_Number ,
-            u.village_code AS target_User_Village_Code ,
-            u.town_code AS target_User_Town_Code,
+            u.name AS pepair_User_Name ,
+            u.phone_number AS pepair_User_Phone_Number ,
+            u.village_code AS pepair_User_Village_Code ,
+            u.town_code AS pepair_User_Town_Code,
             c.car_no   AS   car_brand_number
             FROM (
                 SELECT * FROM t_rt_record_repair
             ) AS a
             LEFT JOIN t_rt_user  AS u
-            ON a.target_user_id = u.id
+            ON a.operation_user_id = u.id
             LEFT JOIN t_rt_cars  AS  c
             ON  a.pump_car_id = c.id
 
@@ -70,16 +70,16 @@
 
         SELECT * FROM (
             SELECT a.*,
-            u.name AS target_User_Name ,
-            u.phone_number AS target_User_Phone_Number ,
-            u.village_code AS target_User_Village_Code ,
-            u.town_code AS target_User_Town_Code,
+            u.name AS pepair_User_Name ,
+            u.phone_number AS pepair_User_Phone_Number ,
+            u.village_code AS pepair_User_Village_Code ,
+            u.town_code AS pepair_User_Town_Code,
             c.car_no   AS   car_brand_number
             FROM (
                 SELECT * FROM t_rt_record_pump
             ) AS a
             LEFT JOIN t_rt_user  AS u
-            ON a.target_user_id = u.id
+            ON a.operation_user_id = u.id
             LEFT JOIN t_rt_cars  AS  c
             ON  a.pump_car_id = c.id
 

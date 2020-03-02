@@ -49,6 +49,11 @@ public class RtRecordPump extends BaseEntityBean {
     @ApiModelProperty(value = "冗余字段1 0未上门，1维修中，2已维修")
     private Integer repairStatus;
 
+    @ApiModelProperty(value = "分派时间")
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date assignTime;
+
     @ApiModelProperty(value = "完成时间")
     @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
@@ -56,7 +61,7 @@ public class RtRecordPump extends BaseEntityBean {
 
 
     @ApiModelProperty(value = "上门时间")
-    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date repairTime;
 

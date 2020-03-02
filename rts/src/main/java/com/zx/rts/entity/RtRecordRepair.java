@@ -42,17 +42,22 @@ public class RtRecordRepair extends BaseEntityBean {
     private String pumpCarId;
 
     @ApiModelProperty(value = "报修时间")
-    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date reportTime;
 
+    @ApiModelProperty(value = "分派时间")
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
+    private Date assignTime;
+
     @ApiModelProperty(value = "上门时间")
-    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date repairTime;
 
     @ApiModelProperty(value = "完成时间")
-    @JsonFormat(shape = JsonFormat.Shape.SCALAR,pattern="yyyy-MM-dd hh:mm:ss",timezone = "GMT+8")
+    @JsonFormat(shape = JsonFormat.Shape.SCALAR, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     private Date finishTime;
 
