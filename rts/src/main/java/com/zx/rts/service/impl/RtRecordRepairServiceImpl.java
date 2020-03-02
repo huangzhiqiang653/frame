@@ -64,8 +64,8 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
                 return getPage(requestBean);
             case GET_MY_PAGE:
                 return getMyPage(requestBean);
-            case GET_PAGE_RESPAIR_CAR:
-                return getPageRecordRepairCar(requestBean);
+            case GET_PAGE_RESPAIR:
+                return getPageRecordRepair(requestBean);
             case GET_PAGE_PUMP_CAR:
                 return getPageRecordPumpCar(requestBean);
 
@@ -358,7 +358,7 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
      * @param requestBean
      * @return
      */
-    public ResponseBean getPageRecordRepairCar(RequestBean requestBean) {
+    public ResponseBean getPageRecordRepair(RequestBean requestBean) {
         Page page = BaseHzq.convertValue(requestBean.getInfo(), Page.class);
         if (StringUtils.isEmpty(page)) {
             page = new Page();
@@ -391,7 +391,7 @@ public class RtRecordRepairServiceImpl extends ServiceImpl<RtRecordRepairMapper,
 
     /**
      * 封装查询条件
-     *
+     * 王志成
      * @param queryWrapper
      */
     public void commonQueryWrapper(Map queryMap, QueryWrapper<?> queryWrapper) {

@@ -28,7 +28,7 @@
             r.phone_number AS pepair_User_Phone_Number ,
             r.village_code AS pepair_User_Village_Code ,
             r.town_code AS pepair_User_Town_Code,
-             c.car_no   AS   car_brand_number
+             c.car_no   AS   pump_car_number
             FROM (
                 SELECT * FROM t_rt_record_repair
                 UNION ALL
@@ -52,7 +52,7 @@
             u.phone_number AS pepair_User_Phone_Number ,
             u.village_code AS pepair_User_Village_Code ,
             u.town_code AS pepair_User_Town_Code,
-            c.car_no   AS   car_brand_number
+            c.car_no   AS   pump_car_number
             FROM (
                 SELECT * FROM t_rt_record_repair
             ) AS a
@@ -74,7 +74,7 @@
             u.phone_number AS pepair_User_Phone_Number ,
             u.village_code AS pepair_User_Village_Code ,
             u.town_code AS pepair_User_Town_Code,
-            c.car_no   AS   car_brand_number
+            c.car_no   AS   pump_car_number
             FROM (
                 SELECT * FROM t_rt_record_pump
             ) AS a

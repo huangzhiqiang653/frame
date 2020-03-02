@@ -54,7 +54,7 @@ public class RtRecordRepairDto extends RtRecordRepair {
 
     @TableField(exist = false)
     @ApiModelProperty(value = "维修人所用车辆号")
-    private String carBrandNumber;
+    private String pumpCarNumber;
 
 
 
